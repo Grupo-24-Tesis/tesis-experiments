@@ -1,0 +1,19 @@
+test_id: EMB-00
+kind: embed
+fixed: {items: {source: auto}}
+groups:
+  - label: ArcFace
+    set: {embed.model: ArcFace}
+    grid: {embed.normalization: [base, ArcFace], embed.align: [true, false]}
+  - label: Facenet512
+    set: {embed.model: Facenet512}
+    grid: {embed.normalization: [base, Facenet], embed.align: [true, false]}
+  - label: Facenet
+    set: {embed.model: Facenet}
+    grid: {embed.normalization: [base, Facenet], embed.align: [true]}
+  - label: SFace
+    set: {embed.model: SFace}
+    grid: {embed.align: [true]}
+  - label: GhostFaceNet
+    set: {embed.model: GhostFaceNet}
+    grid: {embed.align: [true]}

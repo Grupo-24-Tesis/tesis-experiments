@@ -1,0 +1,5 @@
+test_id: SEL-01
+kind: pipeline
+points:
+  - {label: baseline}
+  - {label: "rank by score", stage2.RANKING: score}

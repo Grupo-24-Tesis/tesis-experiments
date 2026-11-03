@@ -1,0 +1,72 @@
+test_id: XV-01
+kind: xvideo
+fixed:
+  xvideo:
+    runs: []
+    report_thresholds:
+    - 0.2
+    - 0.268
+    - 0.3
+    - 0.4
+    - 0.5
+points:
+- label: best B distance_threshold=0.5,top_k=3
+  xvideo.runs:
+  - runs/CLU-04/20261102T163400Z-427b50bb
+  - runs/CLU-04/20261102T163637Z-9ad1ba10
+- label: best B distance_threshold=0.5,top_k=5
+  xvideo.runs:
+  - runs/CLU-04/20261102T163443Z-c0e2903d
+  - runs/CLU-04/20261102T163747Z-c3bd95c7
+- label: best B distance_threshold=0.5,top_k=10
+  xvideo.runs:
+  - runs/CLU-04/20261102T163521Z-79977b07
+  - runs/CLU-04/20261102T163925Z-6c29af25
+- label: best B distance_threshold=0.6,top_k=3
+  xvideo.runs:
+  - runs/CLU-04/20261102T163613Z-b0bc6e82
+  - runs/CLU-04/20261102T164134Z-77df5f92
+- label: best B distance_threshold=0.6,top_k=5
+  xvideo.runs:
+  - runs/CLU-04/20261102T163615Z-b798d40b
+  - runs/CLU-04/20261102T164136Z-1e1ca548
+- label: best B distance_threshold=0.6,top_k=10
+  xvideo.runs:
+  - runs/CLU-04/20261102T163617Z-9f5d0792
+  - runs/CLU-04/20261102T164138Z-cbc2ff42
+- label: best B distance_threshold=0.7,top_k=3
+  xvideo.runs:
+  - runs/CLU-04/20261102T163618Z-037c8642
+  - runs/CLU-04/20261102T164139Z-0b0d6746
+- label: best B distance_threshold=0.7,top_k=5
+  xvideo.runs:
+  - runs/CLU-04/20261102T163620Z-c1bfa034
+  - runs/CLU-04/20261102T164141Z-e0e8ec06
+- label: best B distance_threshold=0.7,top_k=10
+  xvideo.runs:
+  - runs/CLU-04/20261102T163622Z-76d3702c
+  - runs/CLU-04/20261102T164143Z-62b758e7
+- label: best B distance_threshold=0.8,top_k=3
+  xvideo.runs:
+  - runs/CLU-04/20261102T163624Z-1e74ba79
+  - runs/CLU-04/20261102T164144Z-f2011901
+- label: best B distance_threshold=0.8,top_k=5
+  xvideo.runs:
+  - runs/CLU-04/20261102T163625Z-32579c61
+  - runs/CLU-04/20261102T164146Z-9a1814e1
+- label: best B distance_threshold=0.8,top_k=10
+  xvideo.runs:
+  - runs/CLU-04/20261102T163627Z-e7d3ecfc
+  - runs/CLU-04/20261102T164148Z-8c7370a6
+- label: best B distance_threshold=0.9,top_k=3
+  xvideo.runs:
+  - runs/CLU-04/20261102T163629Z-c4bdc32f
+  - runs/CLU-04/20261102T164149Z-89fdbf5a
+- label: best B distance_threshold=0.9,top_k=5
+  xvideo.runs:
+  - runs/CLU-04/20261102T163630Z-93287bb8
+  - runs/CLU-04/20261102T164151Z-97afb558
+- label: best B distance_threshold=0.9,top_k=10
+  xvideo.runs:
+  - runs/CLU-04/20261102T163632Z-89b706fb
+  - runs/CLU-04/20261102T164153Z-8fd8288f

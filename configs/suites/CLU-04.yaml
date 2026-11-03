@@ -1,0 +1,116 @@
+test_id: CLU-04
+kind: cluster
+fixed:
+  embed:
+    model: Facenet
+    align: true
+    normalization: base
+    distance: cosine
+  cluster:
+    algo: agglomerative
+    cannot_link: true
+    agglomerative:
+      linkage: complete
+      distance_threshold: 0.7
+  select:
+    top_k: 5
+groups:
+- label: day 1 best B
+  set:
+    video: videos/Camera_ch6_20261016100358_20261016100614.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-01/20261026T222513Z-076fc503
+  grid:
+    cluster.agglomerative.distance_threshold:
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+    select.top_k:
+    - 3
+    - 5
+    - 10
+- label: day 1 best B no cannot-link
+  set:
+    video: videos/Camera_ch6_20261016100358_20261016100614.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-01/20261026T222513Z-076fc503
+    cluster.cannot_link: false
+  grid:
+    select.top_k:
+    - 5
+- label: day 1 best A
+  set:
+    video: videos/Camera_ch6_20261016100358_20261016100614.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-01/20261026T222257Z-68709474
+  grid:
+    select.top_k:
+    - 5
+- label: other day best B
+  set:
+    video: videos/Camera6_other_day.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T022356Z-b2a826bc
+  grid:
+    cluster.agglomerative.distance_threshold:
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+    select.top_k:
+    - 3
+    - 5
+    - 10
+- label: other day best B no cannot-link
+  set:
+    video: videos/Camera6_other_day.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T022356Z-b2a826bc
+    cluster.cannot_link: false
+  grid:
+    select.top_k:
+    - 5
+- label: other day best A
+  set:
+    video: videos/Camera6_other_day.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T021930Z-9843c9b1
+  grid:
+    select.top_k:
+    - 5
+- label: Camera3 best B
+  set:
+    video: videos/Camera3.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T020358Z-a2fe9242
+  grid:
+    cluster.agglomerative.distance_threshold:
+    - 0.5
+    - 0.6
+    - 0.7
+    - 0.8
+    - 0.9
+    select.top_k:
+    - 3
+    - 5
+    - 10
+- label: Camera3 best B no cannot-link
+  set:
+    video: videos/Camera3.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T020358Z-a2fe9242
+    cluster.cannot_link: false
+  grid:
+    select.top_k:
+    - 5
+- label: Camera3 best A
+  set:
+    video: videos/Camera3.mp4
+    items.source: pipeline
+    items.pipeline_run: runs/E2E-02/20261027T015455Z-e41df1c8
+  grid:
+    select.top_k:
+    - 5

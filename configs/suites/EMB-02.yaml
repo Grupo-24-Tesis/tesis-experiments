@@ -1,0 +1,9 @@
+test_id: EMB-02
+kind: embed
+groups:
+  - label: ArcFace
+    set: {embed.model: ArcFace}
+    grid: {embed.align: [true, false], embed.normalization: [base, ArcFace], embed.distance: [cosine, euclidean_l2]}
+  - label: Facenet
+    set: {embed.model: Facenet}
+    grid: {embed.align: [true, false], embed.normalization: [base, Facenet], embed.distance: [cosine, euclidean_l2]}

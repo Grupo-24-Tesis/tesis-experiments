@@ -1,0 +1,24 @@
+test_id: TRK-04
+kind: pipeline
+fixed:
+  stage1: {MAX_CANDIDATES: 40}
+  stage2: {DETECT_PADDING: 0.8}
+groups:
+  - label: Camera3 weights 0.5/0.5
+    set: {video: videos/Camera3.mp4, tracker.iou_weight: 0.5, tracker.reid_weight: 0.5}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}
+  - label: Camera3 weights 0.3/0.7
+    set: {video: videos/Camera3.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}
+  - label: Camera6 other day weights 0.5/0.5
+    set: {video: videos/Camera6_other_day.mp4, tracker.iou_weight: 0.5, tracker.reid_weight: 0.5}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}
+  - label: Camera6 other day weights 0.3/0.7
+    set: {video: videos/Camera6_other_day.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}
+  - label: Camera6 day 1 weights 0.5/0.5
+    set: {tracker.iou_weight: 0.5, tracker.reid_weight: 0.5}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}
+  - label: Camera6 day 1 weights 0.3/0.7
+    set: {tracker.iou_weight: 0.3, tracker.reid_weight: 0.7}
+    grid: {tracker.min_track_len: [1, 2, 3], tracker.match_thresh: [0.7, 0.8]}

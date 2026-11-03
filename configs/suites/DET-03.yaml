@@ -1,0 +1,5 @@
+test_id: DET-03
+kind: detect
+fixed: {detect: {detector: retinaface}}
+one_at_a_time:
+  gt.min_face_px: [0, 12, 16, 20, 24, 32, 40]

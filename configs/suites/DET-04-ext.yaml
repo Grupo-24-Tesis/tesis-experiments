@@ -1,0 +1,9 @@
+test_id: DET-04
+kind: detect
+fixed: {detect: {detector: pipeline, frame_upscale: 1}}
+one_at_a_time:
+  stage2.DETECT_PADDING: [0.6, 0.8]
+groups:
+  - label: no-upscaling
+    set: {stage2.RETINA_ALLOW_UPSCALING: false}
+    grid: {stage2.DETECT_PADDING: [0.4, 0.6]}

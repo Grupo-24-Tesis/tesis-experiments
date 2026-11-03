@@ -1,0 +1,5 @@
+test_id: ENV-02
+kind: pipeline
+points:
+  - label: baseline
+repeats: 3

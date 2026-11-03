@@ -1,0 +1,9 @@
+test_id: DET-01
+kind: detect
+points:
+  - {label: "retinaface", detect.detector: retinaface}
+  - {label: "retinaface no-upscaling", detect.detector: retinaface, detect.allow_upscaling: false}
+  - {label: "retinaface frame x2", detect.detector: retinaface, detect.frame_upscale: 2}
+  - {label: "mtcnn min20", detect.detector: mtcnn, detect.mtcnn_min_face: 20}
+  - {label: "mtcnn min12", detect.detector: mtcnn, detect.mtcnn_min_face: 12}
+  - {label: "mtcnn frame x2", detect.detector: mtcnn, detect.frame_upscale: 2}

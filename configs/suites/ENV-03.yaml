@@ -1,0 +1,4 @@
+test_id: ENV-03
+kind: pipeline
+points:
+  - label: baseline

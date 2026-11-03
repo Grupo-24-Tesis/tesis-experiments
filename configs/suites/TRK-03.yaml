@@ -1,0 +1,6 @@
+test_id: TRK-03
+kind: pipeline
+points:
+  - {label: baseline}
+one_at_a_time:
+  stage1.MAX_CANDIDATES: [20, 40]

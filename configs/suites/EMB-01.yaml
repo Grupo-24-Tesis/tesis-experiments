@@ -1,0 +1,4 @@
+test_id: EMB-01
+kind: embed
+one_at_a_time:
+  embed.model: [ArcFace, Facenet512, Facenet, SFace, GhostFaceNet]

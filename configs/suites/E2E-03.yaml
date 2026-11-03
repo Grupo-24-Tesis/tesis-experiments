@@ -1,0 +1,16 @@
+test_id: E2E-03
+kind: pipeline
+fixed:
+  tracker: {iou_weight: 0.3, reid_weight: 0.7, min_track_len: 3, match_thresh: 0.7}
+  stage1: {MAX_CANDIDATES: 40}
+  stage2: {DETECT_PADDING: 0.8}
+groups:
+  - label: day 1
+    set: {}
+    grid: {stage2.MIN_FACE_PX: [0, 12]}
+  - label: Camera3
+    set: {video: videos/Camera3.mp4}
+    grid: {stage2.MIN_FACE_PX: [0, 12]}
+  - label: Camera6 other day
+    set: {video: videos/Camera6_other_day.mp4}
+    grid: {stage2.MIN_FACE_PX: [0, 12]}

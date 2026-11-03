@@ -1,0 +1,16 @@
+test_id: CLU-02
+kind: cluster
+fixed:
+  embed: {model: Facenet, align: true, normalization: base, distance: cosine}
+  cluster: {algo: agglomerative, agglomerative: {linkage: complete, distance_threshold: 0.7}}
+groups:
+  - label: "best A"
+    set: {items.source: pipeline, items.pipeline_run: runs/E2E-01/20261026T222257Z-68709474}
+    grid: {select.top_k: [1, 3, 5]}
+  - label: "best B"
+    set: {items.source: pipeline, items.pipeline_run: runs/E2E-01/20261026T222513Z-076fc503}
+    grid: {select.top_k: [1, 3, 5]}
+  - label: "best A ArcFace"
+    set: {items.source: pipeline, items.pipeline_run: runs/E2E-01/20261026T222257Z-68709474, embed.model: ArcFace, embed.align: false,
+          cluster.agglomerative.distance_threshold: 0.05}
+    grid: {select.top_k: [1, 3, 5]}

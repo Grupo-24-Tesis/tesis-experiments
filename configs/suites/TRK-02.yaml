@@ -1,0 +1,15 @@
+test_id: TRK-02
+kind: pipeline
+points:
+  - {label: baseline}
+  - {label: "weights 0.3/0.7", tracker.iou_weight: 0.3, tracker.reid_weight: 0.7}
+  - {label: "weights 0.7/0.3", tracker.iou_weight: 0.7, tracker.reid_weight: 0.3}
+one_at_a_time:
+  tracker.track_high_thresh: [0.4, 0.5]
+  tracker.track_low_thresh: [0.1]
+  tracker.new_track_thresh: [0.5, 0.6]
+  tracker.track_buffer: [15, 60]
+  tracker.match_thresh: [0.6, 0.8]
+  tracker.with_reid: [false]
+  tracker.min_track_len: [2, 3]
+  tracker.gmc_method: [none]

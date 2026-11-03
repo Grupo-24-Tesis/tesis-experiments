@@ -1,0 +1,12 @@
+test_id: E2E-01
+kind: pipeline
+points:
+  - {label: baseline}
+  - {label: "best A", tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 3, tracker.match_thresh: 0.7,
+     stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}
+  - {label: "best B", tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 2, tracker.match_thresh: 0.8,
+     stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}
+  - {label: "best A interval 1.0", tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 3, tracker.match_thresh: 0.7,
+     stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8, stage1.DETECT_INTERVAL_S: 1.0}
+  - {label: "best B interval 1.0", tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 2, tracker.match_thresh: 0.8,
+     stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8, stage1.DETECT_INTERVAL_S: 1.0}

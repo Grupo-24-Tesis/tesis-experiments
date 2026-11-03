@@ -1,0 +1,9 @@
+test_id: E2E-02
+kind: pipeline
+points:
+  - {label: "Camera3 baseline", video: videos/Camera3.mp4}
+  - {label: "Camera3 best A", video: videos/Camera3.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 3, tracker.match_thresh: 0.7, stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}
+  - {label: "Camera3 best B", video: videos/Camera3.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 2, tracker.match_thresh: 0.8, stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}
+  - {label: "Camera6 other day baseline", video: videos/Camera6_other_day.mp4}
+  - {label: "Camera6 other day best A", video: videos/Camera6_other_day.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 3, tracker.match_thresh: 0.7, stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}
+  - {label: "Camera6 other day best B", video: videos/Camera6_other_day.mp4, tracker.iou_weight: 0.3, tracker.reid_weight: 0.7, tracker.min_track_len: 2, tracker.match_thresh: 0.8, stage1.MAX_CANDIDATES: 40, stage2.DETECT_PADDING: 0.8}

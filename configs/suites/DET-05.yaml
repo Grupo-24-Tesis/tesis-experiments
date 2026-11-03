@@ -1,0 +1,16 @@
+test_id: DET-05
+kind: detect
+fixed: {detect: {detector: pipeline, frame_upscale: 1}}
+groups:
+  - label: Camera3 padding
+    set: {video: videos/Camera3.mp4}
+    grid: {stage2.DETECT_PADDING: [0.2, 0.4, 0.8, 1.0]}
+  - label: Camera3 padding 0.8 min face
+    set: {video: videos/Camera3.mp4, stage2.DETECT_PADDING: 0.8}
+    grid: {stage2.MIN_FACE_PX: [12, 16]}
+  - label: Camera6 other day padding
+    set: {video: videos/Camera6_other_day.mp4}
+    grid: {stage2.DETECT_PADDING: [0.2, 0.4, 0.8, 1.0]}
+  - label: Camera6 other day padding 0.8 min face
+    set: {video: videos/Camera6_other_day.mp4, stage2.DETECT_PADDING: 0.8}
+    grid: {stage2.MIN_FACE_PX: [12, 16]}

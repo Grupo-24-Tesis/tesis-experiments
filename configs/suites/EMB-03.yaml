@@ -1,0 +1,9 @@
+test_id: EMB-03
+kind: embed
+groups:
+  - label: ArcFace
+    set: {embed.model: ArcFace}
+    grid: {items.poses: [[frontal, semi], [frontal, semi, profile]]}
+  - label: Facenet
+    set: {embed.model: Facenet}
+    grid: {items.poses: [[frontal, semi], [frontal, semi, profile]]}

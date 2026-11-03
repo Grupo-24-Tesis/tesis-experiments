@@ -1,0 +1,9 @@
+test_id: DET-04
+kind: detect
+fixed: {detect: {detector: pipeline, frame_upscale: 1}}
+points:
+  - {label: baseline}
+one_at_a_time:
+  stage2.DETECT_PADDING: [0.0, 0.1, 0.4]
+  stage2.RETINA_ALLOW_UPSCALING: [false]
+  stage2.MIN_FACE_PX: [12, 16, 20, 24]

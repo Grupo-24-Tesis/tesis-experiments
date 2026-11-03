@@ -1,0 +1,9 @@
+test_id: TRK-01
+kind: pipeline
+points:
+  - {label: baseline}
+one_at_a_time:
+  stage1.DETECT_INTERVAL_S: [0.25, 1.0]
+  stage1.YOLO_CONF: [0.25, 0.4]
+  stage1.YOLO_IOU: [0.5]
+  stage1.YOLO_IMGSZ: [960, 1280]
