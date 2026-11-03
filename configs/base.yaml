@@ -1,0 +1,74 @@
+video: videos/Camera_ch6_20261016100358_20261016100614.mp4
+
+stage1:
+  DETECT_INTERVAL_S: 0.5
+  MAX_CANDIDATES: 10
+  SCENE_CUT_CORRELATION: 0.5
+  YOLO_WEIGHTS: yolo26m.pt
+  YOLO_CONF: 0.1
+  YOLO_IOU: 0.7
+  YOLO_IMGSZ: 640
+
+tracker:
+  tracker_type: tracktrack
+  track_high_thresh: 0.6
+  track_low_thresh: 0.25
+  new_track_thresh: 0.7
+  track_buffer: 30
+  match_thresh: 0.7
+  lost_match_thr: 0.0
+  iou_weight: 0.5
+  reid_weight: 0.5
+  conf_weight: 0.1
+  angle_weight: 0.05
+  penalty_p: 0.2
+  penalty_q: 0.4
+  reduce_step: 0.05
+  tai_thr: 0.55
+  min_track_len: 1
+  gmc_method: sparseOptFlow
+  with_reid: true
+  model: yolo26m-reid.onnx
+
+stage2:
+  FACE_CONFIDENCE_THRESHOLD: 0.92
+  FACE_MARGIN: 0.25
+  OUTPUT_MARGIN_SIDE: 0.8
+  OUTPUT_MARGIN_TOP: 0.6
+  OUTPUT_MARGIN_BOTTOM: 1.8
+  DETECT_PADDING: 0.2
+  RANKING: quality
+  RETINA_ALLOW_UPSCALING: true
+  MIN_FACE_PX: 0
+
+detect:
+  detector: retinaface
+  threshold: 0.5
+  allow_upscaling: true
+  frame_upscale: 1
+
+embed:
+  model: ArcFace
+  align: true
+  normalization: base
+  distance: cosine
+
+select:
+  top_k: 1
+
+cluster:
+  algo: hdbscan
+  cannot_link: false
+  dbscan: {eps: 0.5, min_samples: 2}
+  hdbscan: {min_cluster_size: 2, min_samples: 1, cluster_selection_epsilon: 0.0}
+  agglomerative: {linkage: average, distance_threshold: 0.5}
+
+gt:
+  sample_every_s: 1.0
+  min_face_px: 0
+  min_genuine_gap_s: 2.0
+
+items:
+  source: gt
+  poses: [frontal, semi]
+  pipeline_run: null
