@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiquetado de rostros</title>
+<style>
+  :root { --bg:#16181d; --panel:#1f2229; --line:#2e323c; --text:#e6e8ec; --muted:#9aa1ad;
+          --accent:#5b9dff; --ok:#3fb27f; --warn:#e0a63a; --bad:#e2595b; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:13px/1.4 system-ui, sans-serif; }
+  header { display:flex; gap:12px; align-items:center; padding:8px 14px; border-bottom:1px solid var(--line); }
+  header h1 { font-size:14px; margin:0 12px 0 0; }
+  .tab { background:none; border:1px solid var(--line); color:var(--muted); padding:4px 10px; border-radius:6px; cursor:pointer; }
+  .tab.on { color:var(--text); border-color:var(--accent); }
+  #status { margin-left:auto; color:var(--muted); }
+  main { display:flex; gap:12px; padding:12px; }
+  #stage { flex:1; min-width:0; }
+  #canvasWrap { position:relative; background:#000; border:1px solid var(--line); border-radius:6px; overflow:auto; }
+  canvas { display:block; cursor:crosshair; }
+  #zoom { margin-top:8px; display:flex; gap:12px; align-items:flex-start; }
+  #zoomCanvas { border:1px solid var(--line); border-radius:6px; background:#000; }
+  aside { width:360px; flex:none; display:flex; flex-direction:column; gap:10px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:10px; }
+  .card h2 { font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin:0 0 8px; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin:4px 0; }
+  button.opt { background:#2a2e37; color:var(--text); border:1px solid var(--line); border-radius:5px; padding:3px 8px; cursor:pointer; }
+  button.opt.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.primary { background:var(--ok); border:none; color:#fff; padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:600; }
+  select, input[type=text] { background:#2a2e37; color:var(--text); border:1px solid var(--line); border-radius:5px; padding:3px 6px; }
+  .ids { display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; max-height:280px; overflow:auto; }
+  .idc { border:2px solid transparent; border-radius:6px; padding:3px; text-align:center; cursor:pointer; background:#2a2e37; }
+  .idc.on { border-color:var(--accent); }
+  .idc canvas { width:48px; height:48px; background:#000; border-radius:4px; cursor:pointer; margin:1px; }
+  .idc.absent { opacity:.55; }
+  .ids { grid-template-columns:repeat(2, 1fr); max-height:420px; }
+  #video { max-width:520px; }
+  .muted { color:var(--muted); }
+  .err { color:var(--bad); min-height:1.2em; }
+  .bar { height:6px; background:#2a2e37; border-radius:3px; overflow:hidden; }
+  .bar > div { height:100%; background:var(--ok); }
+  kbd { background:#2a2e37; border:1px solid var(--line); border-radius:3px; padding:0 4px; font-size:11px; }
+  #crops { display:none; padding:12px; }
+  .cgrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; }
+  .citem { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px; }
+  .citem img { width:100%; height:150px; object-fit:contain; background:#000; border-radius:4px; }
+  .citem.done { border-color:var(--ok); }
+  .citem.saving { opacity:.5; pointer-events:none; }
+  button.opt.sug { border:1px dashed var(--warn); color:var(--warn); }
+  .clabel b { color:var(--ok); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Etiquetado de rostros</h1>
+  <select id="video" title="Video"></select>
+  <button class="tab on" id="tabFrames">Fotogramas (GT-02)</button>
+  <button class="tab" id="tabCrops">Recortes del pipeline (GT-03)</button>
+  <span id="status"></span>
+</header>
+
+<main id="framesView">
+  <section id="stage">
+    <div class="row">
+      <button class="opt" id="prev">&larr; Anterior</button>
+      <button class="opt" id="next">Siguiente &rarr;</button>
+      <button class="opt" id="nextUnrev">Siguiente sin revisar (U)</button>
+      <span id="frameInfo" class="muted"></span>
+      <label class="muted" style="margin-left:auto">Escala
+        <select id="scale"><option>1</option><option selected>1.5</option><option>2</option></select></label>
+    </div>
+    <div id="canvasWrap"><canvas id="cv"></canvas></div>
+    <div id="zoom"><canvas id="zoomCanvas" width="200" height="200"></canvas>
+      <div class="muted" id="zoomInfo">Selecciona un rostro para verlo ampliado.</div></div>
+  </section>
+
+  <aside>
+    <div class="card">
+      <h2>Progreso</h2>
+      <div class="bar"><div id="progBar" style="width:0"></div></div>
+      <div class="muted" id="progText"></div>
+    </div>
+    <div class="card">
+      <h2>Rostro seleccionado</h2>
+      <div id="faceEmpty" class="muted">Haz clic en una caja o arrastra sobre la imagen para dibujar una.</div>
+      <div id="faceForm" style="display:none">
+        <div class="row">Identidad
+          <select id="idSel"></select>
+          <button class="opt" id="newId">Nueva (N)</button>
+        </div>
+        <div class="row">Pose
+          <button class="opt" data-pose="frontal">Frontal (F)</button>
+          <button class="opt" data-pose="semi">Semifrontal (S)</button>
+          <button class="opt" data-pose="profile">Perfil (P)</button>
+          <button class="opt" data-pose="back">Espalda (B)</button>
+        </div>
+        <div class="row">Oclusión
+          <button class="opt" data-occ="none">Ninguna</button>
+          <button class="opt" data-occ="partial">Parcial</button>
+          <button class="opt" data-occ="total">Total</button>
+          <span class="muted">(O cambia)</span>
+        </div>
+        <div class="row">
+          <button class="opt" id="ignoreBtn">Ignorar (I)</button>
+          <button class="opt" id="delBtn">Borrar (Supr)</button>
+          <span class="muted" id="faceMeta"></span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="row"><button class="primary" id="saveBtn">Marcar revisado y seguir (Enter)</button></div>
+      <div class="err" id="err"></div>
+    </div>
+    <div class="card">
+      <h2 id="peopleTitle">Personas</h2>
+      <div class="muted" id="peopleHelp"></div>
+      <div class="ids" id="ids"></div>
+      <div class="row"><input type="text" id="idNotes" placeholder="Notas sobre la persona seleccionada (ropa, rol)" style="flex:1"></div>
+      <div class="row"><label class="muted"><input type="checkbox" id="idUnsure"> No estoy seguro de si esta persona aparece también en otro video de esta cámara. Sus rostros se siguen usando dentro de cada video, pero quedan fuera de la comparación entre días.</label></div>
+    </div>
+    <div class="card muted">
+      <kbd>&larr;</kbd>/<kbd>&rarr;</kbd> fotogramas, <kbd>Tab</kbd> siguiente rostro, <kbd>1</kbd> a <kbd>9</kbd> identidad,
+      <kbd>N</kbd> nueva identidad, <kbd>F</kbd>/<kbd>S</kbd>/<kbd>P</kbd>/<kbd>B</kbd> pose, <kbd>O</kbd> oclusión,
+      <kbd>I</kbd> ignorar, <kbd>Supr</kbd> borrar, <kbd>Enter</kbd> marcar revisado. Arrastra dentro de una caja seleccionada para moverla y desde una esquina para cambiar su tamaño.
+      Línea amarilla discontinua: propuesta automática sin confirmar. "?": identidad sugerida a partir del fotograma anterior.
+    </div>
+  </aside>
+</main>
+
+<section id="crops">
+  <div class="row"><span class="muted" id="cropInfo"></span>
+    <label class="muted"><input type="checkbox" id="onlyTodo" checked> solo sin etiquetar</label>
+    <button class="opt" id="refreshCrops">Ocultar los ya etiquetados</button>
+    <button class="opt" id="acceptSug">Aceptar todas las sugerencias visibles</button></div>
+  <div class="row muted">Las sugerencias salen de tus etiquetas de fotogramas (misma caja de rostro a menos de 8 fotogramas) o de otros recortes de la misma pista. Borde amarillo discontinuo: sugerencia todavía sin guardar. Azul: etiqueta guardada (la tarjeta queda con borde verde). Las tarjetas etiquetadas se quedan en su sitio hasta que pulses "Ocultar los ya etiquetados" o cambies el filtro.</div>
+  <div class="cgrid" id="cgrid"></div>
+</section>
+
+<script>
+const $ = s => document.querySelector(s);
+const cv = $("#cv"), ctx = cv.getContext("2d");
+const zc = $("#zoomCanvas"), zctx = zc.getContext("2d");
+let doc, ids, refs = {}, crops, keys = [], cur = 0, sel = -1, img = new Image(), scale = 1.5, dirty = false, V = null, VID = {};
+let drag = null;
+const POSES = {f:"frontal", s:"semi", p:"profile", b:"back"};
+const OCC = ["none", "partial", "total"];
+const thumbCache = {};
+
+function color(id) {
+  if (!id) return "#e0a63a";
+  let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return `hsl(${(h * 137) % 360} 80% 60%)`;
+}
+function iou(a, b) {
+  const ix = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+  const iy = Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+  const i = ix * iy, u = (a[2]-a[0])*(a[3]-a[1]) + (b[2]-b[0])*(b[3]-b[1]) - i;
+  return u > 0 ? i / u : 0;
+}
+async function api(path, body) {
+  const r = await fetch(path, body === undefined ? {} : {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  const j = await r.json(); if (!r.ok) throw new Error(j.error || r.statusText); return j;
+}
+function frame() { return doc.frames[keys[cur]]; }
+function status(t) { $("#status").textContent = t; }
+
+function safeGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function safeSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function pad(k) { return String(k).padStart(6, "0"); }
+
+async function loadVideos() {
+  const vs = (await api("/api/videos")).videos;
+  $("#video").innerHTML = vs.map(v => `<option value="${v.stem}">${v.label}: ${v.reviewed}/${v.frames} fotogramas, ${v.crops_labeled}/${v.crops} recortes</option>`).join("");
+  return vs;
+}
+function camOf(p) { return p.camera || "cam6"; }
+function people() { return ids.identities.filter(p => camOf(p) === VID.camera); }
+function peopleHelp(vs) {
+  const same = vs.filter(v => v.camera === VID.camera && v.stem !== V).map(v => v.label);
+  $("#peopleTitle").textContent = `Personas de la ${VID.camera === "cam3" ? "cámara 3" : "cámara 6"}`;
+  $("#peopleHelp").textContent = (same.length
+    ? `Compartidas con ${same.join(", ")}: usa el mismo identificador solo si estás seguro de que es la misma persona; si no, pulsa N y marca "No estoy seguro". `
+    : "Solo este video usa estos identificadores: repite el identificador cuando la misma persona vuelve a aparecer y pulsa N para alguien nuevo. ")
+    + "Las personas de otras cámaras no se muestran y nunca se comparan con estas.";
+}
+async function loadIds() { const r = await api("/api/identities"); ids = r.identities; refs = r.references || {}; }
+
+async function load(chosen) {
+  const vs = await loadVideos();
+  const want = chosen || new URLSearchParams(location.search).get("v") || safeGet("video");
+  VID = vs.find(v => v.stem === want) || vs[0]; V = VID.stem; peopleHelp(vs);
+  $("#video").value = V;
+  await loadIds();
+  const st = await api(`/api/state/${V}`);
+  doc = st.frames; crops = st.crops;
+  keys = Object.keys(doc.frames).sort((a, b) => +a - +b);
+  const firstTodo = keys.findIndex(k => !doc.frames[k].reviewed);
+  cur = firstTodo >= 0 ? firstTodo : 0;
+  showFrame();
+}
+
+function suggest(fr) {
+  if (fr.reviewed) return;
+  for (let j = cur - 1; j >= 0; j--) {
+    const prev = doc.frames[keys[j]];
+    if (!prev.reviewed) continue;
+    for (const f of fr.faces) {
+      if (f.identity || f.ignore) continue;
+      let best = null, bo = 0.2;
+      for (const p of prev.faces) { const o = iou(f.box, p.box); if (o > bo && p.identity) { bo = o; best = p; } }
+      if (best) { f.identity = best.identity; f.pose = f.pose || best.pose; f.occlusion = f.occlusion || best.occlusion; f.suggested = true; }
+    }
+    return;
+  }
+}
+
+function showFrame() {
+  sel = -1; dirty = false; $("#err").textContent = "";
+  const fr = frame(); suggest(fr);
+  img = new Image();
+  img.onload = () => { cv.width = img.width * scale; cv.height = img.height * scale; draw(); };
+  img.src = `/frames/${V}/${pad(keys[cur])}.jpg`;
+  $("#frameInfo").textContent = `Fotograma ${keys[cur]}, t=${fr.time_s} s, ${cur + 1}/${keys.length}, ${fr.reviewed ? "revisado" : "SIN revisar"}`;
+  progress(); renderForm(); renderIds();
+}
+
+function progress() {
+  const done = keys.filter(k => doc.frames[k].reviewed).length;
+  const boxes = keys.reduce((n, k) => n + doc.frames[k].faces.length, 0);
+  $("#progBar").style.width = `${100 * done / keys.length}%`;
+  $("#progText").textContent = `${done}/${keys.length} fotogramas revisados, ${boxes} cajas, ${people().length} personas en esta cámara`;
+}
+
+function draw() {
+  ctx.drawImage(img, 0, 0, cv.width, cv.height);
+  frame().faces.forEach((f, i) => {
+    const [x1, y1, x2, y2] = f.box.map(v => v * scale);
+    ctx.lineWidth = i === sel ? 3 : 2;
+    ctx.setLineDash(f.source === "auto" && !f.identity ? [5, 4] : []);
+    ctx.strokeStyle = f.ignore ? "#777" : color(f.identity);
+    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    ctx.setLineDash([]);
+    const label = f.ignore ? "ignorada" : `${f.identity || "?"}${f.suggested ? "?" : ""}${f.pose ? " " + f.pose[0] : ""}${f.occlusion && f.occlusion !== "none" ? " ocl:" + f.occlusion[0] : ""}`;
+    ctx.font = "12px system-ui"; const w = ctx.measureText(label).width + 6;
+    ctx.fillStyle = "rgba(0,0,0,.7)"; ctx.fillRect(x1, y1 - 16, w, 16);
+    ctx.fillStyle = f.ignore ? "#aaa" : color(f.identity); ctx.fillText(label, x1 + 3, y1 - 4);
+    if (i === sel) for (const [cx, cy] of [[x1,y1],[x2,y1],[x1,y2],[x2,y2]]) { ctx.fillStyle = "#fff"; ctx.fillRect(cx - 3, cy - 3, 6, 6); }
+  });
+  drawZoom();
+}
+
+function drawZoom() {
+  zctx.fillStyle = "#000"; zctx.fillRect(0, 0, zc.width, zc.height);
+  if (sel < 0) { $("#zoomInfo").textContent = "Selecciona un rostro para verlo ampliado."; return; }
+  const [x1, y1, x2, y2] = frame().faces[sel].box;
+  const w = x2 - x1, h = y2 - y1, m = Math.max(w, h) * 0.6;
+  const sx = Math.max(0, x1 - m), sy = Math.max(0, y1 - m), sw = Math.min(img.width - sx, w + 2 * m), sh = Math.min(img.height - sy, h + 2 * m);
+  const k = Math.min(zc.width / sw, zc.height / sh);
+  zctx.imageSmoothingEnabled = true;
+  zctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw * k, sh * k);
+  zctx.strokeStyle = "#fff"; zctx.strokeRect((x1 - sx) * k, (y1 - sy) * k, w * k, h * k);
+  $("#zoomInfo").textContent = `Caja de ${w.toFixed(0)} x ${h.toFixed(0)} px (lado menor ${Math.min(w, h).toFixed(0)} px)` +
+    (frame().faces[sel].auto_sources ? `, automática: ${JSON.stringify(frame().faces[sel].auto_sources)}` : "");
+}
+
+function renderForm() {
+  const f = sel >= 0 ? frame().faces[sel] : null;
+  $("#faceEmpty").style.display = f ? "none" : ""; $("#faceForm").style.display = f ? "" : "none";
+  if (!f) return;
+  const s = $("#idSel"); s.innerHTML = `<option value="">identidad</option>` +
+    people().map((p, i) => `<option value="${p.id}">${i < 9 ? (i + 1) + ". " : ""}${p.id}${p.notes ? " · " + p.notes : ""}</option>`).join("");
+  s.value = f.identity || "";
+  document.querySelectorAll("[data-pose]").forEach(b => b.classList.toggle("on", b.dataset.pose === f.pose));
+  document.querySelectorAll("[data-occ]").forEach(b => b.classList.toggle("on", b.dataset.occ === f.occlusion));
+  $("#ignoreBtn").classList.toggle("on", !!f.ignore);
+  $("#faceMeta").textContent = f.suggested ? "identidad sugerida, confirmar" : (f.source === "auto" ? "propuesta automática" : "");
+}
+
+function renderIds() {
+  const counts = {};
+  keys.forEach(k => doc.frames[k].faces.forEach(f => { if (f.identity) counts[f.identity] = (counts[f.identity] || 0) + 1; }));
+  const curId = sel >= 0 ? frame().faces[sel].identity : null;
+  $("#ids").innerHTML = people().map((p, i) => {
+    const own = refs[p.id] || [];
+    const local = own.length ? [] : localRef(p.id);
+    const thumbs = [...own, ...local].slice(0, 4).map(r =>
+      `<canvas width="48" height="48" title="${r.video}, fotograma ${r.frame}" data-v="${r.video}" data-f="${r.frame}" data-b="${r.box.join(",")}"></canvas>`).join("");
+    return `<div class="idc ${p.id === curId ? "on" : ""} ${counts[p.id] ? "" : "absent"}" data-id="${p.id}">${thumbs || '<div class="muted">sin rostro todavía</div>'}
+     <div>${i < 9 ? (i + 1) + ". " : ""}<b>${p.id}</b>${p.uncertain ? ' <span style="color:var(--warn)">no seguro</span>' : ""}${p.notes ? ' <span class="muted">' + p.notes + '</span>' : ""}</div>
+     <div class="muted">${counts[p.id] || 0} cajas aquí, en ${new Set(own.map(r => r.video)).size} videos</div></div>`;
+  }).join("");
+  document.querySelectorAll("#ids canvas[data-v]").forEach(drawThumb);
+  const p = ids.identities.find(p => p.id === curId);
+  $("#idNotes").value = p ? (p.notes || "") : ""; $("#idNotes").disabled = !p;
+  $("#idUnsure").checked = !!(p && p.uncertain); $("#idUnsure").disabled = !p;
+}
+
+function localRef(id) {
+  for (const k of keys) { const f = doc.frames[k].faces.find(f => f.identity === id && !f.suggested && !f.ignore); if (f) return [{video: V, frame: +k, box: f.box}]; }
+  return [];
+}
+function drawThumb(c) {
+  const b = c.dataset.b.split(",").map(Number), url = `/frames/${c.dataset.v}/${pad(c.dataset.f)}.jpg`;
+  const paint = im => {
+    const w = b[2] - b[0], h = b[3] - b[1], m = Math.max(w, h) * 0.3, s = Math.max(w, h) + 2 * m;
+    const g = c.getContext("2d"); g.drawImage(im, b[0] + w / 2 - s / 2, b[1] + h / 2 - s / 2, s, s, 0, 0, c.width, c.height);
+  };
+  if (thumbCache[url]?.complete) return paint(thumbCache[url]);
+  const im = thumbCache[url] = new Image(); im.onload = () => paint(im); im.src = url;
+}
+
+function face() { return sel >= 0 ? frame().faces[sel] : null; }
+function touch() { dirty = true; const f = face(); if (f) { f.suggested = false; } draw(); renderForm(); }
+function setId(id) { const f = face(); if (!f) return; f.identity = id || null; touch(); renderIds(); }
+
+async function newIdentity() {
+  await loadIds();
+  const pre = VID.id_prefix || "P";
+  const n = 1 + Math.max(0, ...ids.identities.filter(p => p.id.startsWith(pre) && /^\d+$/.test(p.id.slice(pre.length))).map(p => +p.id.slice(pre.length)));
+  const id = `${pre}${String(n).padStart(2, "0")}`;
+  ids.identities.push({id, notes:"", camera: VID.camera}); await api("/api/identities", ids); setId(id);
+}
+
+async function saveFrame(reviewed) {
+  const fr = frame(); const body = {...fr, reviewed: reviewed || fr.reviewed};
+  try {
+    const r = await api(`/api/frame/${V}/${keys[cur]}`, {frame: body});
+    doc.frames[keys[cur]] = r.frame; dirty = false; $("#err").textContent = ""; status(`fotograma ${keys[cur]} guardado`); return true;
+  } catch (e) { $("#err").textContent = e.message; return false; }
+}
+async function go(i) { if (i < 0 || i >= keys.length) return; if (dirty) await saveFrame(false); cur = i; showFrame(); }
+
+function pt(e) { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / scale, (e.clientY - r.top) / scale]; }
+cv.addEventListener("mousedown", e => {
+  const [x, y] = pt(e), faces = frame().faces, tol = 6 / scale;
+  if (sel >= 0) {
+    const b = faces[sel].box, corners = [[0,1],[2,1],[0,3],[2,3]];
+    for (const [cx, cy] of corners) if (Math.abs(x - b[cx]) < tol && Math.abs(y - b[cy]) < tol) { drag = {mode:"resize", cx, cy}; return; }
+  }
+  const hit = faces.map((f, i) => [f, i]).filter(([f]) => x >= f.box[0] && x <= f.box[2] && y >= f.box[1] && y <= f.box[3])
+                   .sort((a, b) => (a[0].box[2]-a[0].box[0]) - (b[0].box[2]-b[0].box[0]))[0];
+  if (hit) { sel = hit[1]; drag = {mode:"move", x, y, box:[...faces[sel].box]}; draw(); renderForm(); renderIds(); return; }
+  faces.push({box:[x, y, x, y], identity:null, pose:null, occlusion:null, ignore:false, source:"human"});
+  sel = faces.length - 1; drag = {mode:"new", x, y}; renderForm();
+});
+cv.addEventListener("mousemove", e => {
+  if (!drag) return; const [x, y] = pt(e), b = face().box;
+  if (drag.mode === "new") face().box = [Math.min(drag.x, x), Math.min(drag.y, y), Math.max(drag.x, x), Math.max(drag.y, y)];
+  else if (drag.mode === "move") { const dx = x - drag.x, dy = y - drag.y; face().box = [drag.box[0]+dx, drag.box[1]+dy, drag.box[2]+dx, drag.box[3]+dy]; }
+  else { b[drag.cx] = x; b[drag.cy] = y; }
+  dirty = true; draw();
+});
+window.addEventListener("mouseup", () => {
+  if (!drag) return; const f = face();
+  if (f) { const b = f.box; f.box = [Math.min(b[0], b[2]), Math.min(b[1], b[3]), Math.max(b[0], b[2]), Math.max(b[1], b[3])].map(v => Math.round(v * 10) / 10);
+    if (drag.mode === "new" && (f.box[2] - f.box[0] < 3 || f.box[3] - f.box[1] < 3)) { frame().faces.splice(sel, 1); sel = -1; } }
+  drag = null; draw(); renderForm(); renderIds();
+});
+
+$("#prev").onclick = () => go(cur - 1);
+$("#next").onclick = () => go(cur + 1);
+$("#nextUnrev").onclick = () => { const i = keys.findIndex((k, j) => j > cur && !doc.frames[k].reviewed); if (i >= 0) go(i); };
+$("#scale").onchange = e => { scale = +e.target.value; showFrame(); };
+$("#idSel").onchange = e => setId(e.target.value);
+$("#newId").onclick = newIdentity;
+document.querySelectorAll("[data-pose]").forEach(b => b.onclick = () => { if (face()) { face().pose = b.dataset.pose; touch(); } });
+document.querySelectorAll("[data-occ]").forEach(b => b.onclick = () => { if (face()) { face().occlusion = b.dataset.occ; touch(); } });
+$("#ignoreBtn").onclick = () => { if (face()) { face().ignore = !face().ignore; touch(); } };
+$("#delBtn").onclick = () => { if (sel >= 0) { frame().faces.splice(sel, 1); sel = -1; dirty = true; draw(); renderForm(); } };
+$("#saveBtn").onclick = async () => { if (await saveFrame(true)) { progress(); loadIds().then(renderIds).catch(() => {}); const i = keys.findIndex((k, j) => j > cur && !doc.frames[k].reviewed); go(i >= 0 ? i : Math.min(cur + 1, keys.length - 1)); } };
+$("#ids").onclick = e => { const c = e.target.closest(".idc"); if (c) setId(c.dataset.id); };
+$("#idNotes").onchange = async e => { const f = face(); if (!f || !f.identity) return; await loadIds(); const p = ids.identities.find(p => p.id === f.identity); if (p) { p.notes = e.target.value; await api("/api/identities", ids); renderForm(); renderIds(); } };
+$("#idUnsure").onchange = async e => { const f = face(); if (!f || !f.identity) return; await loadIds(); const p = ids.identities.find(p => p.id === f.identity); if (p) { p.uncertain = e.target.checked; await api("/api/identities", ids); renderIds(); } };
+$("#video").onchange = async e => {
+  if (dirty) await saveFrame(false);
+  safeSet("video", e.target.value); history.replaceState(null, "", `?v=${encodeURIComponent(e.target.value)}`);
+  await load(e.target.value); if ($("#crops").style.display === "block") renderCrops();
+};
+
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  const k = e.key.toLowerCase();
+  if (e.key === "ArrowLeft") return go(cur - 1);
+  if (e.key === "ArrowRight") return go(cur + 1);
+  if (e.key === "Enter") { e.preventDefault(); return $("#saveBtn").click(); }
+  if (e.key === "Tab") { e.preventDefault(); const n = frame().faces.length; if (n) { sel = (sel + 1) % n; draw(); renderForm(); renderIds(); } return; }
+  if (k === "u") return $("#nextUnrev").click();
+  if (!face()) return;
+  if (/^[1-9]$/.test(e.key)) { const p = people()[+e.key - 1]; if (p) setId(p.id); return; }
+  if (k === "n") return newIdentity();
+  if (POSES[k]) { face().pose = POSES[k]; return touch(); }
+  if (k === "o") { face().occlusion = OCC[(OCC.indexOf(face().occlusion) + 1) % 3]; return touch(); }
+  if (k === "i") { face().ignore = !face().ignore; return touch(); }
+  if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); $("#delBtn").click(); }
+});
+
+function trackOf(c) { return (c.source || "").split(" track ")[1] && c.source; }
+function cropSuggest(key, c) {
+  let best = null, bo = 0.3;
+  for (const k of keys) {
+    const fr = doc.frames[k]; if (!fr.reviewed || Math.abs(+k - c.frame_idx) > 8) continue;
+    for (const f of fr.faces) if (f.identity && !f.ignore) { const o = iou(f.box, c.box); if (o > bo) { bo = o; best = f.identity; } }
+  }
+  if (best) return best;
+  const t = trackOf(c), votes = {};
+  if (t) for (const [k2, o] of Object.entries(crops.items)) if (k2 !== key && o.source === t && o.label && o.label !== "unknown") votes[o.label] = (votes[o.label] || 0) + 1;
+  const top = Object.entries(votes).sort((a, b) => b[1] - a[1])[0];
+  return top ? top[0] : (c.suggested || null);
+}
+function idsHere() {
+  const here = new Set();
+  keys.forEach(k => doc.frames[k].faces.forEach(f => { if (f.identity && !f.ignore) here.add(f.identity); }));
+  Object.values(crops.items || {}).forEach(c => { if (c.label && people().some(p => p.id === c.label)) here.add(c.label); });
+  return people().map(p => p.id).filter(id => here.has(id));
+}
+function cropLabelText(c, sug) {
+  return c.label ? `guardado: <b>${c.label}</b>` : (sug ? `sugerido: ${sug}` : "sin sugerencia");
+}
+function cropCounts() {
+  const items = Object.values(crops.items || {}), done = items.filter(c => c.label).length;
+  $("#cropInfo").textContent = `${done}/${items.length} recortes etiquetados, se muestran ${$("#cgrid").children.length}`;
+}
+function renderCrops() {
+  const items = Object.entries(crops.items || {}).sort((a, b) => (a[1].frame_idx ?? 0) - (b[1].frame_idx ?? 0));
+  const shown = $("#onlyTodo").checked ? items.filter(([, c]) => !c.label) : items;
+  const here = idsHere();
+  $("#cgrid").innerHTML = shown.map(([key, c]) => {
+    const sug = c.label ? null : cropSuggest(key, c);
+    const opts = [...new Set([...here, ...(sug ? [sug] : []), ...(c.label ? [c.label] : [])])].concat(["not_a_face", "unknown"]);
+    const others = people().map(p => p.id).filter(id => !opts.includes(id));
+    return `<div class="citem ${c.label ? "done" : ""}" data-card="${key}"><img loading="lazy" src="/crops/${V}/${key}.jpg">
+    <div class="muted">fotograma ${c.frame_idx ?? "?"}, ${c.source || ""}</div>
+    <div class="muted clabel">${cropLabelText(c, sug)}</div>
+    <div class="row">${opts.map(o => `<button class="opt ${c.label === o ? "on" : ""} ${sug === o ? "sug" : ""}" data-crop="${key}" data-label="${o}">${o}</button>`).join("")}
+    ${others.length ? `<select data-crop-sel="${key}"><option value="">otra</option>${others.map(o => `<option>${o}</option>`).join("")}</select>` : ""}</div></div>`;
+  }).join("");
+  cropCounts();
+}
+async function saveCrop(key, label, card) {
+  if (card.classList.contains("saving")) return;
+  card.classList.add("saving");
+  try {
+    await api(`/api/crop/${V}/${key}`, {label});
+    crops.items[key].label = label;
+    card.querySelectorAll("[data-crop]").forEach(x => { x.classList.toggle("on", x.dataset.label === label); x.classList.remove("sug"); });
+    card.querySelector(".clabel").innerHTML = cropLabelText(crops.items[key]);
+    const s = card.querySelector("[data-crop-sel]"); if (s && s.value !== label) s.value = "";
+    card.classList.add("done"); status(`guardado ${label} en el fotograma ${crops.items[key].frame_idx}`);
+  } catch (err) { status("no se pudo guardar: " + err.message); }
+  card.classList.remove("saving"); cropCounts();
+}
+$("#cgrid").onclick = e => {
+  const b = e.target.closest("button[data-crop]"); if (!b) return;
+  saveCrop(b.dataset.crop, b.dataset.label, b.closest(".citem"));
+};
+$("#cgrid").onchange = e => {
+  const s = e.target.closest("[data-crop-sel]"); if (!s || !s.value) return;
+  saveCrop(s.dataset.cropSel, s.value, s.closest(".citem"));
+};
+$("#acceptSug").onclick = async () => {
+  const cards = [...document.querySelectorAll("#cgrid .citem")].filter(c => !c.classList.contains("done") && c.querySelector("button.sug"));
+  if (!cards.length) return status("no hay sugerencias sin guardar en pantalla");
+  if (!confirm(`¿Guardar la etiqueta sugerida en los ${cards.length} recortes visibles? Corrige antes las sugerencias equivocadas; después puedes cambiar cualquier recorte.`)) return;
+  let n = 0;
+  for (const card of cards) { const b = card.querySelector("button.sug"); if (b) { await saveCrop(b.dataset.crop, b.dataset.label, card); n++; } }
+  status(`${n} sugerencias aceptadas`);
+};
+$("#onlyTodo").onchange = renderCrops;
+$("#refreshCrops").onclick = renderCrops;
+$("#tabFrames").onclick = () => { $("#framesView").style.display = ""; $("#crops").style.display = "none"; $("#tabFrames").classList.add("on"); $("#tabCrops").classList.remove("on"); };
+$("#tabCrops").onclick = () => { $("#framesView").style.display = "none"; $("#crops").style.display = "block"; $("#tabCrops").classList.add("on"); $("#tabFrames").classList.remove("on"); renderCrops(); };
+window.addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); } });
+document.addEventListener("click", e => { if (e.target.tagName === "BUTTON") e.target.blur(); });
+
+load().catch(e => status("no se pudo cargar: " + e.message));
+</script>
+</body>
+</html>
