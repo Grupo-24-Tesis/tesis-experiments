@@ -1,0 +1,156 @@
+- id: D001
+  date: "2026-11-02"
+  title: Se descarta el reconocimiento de la misma persona entre videos o días
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras revisar XV-01
+  evidence_test: XV-01
+  evidence_label: "best B distance_threshold=0.7,top_k=5"
+  sections:
+    - section: Decisión
+      items:
+        - item: Qué se descarta
+          text: "Reconocer a la misma persona entre videos o días (caso de uso B): el pipeline no envía embeddings de personas al backend y el backend no intenta reconocer a quien vuelve."
+        - item: Qué se mantiene
+          text: "En el momento de esta decisión: el seguimiento ajustado (configuración B), la detección de rostros ajustada (RetinaFace, margen 0.8, umbral 0.92) y la agrupación de pistas en personas dentro de un video (caso de uso A). Ese mismo día, D002 descartó la agrupación y D003 cambió el tracker B por el A."
+        - item: Naturaleza del problema
+          text: "Es una limitación técnica de las grabaciones disponibles, no del método: en las cámaras reales los rostros son demasiado pequeños y con poco detalle para que un modelo de embeddings distinga a las personas entre días."
+    - section: Por qué (medido)
+      items:
+        - item: Grabaciones
+          text: "Cámara 6 día 1: {res_day1}; cámara 6 otro día: {res_other}; cámara 3: {res_cam3}. Las personas están lejos de la cámara, así que los rostros ocupan pocos píxeles."
+        - item: Tamaño de los rostros que entrega el pipeline
+          text: "Tamaño mediano {xv.face_px_median:.0f} px (lado menor). De los rostros etiquetados de los dos días, solo {xv.share_faces_ge24px:.0%} ({xv.n_faces_ge24px} rostros) miden 24 px o más y {xv.share_faces_lt13px:.0%} miden menos de 13 px."
+        - item: La misma persona en días distintos
+          text: "AUC por rostro entre el día 1 y el otro día: {xv.face.auc:.2f} (0.50 equivale al azar). En las 15 configuraciones de agrupación: {range.face_auc}. AUC por persona: {range.person_auc}."
+        - item: Resultado del reconocimiento
+          text: "Mejor exactitud {xv.open_set_accuracy:.2f}, con {xv.wrong_match_rate:.2f} de coincidencias equivocadas (objetivo: exactitud de al menos 0.90). Hubo personas distintas tan cercanas entre sí como la misma persona."
+        - item: Dentro de un mismo día
+          text: "Incluso dentro de un video, los rostros del pipeline separan mal a las personas: AUC {within_day1:.2f} (día 1) y {within_other:.2f} (otro día), frente a {emb01_facenet_auc:.2f} con rostros más grandes, frontales o semifrontales, etiquetados a mano en el día 1 (EMB-01)."
+        - item: Filtros por pose y tamaño
+          text: "Solo rostros frontales o semifrontales: AUC entre días {xv.cross.auc.frontal_semi.px0:.2f}; frontales o semifrontales de al menos 20 px: {xv.cross.auc.frontal_semi.px20:.2f}. Los rostros de 24 px o más se separan bien (AUC {xv.cross.auc.any.px24:.2f}), pero a ese tamaño solo hay {xv.cross.n_genuine.any.px24} pares de la misma persona, muy pocos para confiar en el resultado."
+        - item: Conclusión
+          text: "La separación mejora con el tamaño del rostro y con la pose frontal, lo que señala a la resolución de la imagen como causa. En estas grabaciones muy pocos rostros alcanzan un tamaño útil, así que el reconocimiento entre días daría sobre todo coincidencias equivocadas o ninguna coincidencia."
+    - section: Cómo se puede hacer y probar con mejores grabaciones
+      items:
+        - item: Grabaciones necesarias
+          text: "Grabaciones donde los rostros sean claramente más grandes: el flujo principal de las cámaras (resolución completa) en lugar de la exportación de 960x480, cámaras más cerca de las entradas o con zoom, o cámaras adicionales en los accesos. Con nuestros datos, los rostros de 24 px o más se separaron bien; cuanto más grandes, mejor."
+        - item: Cómo volver a probarlo
+          text: "Exportar los mismos clips (cámara 6 día 1 y otro día) a mayor resolución, etiquetarlos con los mismos identificadores en la página de etiquetado (fotogramas y recortes) y ejecutar E2E-02, CLU-04 y XV-01 con las mismas configuraciones. El Excel y esta hoja se actualizan solos."
+        - item: Criterio de aceptación
+          text: "XV-01 con exactitud de al menos 0.90 y pocas coincidencias equivocadas en un rango estable de umbrales, y AUC entre días cercano al AUC dentro de un mismo día. Si se cumple, se vuelven a enviar los embeddings al backend y se agrega el reconocimiento allí."
+        - item: Estado del código
+          text: "La etapa de embeddings no forma parte de la propuesta de producción (ver D002). Su configuración y el código quedan en el repositorio de experimentos para repetir la prueba."
+    - section: Límites de esta evidencia
+      items:
+        - item: Tamaño de la muestra
+          text: "Dos clips cortos de una sola cámara: {xv.n_labeled_people} grupos de personas etiquetados (P01 a P03 el día 1, P03 a P05 el otro día; el pipeline solo ve a P03 en ambos días) y {xv.face.n_genuine} pares de rostros de la misma persona entre días. La cámara 3 no se puede comparar con la cámara 6 (no se sabe si son las mismas personas), así que no forma parte de esta evidencia."
+- id: D002
+  date: "2026-11-02"
+  title: Se descarta agrupar las pistas en personas con embeddings de rostro; producción envía un rostro por pista
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras revisar CLU-04 en Camera3
+  numbers_from: "Ejecuciones de CLU-04 y E2E-02 en Camera3 y de CLU-04 en la cámara 6 (hojas T CLU-04, X CLU-04, T E2E-02, Detalle - personas)"
+  facts:
+    - {name: cam3_people, gt_people_of: Camera3}
+    - {name: tracks, test: E2E-02, label: "Camera3 best A"}
+    - {name: groupA, test: CLU-04, label: "Camera3 best A top_k=5"}
+    - {name: found_range, test: CLU-04, label_contains: "Camera3 best B distance", metric: ppl.found_recall, agg: range}
+    - {name: merges_range, test: CLU-04, label_contains: "Camera3 best B distance", metric: ppl.false_merges, agg: range}
+    - {name: joined_range, test: CLU-04, label_contains: "Camera3 best B distance", metric: ppl.multi_track_joined, agg: range}
+    - {name: day1, test: CLU-04, label: "day 1 best B distance_threshold=0.7,top_k=5"}
+    - {name: other, test: CLU-04, label: "other day best B distance_threshold=0.7,top_k=5"}
+  sections:
+    - section: Decisión
+      items:
+        - item: Qué se descarta
+          text: "La etapa face_embeddings, que agrupaba en personas las pistas de un mismo video (caso de uso A). Producción envía un rostro por cada persona seguida (pista), como antes, y ningún embedding."
+        - item: Qué se mantiene
+          text: "La detección de rostros ajustada (results/frozen/detection.yaml) y el seguimiento ajustado (decisión D003). La configuración de embeddings y agrupación queda en el repositorio de experimentos para repetir la prueba con mejores grabaciones."
+        - item: Naturaleza del problema
+          text: "La misma causa técnica que en D001: los rostros de las grabaciones reales son demasiado pequeños para que los embeddings separen a las personas, así que agrupar por rostro une a personas distintas en lugar de a la misma."
+    - section: Por qué (medido)
+      items:
+        - item: Escena con mucha gente (Camera3)
+          text: "{cam3_people} personas etiquetadas. Solo con las pistas (tracker A ajustado) se obtiene un rostro útil para el {tracks.e2e.tracks_identity_recall:.0%} de ellas. Tras agrupar por rostro, las personas encontradas bajan al {groupA.ppl.found_recall:.0%} y {groupA.ppl.false_merges} grupos mezclan a personas distintas."
+        - item: El umbral no cambia nada
+          text: "Con el tracker vigente en ese momento (B), todos los umbrales de agrupación entre 0.5 y 0.9 dan el mismo resultado: personas encontradas {found_range}, uniones equivocadas {merges_range}. Si el umbral no tiene efecto, los embeddings de los rostros son demasiado parecidos para distinguir a las personas."
+        - item: Personas que vuelven
+          text: "El objetivo de agrupar es unir a una persona que sale y vuelve a entrar. En Camera3, la proporción de esas personas unidas en un solo grupo es {joined_range} (1 significa todas unidas); en el otro día de la cámara 6 es {other.ppl.multi_track_joined:.0%} (P03 queda dividida en {other.ppl.groups_per_found_person:.1f} grupos en promedio por persona encontrada)."
+        - item: Por qué funcionó en el día 1
+          text: "El día 1 solo tiene {day1.ppl.n_outputs} personas en la salida, y la regla de que dos personas vistas en el mismo fotograma son distintas hizo casi todo el trabajo (sin ella, el día 1 también une a dos personas, CLU-03): personas encontradas {day1.ppl.found_recall:.0%}. Eso no se mantuvo en la escena más concurrida de Camera3 ni en el video más largo del otro día."
+    - section: Cómo se puede hacer y probar con mejores grabaciones
+      items:
+        - item: Cómo volver a probarlo
+          text: "Igual que en D001: con grabaciones de mayor resolución, volver a ejecutar E2E-02 y CLU-04 (y XV-01). Reactivar la agrupación solo si encuentra al menos tantas personas como las pistas solas y sin uniones equivocadas (objetivos de CLU-04: recall de al menos 0.90, precisión por persona de al menos 0.90 y al menos 0.95 de grupos sin mezclas)."
+        - item: Estado del código
+          text: "La etapa de agrupación ya no forma parte de la propuesta de producción (results/proposals/production_tracks_only.patch). Las versiones anteriores se conservan como *_superseded_*.patch."
+- id: D003
+  date: "2026-11-02"
+  title: Se cambia la configuración del tracker de B a A
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras revisar TRK-04 y E2E-02
+  numbers_from: "Cuadrícula TRK-04 en los 3 videos, E2E-02 y E2E-01 (hojas T TRK-04, X TRK-04, T E2E-02, T E2E-01)"
+  facts:
+    - {name: A_recall, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=3,match_thresh=0.7", metric: e2e.tracks_identity_recall, agg: mean}
+    - {name: B_recall, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=2,match_thresh=0.8", metric: e2e.tracks_identity_recall, agg: mean}
+    - {name: A_switches, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=3,match_thresh=0.7", metric: trk.id_switches, agg: sum}
+    - {name: B_switches, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=2,match_thresh=0.8", metric: trk.id_switches, agg: sum}
+    - {name: A_false, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=3,match_thresh=0.7", metric: e2e.tracks_false_outputs, agg: sum}
+    - {name: B_false, test: TRK-04, label_contains: "weights 0.3/0.7 min_track_len=2,match_thresh=0.8", metric: e2e.tracks_false_outputs, agg: sum}
+    - {name: camA, test: E2E-02, label: "Camera3 best A"}
+    - {name: camB, test: E2E-02, label: "Camera3 best B"}
+    - {name: day1A, test: E2E-01, label: "best A"}
+  sections:
+    - section: Decisión
+      items:
+        - item: Nueva configuración del tracker
+          text: "TrackTrack con iou_weight 0.3, reid_weight 0.7, min_track_len 3 y match_thresh 0.7, guardando 40 recortes por persona (configuración A). Reemplaza a la configuración B (min_track_len 2, match_thresh 0.8), elegida el 2026-10-26."
+        - item: Por qué el cambio es válido
+          text: "A y B empataron en el video de ajuste (día 1) y se había elegido B por ser la menos agresiva. Los videos nuevos solo deshacen ese empate: no se buscó ningún ajuste nuevo con ellos."
+    - section: Por qué (medido)
+      items:
+        - item: Día 1
+          text: "Configuración A en el día 1: personas encontradas {day1A.e2e.tracks_identity_recall:.0%}, duplicados {day1A.e2e.tracks_duplicates:.2f}, salidas falsas {day1A.e2e.tracks_false_outputs}."
+        - item: Los 3 videos
+          text: "Personas encontradas (promedio de {A_recall.n_runs} videos): A {A_recall:.2f}, B {B_recall:.2f}. Cambios de identidad (una pista que salta a otra persona), en total: A {A_switches:.0f}, B {B_switches:.0f}. Salidas falsas, en total: A {A_false:.0f}, B {B_false:.0f}."
+        - item: Escena con mucha gente (Camera3)
+          text: "Pureza de las pistas: A {camA.trk.purity:.2f}, B {camB.trk.purity:.2f}. Duplicados por persona: A {camA.e2e.tracks_duplicates:.2f}, B {camB.e2e.tracks_duplicates:.2f}. Personas encontradas: A {camA.e2e.tracks_identity_recall:.0%}, B {camB.e2e.tracks_identity_recall:.0%}. Aquí B tiene menos salidas falsas ({camB.e2e.tracks_false_outputs} frente a {camA.e2e.tracks_false_outputs})."
+- id: D004
+  date: "2026-11-03"
+  title: Se trabaja con un tamaño mínimo de rostro de 12 px (MIN_FACE_PX = 12)
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras revisar DET-05 y E2E-03
+  numbers_from: "Ejecuciones de E2E-03 y DET-05 (hojas T E2E-03, X E2E-03, T DET-05)"
+  facts:
+    - {name: d1_0, test: E2E-03, label: "day 1 MIN_FACE_PX=0"}
+    - {name: d1_12, test: E2E-03, label: "day 1 MIN_FACE_PX=12"}
+    - {name: c3_0, test: E2E-03, label: "Camera3 MIN_FACE_PX=0"}
+    - {name: c3_12, test: E2E-03, label: "Camera3 MIN_FACE_PX=12"}
+    - {name: od_0, test: E2E-03, label: "Camera6 other day MIN_FACE_PX=0"}
+    - {name: od_12, test: E2E-03, label: "Camera6 other day MIN_FACE_PX=12"}
+    - {name: det_c3_12, test: DET-05, label: "Camera3 padding 0.8 min face MIN_FACE_PX=12"}
+    - {name: det_c3_16, test: DET-05, label: "Camera3 padding 0.8 min face MIN_FACE_PX=16"}
+    - {name: det_c3_0, test: DET-05, label: "Camera3 padding DETECT_PADDING=0.8"}
+  sections:
+    - section: Decisión
+      items:
+        - item: Nuevo valor
+          text: "En face_recognition.py, MIN_FACE_PX pasa de 0 a 12: se descartan los rostros cuyo lado menor mide menos de 12 px. Se usa junto con el tracker A, 40 recortes por persona y margen 0.8."
+        - item: Motivo
+          text: "En las cámaras reales aparecen muchos rostros diminutos que no permiten reconocer a nadie. Un mínimo de 12 px los descarta sin perder personas."
+        - item: Uso de los videos nuevos
+          text: "Este valor se eligió con la ayuda de los videos nuevos (cámara 3 y otro día de la cámara 6), así que ya no sirven como prueba independiente para este ajuste."
+    - section: Por qué (medido)
+      items:
+        - item: Día 1
+          text: "Sin mínimo: {d1_0.e2e.tracks_n_outputs} rostros y personas encontradas {d1_0.e2e.tracks_identity_recall:.0%}. Con 12 px: {d1_12.e2e.tracks_n_outputs} rostros y {d1_12.e2e.tracks_identity_recall:.0%}. Sin cambios."
+        - item: Cámara 3
+          text: "Sin mínimo: {c3_0.e2e.tracks_n_outputs} rostros, personas encontradas {c3_0.e2e.tracks_identity_recall:.0%}. Con 12 px: {c3_12.e2e.tracks_n_outputs} rostros, {c3_12.e2e.tracks_identity_recall:.0%}. Se descartan {c3_12.sel.candidates_too_small} candidatos diminutos, ninguno de los elegidos."
+        - item: Otro día de la cámara 6
+          text: "Sin mínimo: {od_0.e2e.tracks_n_outputs} rostros, personas encontradas {od_0.e2e.tracks_identity_recall:.0%}, duplicados {od_0.e2e.tracks_duplicates:.2f}, salidas falsas {od_0.e2e.tracks_false_outputs}. Con 12 px: {od_12.e2e.tracks_n_outputs} rostros, {od_12.e2e.tracks_identity_recall:.0%}, duplicados {od_12.e2e.tracks_duplicates:.2f}, salidas falsas {od_12.e2e.tracks_false_outputs}."
+        - item: Detección de rostros
+          text: "En la cámara 3, F1 sin mínimo {det_c3_0.det.f1:.3f}, con 12 px {det_c3_12.det.f1:.3f} y con 16 px {det_c3_16.det.f1:.3f} (recall {det_c3_16.det.recall:.2f}). Por eso no se usa un valor mayor."
+    - section: Límites
+      items:
+        - item: Qué no resuelve
+          text: "Los rostros que no se pueden identificar pero miden más de 12 px siguen apareciendo (en el otro día de la cámara 6 quedan {od_12.e2e.tracks_false_outputs} salidas no útiles)."
