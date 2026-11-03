@@ -1,0 +1,2642 @@
+{
+  "video": {
+    "path": "Camera_ch6_20261016100358_20261016100614.mp4",
+    "sha256": "07d148120da6b87bdf12f2b0dd763b1e1a99eaaadd99ea2d6618d2e3cf3f25c2",
+    "codec": "hevc",
+    "width": 960,
+    "height": 480,
+    "fps": 15.0,
+    "frames": 2040,
+    "duration_s": 135.999
+  },
+  "sample_every_s": 1.0,
+  "pre_annotate_threshold": 0.3,
+  "created_utc": "2026-10-26T03:32:03.495330Z",
+  "frames": {
+    "0": {
+      "time_s": 0.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            650.0,
+            124.0,
+            669.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9785
+          }
+        }
+      ]
+    },
+    "15": {
+      "time_s": 1.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            661.0,
+            120.0,
+            680.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9984,
+            "mtcnn": 0.4312
+          }
+        }
+      ]
+    },
+    "30": {
+      "time_s": 2.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            663.0,
+            118.0,
+            682.0,
+            137.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.998
+          }
+        }
+      ]
+    },
+    "45": {
+      "time_s": 3.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            668.0,
+            119.0,
+            686.0,
+            138.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9929
+          }
+        }
+      ]
+    },
+    "60": {
+      "time_s": 4.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            652.0,
+            121.0,
+            671.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9508
+          }
+        }
+      ]
+    },
+    "75": {
+      "time_s": 5.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            648.0,
+            124.0,
+            667.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9915
+          }
+        }
+      ]
+    },
+    "90": {
+      "time_s": 6.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            648.0,
+            123.0,
+            668.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9858
+          }
+        }
+      ]
+    },
+    "105": {
+      "time_s": 7.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            635.0,
+            124.0,
+            653.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.995
+          }
+        }
+      ]
+    },
+    "120": {
+      "time_s": 8.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "135": {
+      "time_s": 9.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            555.0,
+            135.0,
+            569.0,
+            152.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9932
+          }
+        }
+      ]
+    },
+    "150": {
+      "time_s": 10.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            521.0,
+            157.0,
+            538.0,
+            175.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9978
+          }
+        },
+        {
+          "box": [
+            530.0,
+            152.0,
+            543.0,
+            171.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.3323
+          }
+        }
+      ]
+    },
+    "165": {
+      "time_s": 11.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            546.0,
+            135.0,
+            563.0,
+            154.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9709
+          }
+        }
+      ]
+    },
+    "180": {
+      "time_s": 12.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            620.0,
+            123.0,
+            643.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9679
+          }
+        }
+      ]
+    },
+    "195": {
+      "time_s": 13.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            642.0,
+            123.0,
+            662.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9973,
+            "mtcnn": 0.3615
+          }
+        }
+      ]
+    },
+    "210": {
+      "time_s": 14.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            727.0,
+            114.0,
+            749.0,
+            138.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9972,
+            "mtcnn": 0.588
+          }
+        }
+      ]
+    },
+    "225": {
+      "time_s": 15.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            741.0,
+            118.0,
+            760.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9965,
+            "mtcnn": 0.969
+          }
+        }
+      ]
+    },
+    "240": {
+      "time_s": 16.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            744.0,
+            118.0,
+            764.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9984,
+            "mtcnn": 0.8168
+          }
+        }
+      ]
+    },
+    "255": {
+      "time_s": 17.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            734.0,
+            114.0,
+            754.0,
+            134.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9976,
+            "mtcnn": 0.3931
+          }
+        }
+      ]
+    },
+    "270": {
+      "time_s": 18.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            707.0,
+            113.0,
+            729.0,
+            137.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9956,
+            "mtcnn": 0.8487
+          }
+        }
+      ]
+    },
+    "285": {
+      "time_s": 19.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            731.0,
+            119.0,
+            750.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9979
+          }
+        }
+      ]
+    },
+    "300": {
+      "time_s": 20.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "315": {
+      "time_s": 21.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "330": {
+      "time_s": 22.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "345": {
+      "time_s": 23.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "360": {
+      "time_s": 24.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "375": {
+      "time_s": 25.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            788.0,
+            149.0,
+            808.0,
+            168.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9116
+          }
+        }
+      ]
+    },
+    "390": {
+      "time_s": 26.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            695.0,
+            113.0,
+            717.0,
+            136.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9943,
+            "mtcnn": 0.787
+          }
+        }
+      ]
+    },
+    "405": {
+      "time_s": 27.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            708.0,
+            120.0,
+            724.0,
+            136.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.5613
+          }
+        }
+      ]
+    },
+    "420": {
+      "time_s": 28.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            666.0,
+            121.0,
+            686.0,
+            138.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9798
+          }
+        }
+      ]
+    },
+    "435": {
+      "time_s": 29.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            639.0,
+            122.0,
+            657.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.998
+          }
+        },
+        {
+          "box": [
+            257.0,
+            426.0,
+            281.0,
+            460.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.914
+          }
+        }
+      ]
+    },
+    "450": {
+      "time_s": 30.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            162.0,
+            396.0,
+            188.0,
+            430.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9961,
+            "mtcnn": 0.4142
+          }
+        },
+        {
+          "box": [
+            685.0,
+            118.0,
+            703.0,
+            137.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9947
+          }
+        }
+      ]
+    },
+    "465": {
+      "time_s": 31.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            158.0,
+            381.0,
+            186.0,
+            414.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9992,
+            "mtcnn": 0.5367
+          }
+        },
+        {
+          "box": [
+            643.0,
+            126.0,
+            663.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.8887
+          }
+        }
+      ]
+    },
+    "480": {
+      "time_s": 32.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            105.0,
+            378.0,
+            131.0,
+            408.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9976,
+            "mtcnn": 0.8315
+          }
+        },
+        {
+          "box": [
+            637.0,
+            120.0,
+            657.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9894
+          }
+        },
+        {
+          "box": [
+            646.0,
+            118.0,
+            662.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.4558
+          }
+        }
+      ]
+    },
+    "495": {
+      "time_s": 33.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            627.0,
+            119.0,
+            651.0,
+            144.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9983
+          }
+        }
+      ]
+    },
+    "510": {
+      "time_s": 34.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            643.0,
+            122.0,
+            662.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9849
+          }
+        }
+      ]
+    },
+    "525": {
+      "time_s": 35.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            654.0,
+            121.0,
+            672.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9835
+          }
+        }
+      ]
+    },
+    "540": {
+      "time_s": 36.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            621.0,
+            126.0,
+            641.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9849
+          }
+        }
+      ]
+    },
+    "555": {
+      "time_s": 37.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            657.0,
+            121.0,
+            675.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9746
+          }
+        }
+      ]
+    },
+    "570": {
+      "time_s": 38.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            627.0,
+            123.0,
+            647.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9776
+          }
+        }
+      ]
+    },
+    "585": {
+      "time_s": 39.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            607.0,
+            124.0,
+            627.0,
+            144.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9768
+          }
+        }
+      ]
+    },
+    "600": {
+      "time_s": 40.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            651.0,
+            123.0,
+            667.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9181
+          }
+        }
+      ]
+    },
+    "615": {
+      "time_s": 41.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            661.0,
+            120.0,
+            678.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9023,
+            "mtcnn": 0.3369
+          }
+        }
+      ]
+    },
+    "630": {
+      "time_s": 42.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            662.0,
+            121.0,
+            679.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9755
+          }
+        }
+      ]
+    },
+    "645": {
+      "time_s": 43.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            669.0,
+            120.0,
+            688.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9977,
+            "mtcnn": 0.7282
+          }
+        }
+      ]
+    },
+    "660": {
+      "time_s": 44.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            668.0,
+            112.0,
+            693.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.64
+          }
+        }
+      ]
+    },
+    "675": {
+      "time_s": 45.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            660.0,
+            119.0,
+            679.0,
+            137.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.997
+          }
+        }
+      ]
+    },
+    "690": {
+      "time_s": 46.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            668.0,
+            120.0,
+            689.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9942
+          }
+        }
+      ]
+    },
+    "705": {
+      "time_s": 47.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            658.0,
+            121.0,
+            677.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.6456
+          }
+        }
+      ]
+    },
+    "720": {
+      "time_s": 48.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            622.0,
+            124.0,
+            640.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9926
+          }
+        }
+      ]
+    },
+    "735": {
+      "time_s": 49.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            625.0,
+            126.0,
+            642.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9782
+          }
+        }
+      ]
+    },
+    "750": {
+      "time_s": 50.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            641.0,
+            122.0,
+            663.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9974,
+            "mtcnn": 0.3913
+          }
+        }
+      ]
+    },
+    "765": {
+      "time_s": 51.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            586.0,
+            123.0,
+            617.0,
+            151.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.3457
+          }
+        }
+      ]
+    },
+    "780": {
+      "time_s": 52.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            548.0,
+            130.0,
+            567.0,
+            150.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9865
+          }
+        }
+      ]
+    },
+    "795": {
+      "time_s": 53.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            521.0,
+            146.0,
+            541.0,
+            162.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9885
+          }
+        }
+      ]
+    },
+    "810": {
+      "time_s": 54.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            528.0,
+            142.0,
+            548.0,
+            158.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9918
+          }
+        }
+      ]
+    },
+    "825": {
+      "time_s": 55.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            526.0,
+            141.0,
+            544.0,
+            158.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9842
+          }
+        }
+      ]
+    },
+    "840": {
+      "time_s": 56.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            556.0,
+            135.0,
+            575.0,
+            153.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9944
+          }
+        }
+      ]
+    },
+    "855": {
+      "time_s": 57.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            624.0,
+            123.0,
+            644.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9919,
+            "mtcnn": 0.5257
+          }
+        }
+      ]
+    },
+    "870": {
+      "time_s": 58.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            634.0,
+            121.0,
+            652.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9929
+          }
+        }
+      ]
+    },
+    "885": {
+      "time_s": 59.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            623.0,
+            121.0,
+            646.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9643,
+            "mtcnn": 0.7827
+          }
+        }
+      ]
+    },
+    "900": {
+      "time_s": 60.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            637.0,
+            124.0,
+            656.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9408
+          }
+        }
+      ]
+    },
+    "915": {
+      "time_s": 61.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            656.0,
+            121.0,
+            675.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9971,
+            "mtcnn": 0.7772
+          }
+        }
+      ]
+    },
+    "930": {
+      "time_s": 62.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            643.0,
+            121.0,
+            663.0,
+            140.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9858
+          }
+        }
+      ]
+    },
+    "945": {
+      "time_s": 63.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            623.0,
+            118.0,
+            646.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9814,
+            "mtcnn": 0.87
+          }
+        }
+      ]
+    },
+    "960": {
+      "time_s": 64.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            577.0,
+            124.0,
+            601.0,
+            148.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9839,
+            "mtcnn": 0.3292
+          }
+        }
+      ]
+    },
+    "975": {
+      "time_s": 65.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            550.0,
+            134.0,
+            571.0,
+            153.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9961
+          }
+        },
+        {
+          "box": [
+            557.0,
+            129.0,
+            577.0,
+            153.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.7375
+          }
+        }
+      ]
+    },
+    "990": {
+      "time_s": 66.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            594.0,
+            127.0,
+            609.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.6509
+          }
+        }
+      ]
+    },
+    "1005": {
+      "time_s": 67.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            630.0,
+            122.0,
+            649.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9728
+          }
+        }
+      ]
+    },
+    "1020": {
+      "time_s": 68.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            587.0,
+            128.0,
+            610.0,
+            151.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9948
+          }
+        }
+      ]
+    },
+    "1035": {
+      "time_s": 69.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            615.0,
+            123.0,
+            634.0,
+            143.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.855
+          }
+        }
+      ]
+    },
+    "1050": {
+      "time_s": 70.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            637.0,
+            120.0,
+            656.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9968,
+            "mtcnn": 0.484
+          }
+        }
+      ]
+    },
+    "1065": {
+      "time_s": 71.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            603.0,
+            125.0,
+            626.0,
+            149.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9836,
+            "mtcnn": 0.5547
+          }
+        },
+        {
+          "box": [
+            318.0,
+            298.0,
+            333.0,
+            320.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.7134
+          }
+        }
+      ]
+    },
+    "1080": {
+      "time_s": 72.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            610.0,
+            124.0,
+            628.0,
+            145.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9614
+          }
+        },
+        {
+          "box": [
+            385.0,
+            263.0,
+            397.0,
+            283.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.7367
+          }
+        },
+        {
+          "box": [
+            303.0,
+            195.0,
+            320.0,
+            215.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.3434
+          }
+        }
+      ]
+    },
+    "1095": {
+      "time_s": 73.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            392.0,
+            257.0,
+            410.0,
+            279.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9923,
+            "mtcnn": 0.9855
+          }
+        },
+        {
+          "box": [
+            665.0,
+            118.0,
+            685.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9908,
+            "mtcnn": 0.9559
+          }
+        }
+      ]
+    },
+    "1110": {
+      "time_s": 74.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            325.0,
+            278.0,
+            347.0,
+            301.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9946,
+            "mtcnn": 0.6246
+          }
+        },
+        {
+          "box": [
+            682.0,
+            117.0,
+            700.0,
+            137.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9944,
+            "mtcnn": 0.9222
+          }
+        }
+      ]
+    },
+    "1125": {
+      "time_s": 75.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            326.0,
+            283.0,
+            348.0,
+            308.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.9982,
+            "retinaface": 0.9981
+          }
+        },
+        {
+          "box": [
+            658.0,
+            118.0,
+            678.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9912,
+            "mtcnn": 0.9645
+          }
+        }
+      ]
+    },
+    "1140": {
+      "time_s": 76.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            327.0,
+            285.0,
+            350.0,
+            310.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9975,
+            "mtcnn": 0.9965
+          }
+        },
+        {
+          "box": [
+            642.0,
+            121.0,
+            662.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.991,
+            "mtcnn": 0.7838
+          }
+        }
+      ]
+    },
+    "1155": {
+      "time_s": 77.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            317.0,
+            283.0,
+            341.0,
+            310.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9982,
+            "mtcnn": 0.9966
+          }
+        },
+        {
+          "box": [
+            642.0,
+            122.0,
+            661.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9903,
+            "mtcnn": 0.619
+          }
+        }
+      ]
+    },
+    "1170": {
+      "time_s": 78.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            649.0,
+            121.0,
+            668.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9968
+          }
+        },
+        {
+          "box": [
+            370.0,
+            275.0,
+            386.0,
+            297.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9932,
+            "mtcnn": 0.3513
+          }
+        }
+      ]
+    },
+    "1185": {
+      "time_s": 79.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            647.0,
+            119.0,
+            667.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.996,
+            "mtcnn": 0.8997
+          }
+        }
+      ]
+    },
+    "1200": {
+      "time_s": 80.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            661.0,
+            117.0,
+            684.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9751,
+            "mtcnn": 0.9049
+          }
+        }
+      ]
+    },
+    "1215": {
+      "time_s": 81.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            654.0,
+            121.0,
+            673.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9948
+          }
+        }
+      ]
+    },
+    "1230": {
+      "time_s": 82.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            638.0,
+            122.0,
+            656.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9715
+          }
+        }
+      ]
+    },
+    "1245": {
+      "time_s": 83.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            634.0,
+            123.0,
+            654.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9869
+          }
+        }
+      ]
+    },
+    "1260": {
+      "time_s": 84.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            636.0,
+            121.0,
+            658.0,
+            138.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9864
+          }
+        },
+        {
+          "box": [
+            639.0,
+            114.0,
+            665.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.3917
+          }
+        }
+      ]
+    },
+    "1275": {
+      "time_s": 85.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1290": {
+      "time_s": 86.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1305": {
+      "time_s": 87.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            520.0,
+            153.0,
+            544.0,
+            177.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9839
+          }
+        }
+      ]
+    },
+    "1320": {
+      "time_s": 88.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            521.0,
+            157.0,
+            542.0,
+            177.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9894
+          }
+        }
+      ]
+    },
+    "1335": {
+      "time_s": 89.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            604.0,
+            125.0,
+            622.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9654
+          }
+        }
+      ]
+    },
+    "1350": {
+      "time_s": 90.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            700.0,
+            118.0,
+            719.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9985,
+            "mtcnn": 0.6802
+          }
+        }
+      ]
+    },
+    "1365": {
+      "time_s": 91.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            759.0,
+            113.0,
+            778.0,
+            134.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9908,
+            "mtcnn": 0.4075
+          }
+        }
+      ]
+    },
+    "1380": {
+      "time_s": 92.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            822.0,
+            120.0,
+            844.0,
+            146.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9595,
+            "mtcnn": 0.6431
+          }
+        }
+      ]
+    },
+    "1395": {
+      "time_s": 93.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            829.0,
+            107.0,
+            851.0,
+            132.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9984,
+            "mtcnn": 0.9798
+          }
+        }
+      ]
+    },
+    "1410": {
+      "time_s": 94.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            814.0,
+            123.0,
+            834.0,
+            141.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.7877
+          }
+        }
+      ]
+    },
+    "1425": {
+      "time_s": 95.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            817.0,
+            107.0,
+            848.0,
+            139.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9952,
+            "mtcnn": 0.4101
+          }
+        }
+      ]
+    },
+    "1440": {
+      "time_s": 96.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            780.0,
+            103.0,
+            817.0,
+            142.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9987,
+            "mtcnn": 0.8376
+          }
+        }
+      ]
+    },
+    "1455": {
+      "time_s": 97.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            637.0,
+            125.0,
+            669.0,
+            158.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9875
+          }
+        }
+      ]
+    },
+    "1470": {
+      "time_s": 98.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            488.0,
+            147.0,
+            520.0,
+            176.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9968
+          }
+        }
+      ]
+    },
+    "1485": {
+      "time_s": 99.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            441.0,
+            152.0,
+            473.0,
+            184.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.9995,
+            "mtcnn": 0.5284
+          }
+        }
+      ]
+    },
+    "1500": {
+      "time_s": 100.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1515": {
+      "time_s": 101.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1530": {
+      "time_s": 102.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1545": {
+      "time_s": 103.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1560": {
+      "time_s": 104.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            575.0,
+            130.0,
+            599.0,
+            157.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.5844
+          }
+        }
+      ]
+    },
+    "1575": {
+      "time_s": 105.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1590": {
+      "time_s": 106.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1605": {
+      "time_s": 107.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1620": {
+      "time_s": 108.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1635": {
+      "time_s": 109.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1650": {
+      "time_s": 110.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1665": {
+      "time_s": 111.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1680": {
+      "time_s": 112.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1695": {
+      "time_s": 113.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1710": {
+      "time_s": 114.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1725": {
+      "time_s": 115.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1740": {
+      "time_s": 116.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1755": {
+      "time_s": 117.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1770": {
+      "time_s": 118.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            625.0,
+            191.0,
+            644.0,
+            212.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.5612
+          }
+        }
+      ]
+    },
+    "1785": {
+      "time_s": 119.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            625.0,
+            191.0,
+            644.0,
+            212.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "mtcnn": 0.6734
+          }
+        }
+      ]
+    },
+    "1800": {
+      "time_s": 120.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1815": {
+      "time_s": 121.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1830": {
+      "time_s": 122.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1845": {
+      "time_s": 123.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1860": {
+      "time_s": 124.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1875": {
+      "time_s": 125.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1890": {
+      "time_s": 126.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1905": {
+      "time_s": 127.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1920": {
+      "time_s": 128.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1935": {
+      "time_s": 129.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1950": {
+      "time_s": 130.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1965": {
+      "time_s": 131.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1980": {
+      "time_s": 132.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "1995": {
+      "time_s": 133.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "2010": {
+      "time_s": 134.0,
+      "reviewed": false,
+      "faces": []
+    },
+    "2025": {
+      "time_s": 135.0,
+      "reviewed": false,
+      "faces": [
+        {
+          "box": [
+            519.0,
+            123.0,
+            552.0,
+            156.0
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": false,
+          "source": "auto",
+          "auto_sources": {
+            "retinaface": 0.6881
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "videos": {
+    "Camera_ch6_20261016100358_20261016100614": {
+      "camera": "cam6",
+      "label": "Camera 6, day 1"
+    },
+    "Camera6_other_day": {
+      "camera": "cam6",
+      "label": "Camera 6, other day"
+    },
+    "Camera3": {
+      "camera": "cam3",
+      "label": "Camera 3"
+    }
+  },
+  "cameras": {
+    "cam6": {
+      "id_prefix": "P"
+    },
+    "cam3": {
+      "id_prefix": "C3-"
+    }
+  }
+}

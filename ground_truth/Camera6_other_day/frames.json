@@ -1,0 +1,5584 @@
+{
+  "video": {
+    "path": "videos/Camera6_other_day.mp4",
+    "sha256": "b42bf309dda9c958e4784364ffbb77ff870e6973e22568b005389715ca41d561",
+    "codec": "hevc",
+    "width": 960,
+    "height": 480,
+    "fps": 15.0,
+    "frames": 1950,
+    "duration_s": 129.999
+  },
+  "sample_every_s": 1.0,
+  "pre_annotate_threshold": 0.3,
+  "created_utc": "2026-10-27T01:47:35.557820Z",
+  "frames": {
+    "0": {
+      "time_s": 0,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            639,
+            215,
+            663,
+            240
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9957,
+            "mtcnn": 0.9519
+          }
+        },
+        {
+          "box": [
+            379,
+            189,
+            387,
+            199
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4384
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:54:13.174031Z"
+    },
+    "15": {
+      "time_s": 1,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            629,
+            213,
+            652,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.996,
+            "mtcnn": 0.9293
+          }
+        },
+        {
+          "box": [
+            326,
+            210,
+            334,
+            221
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7957
+          }
+        },
+        {
+          "box": [
+            376,
+            193,
+            385,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6385
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:54:20.658482Z"
+    },
+    "30": {
+      "time_s": 2,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            630,
+            214,
+            654,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9966,
+            "mtcnn": 0.9873
+          }
+        },
+        {
+          "box": [
+            332,
+            208,
+            340,
+            219
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6623
+          }
+        },
+        {
+          "box": [
+            291,
+            207,
+            299,
+            217
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6261
+          }
+        },
+        {
+          "box": [
+            378,
+            189,
+            387,
+            199
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.562
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:54:29.777349Z"
+    },
+    "45": {
+      "time_s": 3,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            395,
+            189,
+            402,
+            197
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3674
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:54:36.918085Z"
+    },
+    "60": {
+      "time_s": 4,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            613,
+            215,
+            637,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9968,
+            "mtcnn": 0.9739
+          }
+        },
+        {
+          "box": [
+            519,
+            170,
+            531,
+            183
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8098,
+            "mtcnn": 0.6302
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:54:44.070019Z"
+    },
+    "75": {
+      "time_s": 5,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            536,
+            169,
+            548,
+            185
+          ],
+          "identity": "P05",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9929,
+            "retinaface": 0.9832
+          }
+        },
+        {
+          "box": [
+            634,
+            225,
+            654,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9612,
+            "mtcnn": 0.3083
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:55:04.431876Z"
+    },
+    "90": {
+      "time_s": 6,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            638,
+            224,
+            659,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9924,
+            "mtcnn": 0.7165
+          }
+        },
+        {
+          "box": [
+            566,
+            171,
+            577,
+            186
+          ],
+          "identity": "P05",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9803,
+            "mtcnn": 0.9803
+          }
+        },
+        {
+          "box": [
+            376,
+            190,
+            384,
+            199
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4848
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:55:15.433904Z"
+    },
+    "105": {
+      "time_s": 7,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            631,
+            223,
+            651,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9896,
+            "mtcnn": 0.3854
+          }
+        },
+        {
+          "box": [
+            308,
+            325,
+            324,
+            349
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9886
+          }
+        },
+        {
+          "box": [
+            328,
+            202,
+            337,
+            212
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9634
+          }
+        },
+        {
+          "box": [
+            557,
+            174,
+            569,
+            189
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8608
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:55:39.227750Z"
+    },
+    "120": {
+      "time_s": 8,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            286,
+            296,
+            302,
+            320
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9981,
+            "retinaface": 0.9975
+          }
+        },
+        {
+          "box": [
+            633,
+            227,
+            653,
+            246
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8625
+          }
+        },
+        {
+          "box": [
+            539,
+            176,
+            549,
+            189
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7322
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:55:49.645619Z"
+    },
+    "135": {
+      "time_s": 9,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            630,
+            221,
+            653,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9902
+          }
+        },
+        {
+          "box": [
+            297,
+            204,
+            304,
+            214
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9046
+          }
+        },
+        {
+          "box": [
+            304,
+            280.7,
+            322,
+            307.7
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.3372
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:55:59.497336Z"
+    },
+    "150": {
+      "time_s": 10,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            634,
+            224,
+            656,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9911
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:03.437302Z"
+    },
+    "165": {
+      "time_s": 11,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            640,
+            225,
+            661,
+            245
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9842,
+            "mtcnn": 0.8659
+          }
+        },
+        {
+          "box": [
+            550,
+            176,
+            558,
+            186
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6607
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:07.113408Z"
+    },
+    "180": {
+      "time_s": 12,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            628,
+            222,
+            649,
+            243
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9868,
+            "mtcnn": 0.5642
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:10.159505Z"
+    },
+    "195": {
+      "time_s": 13,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            558,
+            176,
+            566,
+            186
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.862
+          }
+        },
+        {
+          "box": [
+            603,
+            224,
+            624,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8461
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:18.511072Z"
+    },
+    "210": {
+      "time_s": 14,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            520,
+            171,
+            528,
+            182
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9697
+          }
+        },
+        {
+          "box": [
+            600,
+            221,
+            620,
+            238
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9697
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:23.143140Z"
+    },
+    "225": {
+      "time_s": 15,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            606,
+            214,
+            625,
+            236
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9769,
+            "mtcnn": 0.3082
+          }
+        },
+        {
+          "box": [
+            299,
+            210,
+            309,
+            223
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9235
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:34.903860Z"
+    },
+    "240": {
+      "time_s": 16,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            559,
+            211,
+            581,
+            236
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9932,
+            "mtcnn": 0.4412
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:56:48.844708Z"
+    },
+    "255": {
+      "time_s": 17,
+      "reviewed": true,
+      "faces": [],
+      "reviewed_utc": "2026-11-02T15:56:57.309314Z"
+    },
+    "270": {
+      "time_s": 18,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            639,
+            218,
+            659,
+            237
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9856,
+            "mtcnn": 0.7333
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:57:17.420490Z"
+    },
+    "285": {
+      "time_s": 19,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            596,
+            218,
+            617,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9867,
+            "mtcnn": 0.9524
+          }
+        },
+        {
+          "box": [
+            527,
+            169,
+            537,
+            182
+          ],
+          "identity": "P05",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9654,
+            "mtcnn": 0.9399
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:57:34.317108Z"
+    },
+    "300": {
+      "time_s": 20,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            633,
+            213,
+            656,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9969,
+            "mtcnn": 0.9851
+          }
+        },
+        {
+          "box": [
+            574,
+            172,
+            585,
+            185
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4524
+          }
+        },
+        {
+          "box": [
+            388,
+            191,
+            399,
+            203
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4069
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:57:46.417248Z"
+    },
+    "315": {
+      "time_s": 21,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            617,
+            214,
+            640,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9983,
+            "mtcnn": 0.9959
+          }
+        },
+        {
+          "box": [
+            580,
+            174,
+            592,
+            190
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6505
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:58:15.242239Z"
+    },
+    "330": {
+      "time_s": 22,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            607,
+            215,
+            627,
+            236
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9922,
+            "mtcnn": 0.9828
+          }
+        },
+        {
+          "box": [
+            299,
+            205,
+            307,
+            215
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9174
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:58:21.372899Z"
+    },
+    "345": {
+      "time_s": 23,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            646,
+            213,
+            669,
+            236
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9982,
+            "mtcnn": 0.9959
+          }
+        },
+        {
+          "box": [
+            565,
+            175,
+            574,
+            189
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4616
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:58:40.629063Z"
+    },
+    "360": {
+      "time_s": 24,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            594,
+            215,
+            616,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.995,
+            "mtcnn": 0.893
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:58:47.045928Z"
+    },
+    "375": {
+      "time_s": 25,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            641,
+            215,
+            661,
+            238
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9992,
+            "retinaface": 0.9943
+          }
+        },
+        {
+          "box": [
+            565,
+            176,
+            575,
+            190
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7516
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:04.470198Z"
+    },
+    "390": {
+      "time_s": 26,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            664.3,
+            221,
+            688.3,
+            245
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9942,
+            "mtcnn": 0.9618
+          }
+        },
+        {
+          "box": [
+            552.3,
+            177.7,
+            564.3,
+            190.7
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3611
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:16.341843Z"
+    },
+    "405": {
+      "time_s": 27,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            395,
+            192,
+            404,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7548
+          }
+        },
+        {
+          "box": [
+            549,
+            177,
+            557,
+            187
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5534
+          }
+        },
+        {
+          "box": [
+            652,
+            224,
+            674,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4046
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:21.265284Z"
+    },
+    "420": {
+      "time_s": 28,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            653,
+            224,
+            674,
+            243
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.986
+          }
+        },
+        {
+          "box": [
+            545,
+            175,
+            555,
+            188
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8143
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:24.785103Z"
+    },
+    "435": {
+      "time_s": 29,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            652,
+            224,
+            673,
+            243
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9948,
+            "mtcnn": 0.3343
+          }
+        },
+        {
+          "box": [
+            550,
+            180,
+            562,
+            195
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9647
+          }
+        },
+        {
+          "box": [
+            344,
+            267,
+            359,
+            290
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9566,
+            "mtcnn": 0.556
+          }
+        },
+        {
+          "box": [
+            399,
+            192,
+            408,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4305
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:43.538260Z"
+    },
+    "450": {
+      "time_s": 30,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            657,
+            225,
+            678,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9922,
+            "mtcnn": 0.8208
+          }
+        },
+        {
+          "box": [
+            562,
+            177,
+            572,
+            192
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9623
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T15:59:54.985915Z"
+    },
+    "465": {
+      "time_s": 31,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            652,
+            223,
+            673,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9958,
+            "mtcnn": 0.8781
+          }
+        },
+        {
+          "box": [
+            349,
+            266,
+            362,
+            288
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.934,
+            "mtcnn": 0.586
+          }
+        },
+        {
+          "box": [
+            562,
+            175,
+            570,
+            186
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7572
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:00:17.344877Z"
+    },
+    "480": {
+      "time_s": 32,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            633,
+            219,
+            655,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9708,
+            "mtcnn": 0.5564
+          }
+        },
+        {
+          "box": [
+            524,
+            174,
+            534,
+            187
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4927
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:00:33.079685Z"
+    },
+    "495": {
+      "time_s": 33,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            606,
+            210,
+            629,
+            235
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9976,
+            "mtcnn": 0.8723
+          }
+        },
+        {
+          "box": [
+            386,
+            252,
+            402,
+            274
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8069
+          }
+        },
+        {
+          "box": [
+            302,
+            210,
+            311,
+            221
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3346
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:00:47.557459Z"
+    },
+    "510": {
+      "time_s": 34,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            584,
+            211,
+            602,
+            233
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9934
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:00:59.297105Z"
+    },
+    "525": {
+      "time_s": 35,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            610,
+            221,
+            629,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9913,
+            "mtcnn": 0.7757
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:01:31.942144Z"
+    },
+    "540": {
+      "time_s": 36,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            671,
+            232,
+            690,
+            252
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8077
+          }
+        },
+        {
+          "box": [
+            526.3,
+            269.3,
+            555.3,
+            302.3
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.7386
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:01:59.118018Z"
+    },
+    "555": {
+      "time_s": 37,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            605,
+            213,
+            623,
+            234
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9927,
+            "mtcnn": 0.9541
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:02:11.505729Z"
+    },
+    "570": {
+      "time_s": 38,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            643,
+            219,
+            664,
+            238
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9961
+          }
+        },
+        {
+          "box": [
+            558,
+            168,
+            569,
+            181
+          ],
+          "identity": "P05",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9922,
+            "mtcnn": 0.9882
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:02:39.881779Z"
+    },
+    "585": {
+      "time_s": 39,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            619,
+            212,
+            642,
+            236
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9986,
+            "mtcnn": 0.9955
+          }
+        },
+        {
+          "box": [
+            310,
+            207,
+            320,
+            221
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6196
+          }
+        },
+        {
+          "box": [
+            577,
+            174,
+            589,
+            188
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5447
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:03:14.729636Z"
+    },
+    "600": {
+      "time_s": 40,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            406,
+            241,
+            422,
+            261
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7734
+          }
+        },
+        {
+          "box": [
+            655.7,
+            225,
+            675.7,
+            241
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7613
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:03:22.184975Z"
+    },
+    "615": {
+      "time_s": 41,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            624,
+            221,
+            643,
+            239
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9914
+          }
+        },
+        {
+          "box": [
+            542,
+            178,
+            552,
+            192
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7472
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:03:33.366750Z"
+    },
+    "630": {
+      "time_s": 42,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            614,
+            218,
+            634,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9645
+          }
+        },
+        {
+          "box": [
+            542,
+            179,
+            552,
+            192
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8891
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:03:44.940343Z"
+    },
+    "645": {
+      "time_s": 43,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            647,
+            219,
+            666,
+            238
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9948,
+            "mtcnn": 0.9003
+          }
+        },
+        {
+          "box": [
+            545,
+            178,
+            556,
+            193
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9862
+          }
+        },
+        {
+          "box": [
+            406,
+            240,
+            422,
+            262
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9235,
+            "mtcnn": 0.7335
+          }
+        },
+        {
+          "box": [
+            289,
+            204,
+            298,
+            214
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3488
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:04:39.438536Z"
+    },
+    "660": {
+      "time_s": 44,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            549,
+            181,
+            561,
+            195
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.981
+          }
+        },
+        {
+          "box": [
+            596,
+            223,
+            618,
+            239
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9535
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:04:53.029898Z"
+    },
+    "675": {
+      "time_s": 45,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            526,
+            288,
+            556,
+            319
+          ],
+          "identity": "P01",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9999,
+            "retinaface": 0.9995
+          }
+        },
+        {
+          "box": [
+            423,
+            232,
+            441,
+            252
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9946,
+            "mtcnn": 0.9866
+          }
+        },
+        {
+          "box": [
+            608,
+            222,
+            628,
+            240
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9794,
+            "mtcnn": 0.8875
+          }
+        },
+        {
+          "box": [
+            550,
+            191,
+            563,
+            206
+          ],
+          "identity": "P05",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8123
+          }
+        },
+        {
+          "box": [
+            391,
+            188.3,
+            400,
+            198.3
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4342
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:05:32.325991Z"
+    },
+    "690": {
+      "time_s": 46,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            392,
+            239,
+            408,
+            254
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9875,
+            "mtcnn": 0.6682
+          }
+        },
+        {
+          "box": [
+            473,
+            204,
+            485,
+            218
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9581
+          }
+        },
+        {
+          "box": [
+            605,
+            224,
+            626,
+            242
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9454
+          }
+        },
+        {
+          "box": [
+            390,
+            188,
+            400,
+            200
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9331
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:05:50.545390Z"
+    },
+    "705": {
+      "time_s": 47,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            357.3,
+            295,
+            376.3,
+            308
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.982
+          }
+        },
+        {
+          "box": [
+            600,
+            228,
+            622,
+            245
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9342
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:05:59.626044Z"
+    },
+    "720": {
+      "time_s": 48,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            395,
+            196,
+            402,
+            207
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5244
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:06:12.193509Z"
+    },
+    "735": {
+      "time_s": 49,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            395,
+            187.3,
+            406,
+            202.3
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9843
+          }
+        },
+        {
+          "box": [
+            593,
+            234,
+            615,
+            251
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8114
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:06:32.275874Z"
+    },
+    "750": {
+      "time_s": 50,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            398,
+            186,
+            411,
+            200
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.872
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:06:37.245769Z"
+    },
+    "765": {
+      "time_s": 51,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            616,
+            216,
+            635,
+            236
+          ],
+          "identity": "P04",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.992
+          }
+        },
+        {
+          "box": [
+            403,
+            187,
+            413,
+            200
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7713
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:06:54.090188Z"
+    },
+    "780": {
+      "time_s": 52,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            602,
+            210,
+            621,
+            232
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9931,
+            "mtcnn": 0.6678
+          }
+        },
+        {
+          "box": [
+            314,
+            201,
+            323,
+            211
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9373
+          }
+        },
+        {
+          "box": [
+            382,
+            192,
+            391,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3619
+          }
+        },
+        {
+          "box": [
+            403,
+            188,
+            413,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3063
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:07:11.891322Z"
+    },
+    "795": {
+      "time_s": 53,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            611,
+            221,
+            631,
+            240
+          ],
+          "identity": "P04",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.993,
+            "mtcnn": 0.7068
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:07:22.534989Z"
+    },
+    "810": {
+      "time_s": 54,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            249,
+            317,
+            262,
+            339
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8053
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:07:28.127831Z"
+    },
+    "825": {
+      "time_s": 55,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            615,
+            211,
+            633,
+            232
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9978,
+            "retinaface": 0.9953
+          }
+        },
+        {
+          "box": [
+            255,
+            317,
+            269,
+            339
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8276
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:07:43.218896Z"
+    },
+    "840": {
+      "time_s": 56,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            644,
+            214.3,
+            666,
+            238.3
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9826,
+            "mtcnn": 0.9791
+          }
+        },
+        {
+          "box": [
+            259.3,
+            318,
+            274.3,
+            340
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8289
+          }
+        },
+        {
+          "box": [
+            382,
+            189,
+            391,
+            198
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3034
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:08:11.606800Z"
+    },
+    "855": {
+      "time_s": 57,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            613,
+            216,
+            637,
+            240
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9968,
+            "mtcnn": 0.6693
+          }
+        },
+        {
+          "box": [
+            262,
+            316,
+            277,
+            338
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9355,
+            "mtcnn": 0.5146
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:08:26.334150Z"
+    },
+    "870": {
+      "time_s": 58,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            639,
+            221,
+            661,
+            240
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9925,
+            "mtcnn": 0.9846
+          }
+        },
+        {
+          "box": [
+            299,
+            301.3,
+            313,
+            323.3
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9811
+          }
+        },
+        {
+          "box": [
+            402,
+            198,
+            410,
+            209
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8164
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:08:49.718996Z"
+    },
+    "885": {
+      "time_s": 59,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            621,
+            217.7,
+            644,
+            240.7
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9926
+          }
+        },
+        {
+          "box": [
+            371,
+            262,
+            388,
+            285
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9693
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:09:12.790639Z"
+    },
+    "900": {
+      "time_s": 60,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            641,
+            222,
+            664,
+            245
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9931,
+            "mtcnn": 0.9784
+          }
+        },
+        {
+          "box": [
+            340.7,
+            273.4,
+            356,
+            293.3
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human"
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:10:07.010728Z"
+    },
+    "915": {
+      "time_s": 61,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            618,
+            215,
+            642,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9924,
+            "mtcnn": 0.4374
+          }
+        },
+        {
+          "box": [
+            310,
+            210,
+            317,
+            222
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3314
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:10:15.263768Z"
+    },
+    "930": {
+      "time_s": 62,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            607.3,
+            225.3,
+            629.3,
+            245
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.502
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:10:26.754323Z"
+    },
+    "945": {
+      "time_s": 63,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            618,
+            224,
+            639,
+            243
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9656
+          }
+        },
+        {
+          "box": [
+            451,
+            293,
+            470,
+            313
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3141
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:10:33.054682Z"
+    },
+    "960": {
+      "time_s": 64,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            603,
+            221,
+            626,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9652,
+            "mtcnn": 0.3198
+          }
+        },
+        {
+          "box": [
+            594,
+            160.7,
+            603.3,
+            168.7
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human"
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:11:10.910649Z"
+    },
+    "975": {
+      "time_s": 65,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            604,
+            228,
+            624,
+            247
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.914
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:11:15.956241Z"
+    },
+    "990": {
+      "time_s": 66,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            592,
+            223,
+            612,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9858,
+            "mtcnn": 0.973
+          }
+        },
+        {
+          "box": [
+            257,
+            331,
+            270,
+            351
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9622,
+            "mtcnn": 0.3371
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:11:33.647392Z"
+    },
+    "1005": {
+      "time_s": 67,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            228,
+            299,
+            248,
+            323
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9997,
+            "retinaface": 0.9987
+          }
+        },
+        {
+          "box": [
+            585,
+            222,
+            607,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9864
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:11:46.514635Z"
+    },
+    "1020": {
+      "time_s": 68,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            302,
+            294.3,
+            318,
+            317.3
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9951,
+            "retinaface": 0.9899
+          }
+        },
+        {
+          "box": [
+            595,
+            213,
+            614,
+            235
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9916,
+            "mtcnn": 0.9815
+          }
+        },
+        {
+          "box": [
+            301,
+            206,
+            310,
+            216
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9651
+          }
+        },
+        {
+          "box": [
+            396,
+            190.3,
+            406,
+            201.3
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.659
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:12:01.566618Z"
+    },
+    "1035": {
+      "time_s": 69,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            547,
+            217,
+            570,
+            241
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9923,
+            "mtcnn": 0.9596
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:12:12.407205Z"
+    },
+    "1050": {
+      "time_s": 70,
+      "reviewed": true,
+      "faces": [],
+      "reviewed_utc": "2026-11-02T16:12:16.182847Z"
+    },
+    "1065": {
+      "time_s": 71,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            631,
+            214,
+            650,
+            233
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.998,
+            "mtcnn": 0.9928
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:12:26.138923Z"
+    },
+    "1080": {
+      "time_s": 72,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            192,
+            295,
+            208,
+            317
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9973,
+            "mtcnn": 0.9882
+          }
+        },
+        {
+          "box": [
+            653,
+            213,
+            676,
+            236
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9943,
+            "mtcnn": 0.9873
+          }
+        },
+        {
+          "box": [
+            567,
+            161,
+            574,
+            171
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6127
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:12:44.416163Z"
+    },
+    "1095": {
+      "time_s": 73,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            259,
+            351,
+            275,
+            366
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9991
+          }
+        },
+        {
+          "box": [
+            639,
+            213,
+            662,
+            236
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9942,
+            "mtcnn": 0.8172
+          }
+        },
+        {
+          "box": [
+            534,
+            165,
+            543,
+            176
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8856
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:13:25.671189Z"
+    },
+    "1110": {
+      "time_s": 74,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            260,
+            356,
+            277,
+            371
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9984,
+            "mtcnn": 0.4003
+          }
+        },
+        {
+          "box": [
+            639,
+            215,
+            662,
+            239
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9964,
+            "mtcnn": 0.9493
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:13:32.735849Z"
+    },
+    "1125": {
+      "time_s": 75,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            254,
+            354,
+            272,
+            370
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9987
+          }
+        },
+        {
+          "box": [
+            661,
+            218,
+            682,
+            237
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.991,
+            "mtcnn": 0.9578
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:13:44.294778Z"
+    },
+    "1140": {
+      "time_s": 76,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            216,
+            342,
+            235,
+            358
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9938,
+            "mtcnn": 0.4641
+          }
+        },
+        {
+          "box": [
+            641,
+            217,
+            664,
+            240
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9922,
+            "mtcnn": 0.9478
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:14:06.402720Z"
+    },
+    "1155": {
+      "time_s": 77,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            209,
+            301,
+            230,
+            328
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9997,
+            "retinaface": 0.9991
+          }
+        },
+        {
+          "box": [
+            656.3,
+            218,
+            679.3,
+            241
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9887,
+            "mtcnn": 0.9736
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:14:39.278869Z"
+    },
+    "1170": {
+      "time_s": 78,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            656,
+            214,
+            678,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.993,
+            "mtcnn": 0.8802
+          }
+        },
+        {
+          "box": [
+            282,
+            289,
+            302,
+            319
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9925,
+            "mtcnn": 0.8326
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:14:51.538902Z"
+    },
+    "1185": {
+      "time_s": 79,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            617,
+            223,
+            638,
+            239
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9533
+          }
+        },
+        {
+          "box": [
+            373,
+            262,
+            387,
+            286
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.915,
+            "mtcnn": 0.6798
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:03.622870Z"
+    },
+    "1200": {
+      "time_s": 80,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            629,
+            222,
+            649,
+            241
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9848
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:10.750731Z"
+    },
+    "1215": {
+      "time_s": 81,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            618,
+            223,
+            639,
+            242
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.991,
+            "mtcnn": 0.4122
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:18.780083Z"
+    },
+    "1230": {
+      "time_s": 82,
+      "reviewed": true,
+      "faces": [],
+      "reviewed_utc": "2026-11-02T16:15:23.955628Z"
+    },
+    "1245": {
+      "time_s": 83,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            616,
+            228,
+            635,
+            244
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.894,
+            "mtcnn": 0.5655
+          }
+        },
+        {
+          "box": [
+            363,
+            193,
+            372,
+            203
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5028
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:35.175302Z"
+    },
+    "1260": {
+      "time_s": 84,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            621,
+            224,
+            642,
+            243
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9809,
+            "mtcnn": 0.4749
+          }
+        },
+        {
+          "box": [
+            302,
+            213,
+            311,
+            223
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3223
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:42.363673Z"
+    },
+    "1275": {
+      "time_s": 85,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            284,
+            292,
+            299,
+            305
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9755
+          }
+        },
+        {
+          "box": [
+            590,
+            225,
+            608,
+            241
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7433
+          }
+        },
+        {
+          "box": [
+            310,
+            207,
+            320,
+            221
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.707
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:49.155743Z"
+    },
+    "1290": {
+      "time_s": 86,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            595,
+            218,
+            614,
+            239
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9853,
+            "mtcnn": 0.6879
+          }
+        },
+        {
+          "box": [
+            320,
+            207,
+            328,
+            217
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3204
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:15:57.963408Z"
+    },
+    "1305": {
+      "time_s": 87,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            548,
+            219,
+            570,
+            243
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9828,
+            "mtcnn": 0.583
+          }
+        },
+        {
+          "box": [
+            363,
+            193,
+            371,
+            203
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5973
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:16:10.209144Z"
+    },
+    "1320": {
+      "time_s": 88,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            326,
+            240,
+            341,
+            258
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9104
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:16:16.964739Z"
+    },
+    "1335": {
+      "time_s": 89,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            340,
+            240,
+            357,
+            257
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.998,
+            "mtcnn": 0.9974
+          }
+        },
+        {
+          "box": [
+            683,
+            217,
+            703,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9964,
+            "mtcnn": 0.5541
+          }
+        },
+        {
+          "box": [
+            359,
+            192,
+            367,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4388
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:16:33.795328Z"
+    },
+    "1350": {
+      "time_s": 90,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            349,
+            235,
+            363,
+            252
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9997,
+            "retinaface": 0.9989
+          }
+        },
+        {
+          "box": [
+            666,
+            211,
+            689,
+            235
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9953,
+            "mtcnn": 0.9588
+          }
+        },
+        {
+          "box": [
+            563,
+            169,
+            574,
+            183
+          ],
+          "identity": "P05",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.983
+          }
+        },
+        {
+          "box": [
+            365,
+            192,
+            373,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3662
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:16:55.008839Z"
+    },
+    "1365": {
+      "time_s": 91,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            416,
+            228,
+            430,
+            248
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9968,
+            "retinaface": 0.9959
+          }
+        },
+        {
+          "box": [
+            665,
+            213,
+            687,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.994,
+            "mtcnn": 0.9613
+          }
+        },
+        {
+          "box": [
+            596,
+            167,
+            608,
+            181
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8458,
+            "mtcnn": 0.4728
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:17:23.751204Z"
+    },
+    "1380": {
+      "time_s": 92,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            470,
+            222,
+            486,
+            243
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9999,
+            "retinaface": 0.9965
+          }
+        },
+        {
+          "box": [
+            649,
+            213,
+            672,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9972,
+            "mtcnn": 0.9347
+          }
+        },
+        {
+          "box": [
+            309,
+            203,
+            317,
+            213
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7529
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:17:40.515643Z"
+    },
+    "1395": {
+      "time_s": 93,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            451,
+            225,
+            470,
+            246
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9991,
+            "retinaface": 0.9982
+          }
+        },
+        {
+          "box": [
+            679,
+            216,
+            700,
+            240
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9943,
+            "mtcnn": 0.9812
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:18:05.451722Z"
+    },
+    "1410": {
+      "time_s": 94,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            396,
+            233,
+            411,
+            251
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9985,
+            "mtcnn": 0.9482
+          }
+        },
+        {
+          "box": [
+            659,
+            214,
+            682,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9884,
+            "mtcnn": 0.929
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:18:15.754425Z"
+    },
+    "1425": {
+      "time_s": 95,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            673,
+            213,
+            695,
+            237
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9982,
+            "mtcnn": 0.984
+          }
+        },
+        {
+          "box": [
+            583,
+            172,
+            593,
+            185
+          ],
+          "identity": "P05",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6278
+          }
+        },
+        {
+          "box": [
+            301,
+            292,
+            317,
+            306
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5121
+          }
+        },
+        {
+          "box": [
+            366,
+            197,
+            375,
+            206
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4329
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:18:27.116150Z"
+    },
+    "1440": {
+      "time_s": 96,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            673,
+            217,
+            695,
+            242
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9971,
+            "mtcnn": 0.9962
+          }
+        },
+        {
+          "box": [
+            290.3,
+            290.7,
+            307.3,
+            304.7
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7888
+          }
+        },
+        {
+          "box": [
+            364,
+            196,
+            373,
+            206
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5578
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:18:36.740241Z"
+    },
+    "1455": {
+      "time_s": 97,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            642,
+            220,
+            664,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.927
+          }
+        },
+        {
+          "box": [
+            358,
+            192,
+            375.3,
+            205.3
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.8803
+          }
+        },
+        {
+          "box": [
+            309,
+            203,
+            316,
+            214
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8732
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:18:56.920171Z"
+    },
+    "1470": {
+      "time_s": 98,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            633,
+            219,
+            659,
+            240
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9913
+          }
+        },
+        {
+          "box": [
+            329,
+            244,
+            347,
+            264
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9027,
+            "retinaface": 0.4131
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:19:06.476610Z"
+    },
+    "1485": {
+      "time_s": 99,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            639,
+            226,
+            661,
+            241
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8502
+          }
+        },
+        {
+          "box": [
+            545,
+            169,
+            556,
+            182
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8144
+          }
+        },
+        {
+          "box": [
+            306,
+            205,
+            313,
+            215
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6085
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:19:14.752531Z"
+    },
+    "1500": {
+      "time_s": 100,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            545.3,
+            168,
+            555.3,
+            182
+          ],
+          "identity": "P05",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9485
+          }
+        },
+        {
+          "box": [
+            633,
+            224,
+            655,
+            242
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9469
+          }
+        },
+        {
+          "box": [
+            339,
+            243,
+            356,
+            261
+          ],
+          "identity": "P03",
+          "pose": null,
+          "occlusion": "none",
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.7137
+          }
+        },
+        {
+          "box": [
+            367,
+            192,
+            376,
+            201
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5706
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:19:33.745416Z"
+    },
+    "1515": {
+      "time_s": 101,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            385,
+            235,
+            403,
+            255
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9968,
+            "mtcnn": 0.9865
+          }
+        },
+        {
+          "box": [
+            633,
+            230,
+            653,
+            247
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.5313
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:20:19.807782Z"
+    },
+    "1530": {
+      "time_s": 102,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            638,
+            223,
+            659,
+            242
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9846,
+            "mtcnn": 0.7551
+          }
+        },
+        {
+          "box": [
+            411,
+            239,
+            431,
+            260
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9768,
+            "mtcnn": 0.922
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:20:28.148929Z"
+    },
+    "1545": {
+      "time_s": 103,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            613.7,
+            226.7,
+            633.7,
+            241.7
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9657
+          }
+        },
+        {
+          "box": [
+            386.7,
+            245,
+            407.7,
+            271
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.4537
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:20:36.264705Z"
+    },
+    "1560": {
+      "time_s": 104,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            409,
+            235,
+            426,
+            256
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9975,
+            "mtcnn": 0.9904
+          }
+        },
+        {
+          "box": [
+            640,
+            225,
+            658,
+            240
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9772
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:20:46.336940Z"
+    },
+    "1575": {
+      "time_s": 105,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            416,
+            235,
+            432,
+            253
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9984,
+            "retinaface": 0.9951
+          }
+        },
+        {
+          "box": [
+            627,
+            214,
+            646,
+            235
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9884,
+            "mtcnn": 0.4267
+          }
+        },
+        {
+          "box": [
+            562,
+            286,
+            592,
+            322
+          ],
+          "identity": "P01",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8925,
+            "mtcnn": 0.5443
+          }
+        },
+        {
+          "box": [
+            376,
+            194,
+            388,
+            206
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3781
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:21:09.563701Z"
+    },
+    "1590": {
+      "time_s": 106,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            423,
+            232,
+            441,
+            251
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9985,
+            "mtcnn": 0.9981
+          }
+        },
+        {
+          "box": [
+            563,
+            216,
+            582,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9903
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:21:21.893623Z"
+    },
+    "1605": {
+      "time_s": 107,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            607,
+            217,
+            625,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9945,
+            "mtcnn": 0.9678
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:21:32.545471Z"
+    },
+    "1620": {
+      "time_s": 108,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            699.3,
+            217,
+            715.3,
+            237
+          ],
+          "identity": "P04",
+          "pose": "profile",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9976,
+            "mtcnn": 0.9112
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:21:52.166340Z"
+    },
+    "1635": {
+      "time_s": 109,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            725,
+            226,
+            744,
+            240
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.891
+          }
+        },
+        {
+          "box": [
+            301,
+            209,
+            311,
+            222
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3988
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:21:58.662533Z"
+    },
+    "1650": {
+      "time_s": 110,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            695,
+            214.7,
+            714,
+            233.7
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9981
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:05.343253Z"
+    },
+    "1665": {
+      "time_s": 111,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            724,
+            225,
+            745,
+            239
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9132
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:09.075089Z"
+    },
+    "1680": {
+      "time_s": 112,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            726,
+            220,
+            744,
+            237
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9837
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:12.662008Z"
+    },
+    "1695": {
+      "time_s": 113,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            716,
+            207,
+            734,
+            227
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9963,
+            "mtcnn": 0.9926
+          }
+        },
+        {
+          "box": [
+            408,
+            239,
+            426,
+            260
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9705,
+            "mtcnn": 0.692
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:24.240108Z"
+    },
+    "1710": {
+      "time_s": 114,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            701,
+            200,
+            720,
+            221
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9966,
+            "mtcnn": 0.9854
+          }
+        },
+        {
+          "box": [
+            401,
+            240,
+            419,
+            261
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9619,
+            "mtcnn": 0.3595
+          }
+        },
+        {
+          "box": [
+            293,
+            205,
+            301,
+            215
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8495
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:41.472149Z"
+    },
+    "1725": {
+      "time_s": 115,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            691,
+            213,
+            711,
+            233
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9973,
+            "mtcnn": 0.9572
+          }
+        },
+        {
+          "box": [
+            421,
+            236,
+            439,
+            258
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9861,
+            "mtcnn": 0.7744
+          }
+        },
+        {
+          "box": [
+            297,
+            204,
+            304,
+            213
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8359
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:22:59.180656Z"
+    },
+    "1740": {
+      "time_s": 116,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            419,
+            233,
+            437,
+            253
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9984,
+            "mtcnn": 0.9982
+          }
+        },
+        {
+          "box": [
+            673,
+            210,
+            695,
+            235
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9973,
+            "mtcnn": 0.9964
+          }
+        },
+        {
+          "box": [
+            567,
+            170,
+            577,
+            183
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9202
+          }
+        },
+        {
+          "box": [
+            294,
+            204,
+            302,
+            214
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8719
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:23:19.344129Z"
+    },
+    "1755": {
+      "time_s": 117,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            390.3,
+            230,
+            404.3,
+            249
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9982,
+            "mtcnn": 0.5934
+          }
+        },
+        {
+          "box": [
+            692,
+            217,
+            713,
+            236
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.971,
+            "mtcnn": 0.7524
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:23:33.776879Z"
+    },
+    "1770": {
+      "time_s": 118,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            679,
+            216,
+            700,
+            236
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.995,
+            "mtcnn": 0.9794
+          }
+        },
+        {
+          "box": [
+            324,
+            202,
+            333,
+            212
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9358
+          }
+        },
+        {
+          "box": [
+            298,
+            276,
+            311,
+            289
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8897,
+            "mtcnn": 0.4477
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:23:54.672289Z"
+    },
+    "1785": {
+      "time_s": 119,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            691,
+            215,
+            713,
+            239
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9933,
+            "mtcnn": 0.6943
+          }
+        },
+        {
+          "box": [
+            325,
+            203,
+            334,
+            213
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.985
+          }
+        },
+        {
+          "box": [
+            278.7,
+            316.7,
+            297.3,
+            329.3
+          ],
+          "identity": "P03",
+          "pose": "profile",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human"
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:09.677556Z"
+    },
+    "1800": {
+      "time_s": 120,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            697,
+            215,
+            719,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9935,
+            "mtcnn": 0.9053
+          }
+        },
+        {
+          "box": [
+            312,
+            203,
+            321,
+            213
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9739
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:15.009947Z"
+    },
+    "1815": {
+      "time_s": 121,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            697,
+            211,
+            716,
+            232
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9932,
+            "mtcnn": 0.682
+          }
+        },
+        {
+          "box": [
+            321,
+            203,
+            329,
+            214
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.791
+          }
+        },
+        {
+          "box": [
+            371,
+            192,
+            380,
+            202
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.692
+          }
+        },
+        {
+          "box": [
+            497,
+            273,
+            519,
+            305
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6375
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:23.318282Z"
+    },
+    "1830": {
+      "time_s": 122,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            347,
+            242,
+            363,
+            258
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9853
+          }
+        },
+        {
+          "box": [
+            673,
+            214,
+            695,
+            238
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9829,
+            "mtcnn": 0.9637
+          }
+        },
+        {
+          "box": [
+            566,
+            287,
+            585,
+            309
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.6165
+          }
+        },
+        {
+          "box": [
+            329,
+            213,
+            337,
+            223
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.524
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:35.545770Z"
+    },
+    "1845": {
+      "time_s": 123,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            355,
+            239,
+            371,
+            255
+          ],
+          "identity": "P03",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9966,
+            "mtcnn": 0.8353
+          }
+        },
+        {
+          "box": [
+            653,
+            224,
+            674,
+            241
+          ],
+          "identity": "P04",
+          "pose": "semi",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.8888
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:46.925813Z"
+    },
+    "1860": {
+      "time_s": 124,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            402,
+            238,
+            417,
+            253
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9032,
+            "mtcnn": 0.4015
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:24:52.968726Z"
+    },
+    "1875": {
+      "time_s": 125,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            423,
+            237,
+            441,
+            253
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9978,
+            "mtcnn": 0.3148
+          }
+        },
+        {
+          "box": [
+            363,
+            200,
+            372,
+            209
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6849
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:25:01.381448Z"
+    },
+    "1890": {
+      "time_s": 126,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            420,
+            236,
+            438,
+            257
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9972,
+            "retinaface": 0.9921
+          }
+        },
+        {
+          "box": [
+            553,
+            174,
+            561,
+            184
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.961
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:25:10.952447Z"
+    },
+    "1905": {
+      "time_s": 127,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            647,
+            227,
+            668,
+            244
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9501
+          }
+        },
+        {
+          "box": [
+            376,
+            251,
+            393,
+            271
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.656
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:25:20.416070Z"
+    },
+    "1920": {
+      "time_s": 128,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            619,
+            221,
+            640,
+            239
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.961,
+            "mtcnn": 0.8913
+          }
+        },
+        {
+          "box": [
+            328,
+            277,
+            352,
+            307
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.3818
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:25:29.666518Z"
+    },
+    "1935": {
+      "time_s": 129,
+      "reviewed": true,
+      "faces": [
+        {
+          "box": [
+            279,
+            301,
+            303,
+            333
+          ],
+          "identity": "P03",
+          "pose": "frontal",
+          "occlusion": "none",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "mtcnn": 0.9998,
+            "retinaface": 0.9987
+          }
+        },
+        {
+          "box": [
+            614,
+            222,
+            636,
+            240
+          ],
+          "identity": "P04",
+          "pose": "frontal",
+          "occlusion": "partial",
+          "ignore": false,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.9704
+          }
+        },
+        {
+          "box": [
+            310,
+            202,
+            318,
+            213
+          ],
+          "identity": null,
+          "pose": null,
+          "occlusion": null,
+          "ignore": true,
+          "source": "human",
+          "auto_sources": {
+            "retinaface": 0.6294
+          }
+        }
+      ],
+      "reviewed_utc": "2026-11-02T16:25:47.552024Z"
+    }
+  }
+}
