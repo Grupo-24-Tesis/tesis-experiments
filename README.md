@@ -14,10 +14,12 @@ Este repositorio debe estar junto al del pipeline:
 
 Para usar otra copia del pipeline, definir `TESIS_PIPELINE_DIR` con su ruta.
 
+En Ubuntu 26.04, el driver de NVIDIA y Python 3.12 se instalan como indica el README del pipeline.
+
 ## Instalación
 
 ```bash
-python3 -m venv venvs/eval
+python3.12 -m venv venvs/eval
 venvs/eval/bin/pip install -r requirements-eval.txt
 venvs/eval/bin/python -m pytest -q tests
 ```
@@ -60,4 +62,5 @@ guarda en git junto con el código que lo generó.
 ## Reglas
 
 - Las pruebas nunca modifican el código del pipeline.
-- Videos, fotogramas y recortes no salen de la máquina: muestran a personas reales.
+- Videos, fotogramas y recortes solo se guardan en las máquinas del proyecto y nunca en git:
+  muestran a personas reales.
