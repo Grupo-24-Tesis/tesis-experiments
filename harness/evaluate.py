@@ -641,7 +641,8 @@ def eval_xvideo(run_dir, cfg, gt):
         missing.append("no hay personas etiquetadas en las ejecuciones de origen (GT-03)")
         return m, missing
     if not gen:
-        missing.append("ninguna persona aparece en ambos videos con esta configuración: la exactitud solo contaría rechazos, sin calcular")
+        m["_unmet"] = ("ninguna persona aparece en ambos videos con esta configuración: no puede reconocer a "
+                       "nadie entre videos, y la exactitud solo contaría rechazos")
         return m, missing
     top = max(r["accuracy"] for r in scored)
     best_ts = [r["threshold"] for r in scored if r["accuracy"] == top]

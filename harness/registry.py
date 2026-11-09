@@ -12,6 +12,7 @@ REQUIRED = ("run.json", "config.json", "events.jsonl")
 NEAR_MARGIN = 0.02
 DEVICE_ES = {"CPU (CUDA EP failed to load)": "CPU (no cargó el proveedor CUDA de ONNX)",
              "CPU (TF GPU libraries missing)": "CPU (faltan las librerías GPU de TensorFlow)"}
+PIPELINE_REWRITTEN = {"ff1511563d": "1e38058b31"}
 
 TESTS = {
     "ENV-01": ("env.pass_rate", True, {"env.pass_rate": 1.0}),
@@ -31,7 +32,6 @@ TESTS = {
     "TRK-02": ("trk.fragmentation", False, {}),
     "TRK-03": ("trk.best_face_quality_median", True, {}),
     "SEL-01": ("sel.valid_rate", True, {}),
-    "SEL-02": ("clu.ari", True, {}),
     "E2E-01": ("e2e.tracks_identity_recall", True, {"e2e.tracks_identity_recall": 0.90}),
     "E2E-03": ("e2e.tracks_identity_recall", True, {"e2e.tracks_identity_recall": 0.90}),
     "E2E-02": ("e2e.tracks_identity_recall", True, {"e2e.tracks_identity_recall": 0.90}),
@@ -53,13 +53,21 @@ def flatten(prefix, d, out):
     return out
 
 
+def commit_id(commit, rewritten=None):
+    commit = (commit or "")[:10]
+    if commit in ("", "HEAD"):
+        return "sin commits"
+    return (rewritten or {}).get(commit, commit)
+
+
 def git_columns(git):
     if "pipeline" not in git:
-        return {"git_pipeline_commit": git.get("commit", "")[:10], "git_pipeline_dirty": git.get("dirty"),
-                "git_experiments_commit": "", "git_experiments_dirty": None}
-    return {"git_pipeline_commit": git["pipeline"].get("commit", "")[:10],
+        return {"git_pipeline_commit": commit_id(git.get("commit"), PIPELINE_REWRITTEN),
+                "git_pipeline_dirty": git.get("dirty"),
+                "git_experiments_commit": "sin commits", "git_experiments_dirty": None}
+    return {"git_pipeline_commit": commit_id(git["pipeline"].get("commit"), PIPELINE_REWRITTEN),
             "git_pipeline_dirty": git["pipeline"].get("dirty"),
-            "git_experiments_commit": git["experiments"].get("commit", "")[:10],
+            "git_experiments_commit": commit_id(git["experiments"].get("commit")),
             "git_experiments_dirty": git["experiments"].get("dirty")}
 
 
@@ -83,7 +91,7 @@ def verdict(row, targets):
     for metric, target in targets.items():
         v = row.get("metric." + metric)
         if v is None or pd.isna(v):
-            return "PENDING"
+            return "FAIL" if row.get("unmet") else "PENDING"
         results.append("PASS" if v >= target else ("NEAR" if v >= target - NEAR_MARGIN else "FAIL"))
     if all(r == "PASS" for r in results):
         return "PASS"
@@ -114,6 +122,7 @@ def rebuild():
             if not k.startswith("_"):
                 row["metric." + k] = v
         row["missing"] = "; ".join(metrics.get("_missing", []))
+        row["unmet"] = metrics.get("_unmet", "")
         for k, v in meta.get("devices_used", {}).items():
             row["device." + k] = DEVICE_ES.get(v, v)
         for k, v in meta.get("cache_hits", {}).items():

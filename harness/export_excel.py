@@ -34,6 +34,7 @@ ITEM_FILES = [
     ("Detalle - xv tamaño y pose", "classification/xv_face_slices.csv"),
     ("Detalle - entorno", "classification/env_checks.csv"),
 ]
+DERIVED = {"DET-02": "DET-01"}
 TEST_DESCRIPTIONS = {
     "ENV-01": "El entorno funciona (librerías, dispositivos, lectura de videos)",
     "ENV-02": "Variación entre ejecuciones repetidas de la configuración base (3 repeticiones)",
@@ -47,7 +48,6 @@ TEST_DESCRIPTIONS = {
     "TRK-02": "Ajustes de asociación del tracker",
     "TRK-03": "Recortes guardados por pista; control de cortes de escena",
     "SEL-01": "Regla para elegir el mejor rostro de cada pista",
-    "SEL-02": "Cantidad de rostros por pista",
     "EMB-00": "Control sin etiquetas de los embeddings (rostros frente a fondo)",
     "EMB-01": "Comparación de modelos de embeddings",
     "EMB-02": "Preprocesamiento de los embeddings (alineación, normalización, distancia)",
@@ -92,7 +92,8 @@ def summary(df):
     rows = []
     for test_id in sorted(set(df["test_id"]) | set(TEST_DESCRIPTIONS)):
         primary, higher, targets = registry.TESTS.get(test_id, (None, True, {}))
-        sub = df[df["test_id"] == test_id] if not df.empty else df
+        source = DERIVED.get(test_id, test_id)
+        sub = df[df["test_id"] == source] if not df.empty else df
         row = {"Prueba": test_id, "Descripción": TEST_DESCRIPTIONS.get(test_id, ""),
                "Ejecuciones": len(sub), "Ejecuciones ok": int((sub["status"] == "ok").sum()) if len(sub) else 0,
                "Ejecuciones que cumplen": int((sub["verdict"] == "PASS").sum()) if len(sub) else 0,
@@ -114,8 +115,11 @@ def summary(df):
         elif col and col in ok and ok[col].notna().any():
             best = ok.loc[ok[col].idxmax() if higher else ok[col].idxmin()]
             row.update({"Ganador": best["label"], "Valor del ganador": best[col],
-                        "Veredicto del ganador": VERDICT_ES.get(best["verdict"], best["verdict"]),
-                        "Directorio del ganador": best["run_dir"], "Estado": "calculado"})
+                        "Veredicto del ganador": (VERDICT_ES.get(best["verdict"], best["verdict"])
+                                                  if source == test_id else VERDICT_ES["no_target"]),
+                        "Directorio del ganador": best["run_dir"],
+                        "Estado": "calculado" if source == test_id
+                        else f"calculado (de las ejecuciones de {source})"})
             base = ok[(ok["label"] == "baseline") & ok[col].notna()]
             if not base.empty:
                 row["Valor de la base"] = base[col].iloc[0]
@@ -383,7 +387,16 @@ def readme(df):
         ("device.<parte>", "Dispositivo que usó realmente esa parte de la ejecución"),
         ("cache.<etapa>", "TRUE = la salida de la etapa (y su tiempo) se reutilizó de una ejecución idéntica anterior"),
         ("", ""),
-        ("verdict", "CUMPLE = alcanza todos los objetivos; CERCA = hasta 0.02 por debajo; NO CUMPLE; PENDIENTE = la métrica todavía no se puede calcular; sin objetivo = la prueba no tiene objetivo"),
+        ("verdict", "CUMPLE = alcanza todos los objetivos; CERCA = hasta 0.02 por debajo; NO CUMPLE (también cuando "
+                    "la salida de la configuración impide calcular la métrica; el motivo está en la columna unmet); "
+                    "PENDIENTE = la métrica todavía no se puede calcular; sin objetivo = la prueba no tiene objetivo"),
+        ("git_pipeline_commit", "Commit del pipeline con el que corrió la ejecución. El historial del pipeline se "
+                                "reescribió el 2026-11-03: las ejecuciones anteriores registraron ff1511563d, que "
+                                "ahora es 1e38058b31, y se muestran con el commit actual. git_pipeline_dirty = TRUE "
+                                "indica cambios sin commit en ese momento. \"sin commits\" = el repositorio de "
+                                "experimentos todavía no tenía historial."),
+        ("DET-02", "No tiene ejecuciones propias: cada ejecución de DET-01 calcula su curva PR y su mejor umbral "
+                   "(det.best_threshold, det.best_f1), y el Resumen los toma de ahí."),
         ("status", "ok / failed (falló) / timeout (excedió el tiempo) / invalid (falta un registro o falló la evaluación)"),
         ("rank_in_test", "1 = mejor ejecución de su prueba según la métrica principal"),
         ("pareto", "TRUE = ninguna otra ejecución de la prueba es a la vez mejor y más rápida"),

@@ -1,6 +1,6 @@
 import numpy as np
 
-from harness import cluster, run
+from harness import cluster, registry, run
 from labeling.server import validate_frame
 
 BASE = {"video": "v.mp4", "stage1": {"A": 1, "B": 2}, "cluster": {"algo": "hdbscan", "dbscan": {"eps": 0.5}}}
@@ -46,6 +46,20 @@ def test_hdbscan_with_selection_epsilon_merges_nested_clusters():
     labels = cluster.cluster(d, "hdbscan", {"min_cluster_size": 2, "min_samples": 1,
                                             "cluster_selection_epsilon": 0.5})
     assert len(set(labels[:20])) == 1 and len(set(labels[20:])) == 1 and labels[0] != labels[20]
+
+
+def test_verdict_fails_when_the_output_prevents_the_metric():
+    targets = {"xv.open_set_accuracy": 0.9}
+    assert registry.verdict({"metric.xv.open_set_accuracy": None}, targets) == "PENDING"
+    assert registry.verdict({"metric.xv.open_set_accuracy": None, "unmet": "sin personas"}, targets) == "FAIL"
+    assert registry.verdict({"metric.xv.open_set_accuracy": 0.95}, targets) == "PASS"
+
+
+def test_rewritten_pipeline_commit_is_shown_with_its_new_hash():
+    cols = registry.git_columns({"pipeline": {"commit": "ff1511563d1636f272304d31adbba9061c883378", "dirty": True},
+                                 "experiments": {"commit": "HEAD", "dirty": False}})
+    assert cols["git_pipeline_commit"] == "1e38058b31"
+    assert cols["git_experiments_commit"] == "sin commits"
 
 
 def test_validate_frame_requires_fields_unless_ignored():
