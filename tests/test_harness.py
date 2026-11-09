@@ -39,6 +39,15 @@ def test_dbscan_noise():
     assert labels[2] == -1 and labels[0] == labels[1] != -1
 
 
+def test_hdbscan_with_selection_epsilon_merges_nested_clusters():
+    rng = np.random.default_rng(0)
+    x = np.concatenate([np.array(c) + rng.normal(scale=0.01, size=(10, 2)) for c in ([0, 0], [0.2, 0], [10, 0])])
+    d = np.linalg.norm(x[:, None] - x[None], axis=-1)
+    labels = cluster.cluster(d, "hdbscan", {"min_cluster_size": 2, "min_samples": 1,
+                                            "cluster_selection_epsilon": 0.5})
+    assert len(set(labels[:20])) == 1 and len(set(labels[20:])) == 1 and labels[0] != labels[20]
+
+
 def test_validate_frame_requires_fields_unless_ignored():
     ok = {"faces": [{"box": [0, 0, 5, 5], "identity": "P01", "pose": "frontal", "occlusion": "none"},
                     {"box": [0, 0, 5, 5], "ignore": True}]}
