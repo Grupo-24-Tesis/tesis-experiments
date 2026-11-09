@@ -99,6 +99,14 @@ class EventLog:
         self._f.close()
 
 
+def pipeline_code_hash(*names) -> str:
+    h = hashlib.sha256()
+    for name in names:
+        with open(os.path.join(PIPELINE_DIR, name), "rb") as f:
+            h.update(name.encode() + b"\0" + f.read())
+    return h.hexdigest()[:16]
+
+
 def file_sha256(path) -> str:
     st = os.stat(path)
     cache_path = os.path.join(CACHE_DIR, "sha256.json")

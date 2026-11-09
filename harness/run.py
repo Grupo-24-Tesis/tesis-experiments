@@ -174,12 +174,15 @@ def run_pipeline_point(test_id, label, over, cfg, repeat):
             "repeat": repeat, "status": "running", "started_utc": runlog.utc_now(),
             "config_hash": runlog.config_hash(key), "git": runlog.git_info(), "video": video,
             "env": runlog.env_info(), "parents": {}, "timing_s": {}, "exit_codes": {},
-            "devices_used": {}, "cache_hits": {}}
+            "devices_used": {}, "cache_hits": {},
+            "pipeline_code": {"tracking.py": runlog.pipeline_code_hash("tracking.py"),
+                              "face_recognition.py": runlog.pipeline_code_hash("face_recognition.py")}}
     runlog.write_json(os.path.join(run_dir, "run.json"), meta)
     events = os.path.join(run_dir, "events.jsonl")
     try:
         k1 = {"video_sha256": video["sha256"], "stage1": cfg["stage1"], "tracker": cfg["tracker"],
-              "_repeat": repeat, "_harness": HARNESS_VERSION}
+              "_repeat": repeat, "_harness": HARNESS_VERSION,
+              "_pipeline": meta["pipeline_code"]["tracking.py"]}
         d1, h1, i1, hit1 = cached_stage("stage1", k1, build_stage1(cfg_path), env)
         meta["parents"]["stage1"] = h1
         meta["cache_hits"]["stage1"] = hit1
@@ -195,7 +198,8 @@ def run_pipeline_point(test_id, label, over, cfg, repeat):
         if i1["status"] != "ok":
             raise RuntimeError(f"stage1 falló (código {i1['exit_code']})")
 
-        k2 = {"stage1": h1, "stage2": cfg["stage2"], "_harness": HARNESS_VERSION}
+        k2 = {"stage1": h1, "stage2": cfg["stage2"], "_harness": HARNESS_VERSION,
+              "_pipeline": meta["pipeline_code"]["face_recognition.py"]}
         d2, h2, i2, hit2 = cached_stage("stage2", k2, build_stage2(cfg_path, os.path.join(d1, "candidates")), env)
         meta["parents"]["stage2"] = h2
         meta["cache_hits"]["stage2"] = hit2
