@@ -13,7 +13,7 @@ from openpyxl.utils import get_column_letter
 
 from harness import registry, runlog
 
-WORKBOOK = os.path.join(registry.RESULTS_DIR, "tuning_results.xlsx")
+WORKBOOK = os.path.join(runlog.EXP_DIR, "tuning_results.xlsx")
 GT_ROOT = runlog.GT_ROOT
 FINDINGS = os.path.join(runlog.EXP_DIR, "findings.yaml")
 DECISIONS = os.path.join(runlog.EXP_DIR, "decisions.yaml")
@@ -474,7 +474,6 @@ def export():
     for name, frame in sheets.items():
         if "verdict" in frame.columns:
             sheets[name] = frame.assign(verdict=frame["verdict"].map(lambda v: VERDICT_ES.get(v, v)))
-    os.makedirs(registry.RESULTS_DIR, exist_ok=True)
     tmp = WORKBOOK + ".tmp.xlsx"
     with pd.ExcelWriter(tmp, engine="openpyxl") as xw:
         for name, frame in sheets.items():

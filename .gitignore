@@ -33,3 +33,4 @@ findings.yaml
 .DS_Store
 .idea/
 .vscode/
+~$*.xlsx
