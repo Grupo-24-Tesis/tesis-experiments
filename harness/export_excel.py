@@ -390,9 +390,10 @@ def readme(df):
         ("verdict", "CUMPLE = alcanza todos los objetivos; CERCA = hasta 0.02 por debajo; NO CUMPLE (también cuando "
                     "la salida de la configuración impide calcular la métrica; el motivo está en la columna unmet); "
                     "PENDIENTE = la métrica todavía no se puede calcular; sin objetivo = la prueba no tiene objetivo"),
-        ("git_pipeline_commit", "Commit del pipeline con el que corrió la ejecución. El historial del pipeline se "
-                                "reescribió el 2026-11-03: las ejecuciones anteriores registraron ff1511563d, que "
-                                "ahora es 1e38058b31, y se muestran con el commit actual. git_pipeline_dirty = TRUE "
+        ("git_pipeline_commit", "Commit del pipeline con el que corrió la ejecución. Los historiales de ambos "
+                                "repositorios se reescribieron (pipeline el 2026-11-03 y el 2026-11-09, experimentos "
+                                "el 2026-11-09) y cada ejecución se muestra con el commit equivalente actual "
+                                "(registry.PIPELINE_REWRITTEN y EXPERIMENTS_REWRITTEN). git_pipeline_dirty = TRUE "
                                 "indica cambios sin commit en ese momento. \"sin commits\" = el repositorio de "
                                 "experimentos todavía no tenía historial."),
         ("DET-02", "No tiene ejecuciones propias: cada ejecución de DET-01 calcula su curva PR y su mejor umbral "

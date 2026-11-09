@@ -12,7 +12,8 @@ REQUIRED = ("run.json", "config.json", "events.jsonl")
 NEAR_MARGIN = 0.02
 DEVICE_ES = {"CPU (CUDA EP failed to load)": "CPU (no cargó el proveedor CUDA de ONNX)",
              "CPU (TF GPU libraries missing)": "CPU (faltan las librerías GPU de TensorFlow)"}
-PIPELINE_REWRITTEN = {"ff1511563d": "1e38058b31"}
+PIPELINE_REWRITTEN = {"ff1511563d": "c87c7cbc22", "1e38058b31": "c87c7cbc22", "3bed659b39": "514a88baf4"}
+EXPERIMENTS_REWRITTEN = {"c1982c71d9": "07aae05c1e"}
 
 TESTS = {
     "ENV-01": ("env.pass_rate", True, {"env.pass_rate": 1.0}),
@@ -67,7 +68,7 @@ def git_columns(git):
                 "git_experiments_commit": "sin commits", "git_experiments_dirty": None}
     return {"git_pipeline_commit": commit_id(git["pipeline"].get("commit"), PIPELINE_REWRITTEN),
             "git_pipeline_dirty": git["pipeline"].get("dirty"),
-            "git_experiments_commit": commit_id(git["experiments"].get("commit")),
+            "git_experiments_commit": commit_id(git["experiments"].get("commit"), EXPERIMENTS_REWRITTEN),
             "git_experiments_dirty": git["experiments"].get("dirty")}
 
 

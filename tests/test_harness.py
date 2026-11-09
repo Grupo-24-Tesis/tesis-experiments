@@ -58,8 +58,12 @@ def test_verdict_fails_when_the_output_prevents_the_metric():
 def test_rewritten_pipeline_commit_is_shown_with_its_new_hash():
     cols = registry.git_columns({"pipeline": {"commit": "ff1511563d1636f272304d31adbba9061c883378", "dirty": True},
                                  "experiments": {"commit": "HEAD", "dirty": False}})
-    assert cols["git_pipeline_commit"] == "1e38058b31"
+    assert cols["git_pipeline_commit"] == "c87c7cbc22"
     assert cols["git_experiments_commit"] == "sin commits"
+    cols = registry.git_columns({"pipeline": {"commit": "3bed659b39", "dirty": False},
+                                 "experiments": {"commit": "c1982c71d9", "dirty": False}})
+    assert cols["git_pipeline_commit"] == "514a88baf4"
+    assert cols["git_experiments_commit"] == "07aae05c1e"
 
 
 def test_validate_frame_requires_fields_unless_ignored():
