@@ -21,7 +21,7 @@ VIDEOS_META = os.path.join(GT_ROOT, "videos.json")
 CONFIG_DIR = os.path.join(EXP_DIR, "configs")
 KEY_PACKAGES = ["torch", "torchvision", "ultralytics", "onnxruntime-gpu", "onnxruntime",
                 "opencv-python-headless", "opencv-python", "numpy", "tensorflow", "tf_keras",
-                "retina-face", "deepface", "mtcnn", "scikit-learn", "pandas"]
+                "retina-face", "deepface", "mtcnn", "scikit-learn", "pandas", "boto3"]
 
 
 def isolated_env(extra=None):

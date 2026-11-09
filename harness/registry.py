@@ -14,6 +14,7 @@ DEVICE_ES = {"CPU (CUDA EP failed to load)": "CPU (no cargó el proveedor CUDA d
              "CPU (TF GPU libraries missing)": "CPU (faltan las librerías GPU de TensorFlow)"}
 
 TESTS = {
+    "ENV-01": ("env.pass_rate", True, {"env.pass_rate": 1.0}),
     "DET-01": ("det.f1", True, {"det.f1": 0.85}),
     "DET-02": ("det.best_f1", True, {}),
     "DET-03": ("det.f1", True, {}),

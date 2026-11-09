@@ -673,8 +673,48 @@ def eval_xvideo(run_dir, cfg, gt):
     return m, missing
 
 
+def eval_env(run_dir, cfg, gt):
+    out = os.path.join(run_dir, "outputs")
+    videos = runlog.read_json(os.path.join(out, "videos.json"), {})
+    rows = []
+
+    def check(name, venv, value, expected, passed):
+        rows.append({"check": name, "venv": venv, "value": value, "expected": expected, "passed": bool(passed)})
+
+    reports = {}
+    for venv in cfg["env"]["venvs"]:
+        rep = runlog.read_json(os.path.join(out, f"env_{venv}.json"), {})
+        reports[venv] = rep
+        check("funciona", venv, rep.get("error") or "ok", "ok", rep.get("ok"))
+        for video, d in (rep.get("decode") or {}).items():
+            v = videos.get(video, {})
+            expected = round(v.get("fps", 0) * v.get("duration_s", 0))
+            check(f"fotogramas {os.path.basename(video)}", venv, d.get("frames_decoded"),
+                  f"{expected} (+-1)", d.get("opened") and abs(d.get("frames_decoded", 0) - expected) <= 1)
+    track = reports.get("track", {}).get("probe", {})
+    faces = reports.get("faces", {}).get("probe", {})
+    check("GPU YOLO26m", "track", track.get("yolo_device"), "cuda", track.get("yolo_cuda"))
+    check("GPU codificador ReID", "track", ",".join(track.get("onnx_providers", [])),
+          "CUDAExecutionProvider primero", track.get("onnx_cuda"))
+    check("GPU RetinaFace", "faces", ",".join(faces.get("tf_gpus", [])) or "sin GPU", "GPU:0", faces.get("tf_cuda"))
+    outside = runlog.read_json(os.path.join(out, "outside.json"), {}).get("after", {})
+    written = [f for s in outside.values() for f in s.get("written", [])]
+    check("sin archivos fuera del repositorio", "", len(written), 0, not written)
+    write_csv(os.path.join(run_dir, "classification", "env_checks.csv"), rows)
+    passed = sum(r["passed"] for r in rows)
+    m = {"env.checks": len(rows), "env.passed": passed, "env.pass_rate": passed / len(rows) if rows else None,
+         "env.outside_files_written": len(written)}
+    for venv, rep in reports.items():
+        for k, v in (rep.get("packages") or {}).items():
+            m[f"env.{venv}.{k}"] = v
+    for k in ("gpu", "driver", "gpu_memory"):
+        if reports.get("track", {}).get(k):
+            m[f"env.{k}"] = reports["track"][k]
+    return m, []
+
+
 EVALUATORS = {"detect": eval_detect, "pipeline": eval_pipeline, "embed": eval_embed,
-              "cluster": eval_cluster, "xvideo": eval_xvideo}
+              "cluster": eval_cluster, "xvideo": eval_xvideo, "env": eval_env}
 
 
 def kind_of(run_dir, meta):

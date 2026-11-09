@@ -32,6 +32,7 @@ ITEM_FILES = [
     ("Detalle - xv pares de personas", "classification/xv_person_pairs.csv"),
     ("Detalle - xv barrido de umbral", "classification/xv_threshold_sweep.csv"),
     ("Detalle - xv tamaño y pose", "classification/xv_face_slices.csv"),
+    ("Detalle - entorno", "classification/env_checks.csv"),
 ]
 TEST_DESCRIPTIONS = {
     "ENV-01": "El entorno funciona (librerías, dispositivos, lectura de videos)",
@@ -325,14 +326,21 @@ def decisions(df):
 
 def environment():
     rows = []
-    rep = runlog.read_json(os.path.join(runlog.RUNS_DIR, "ENV-01", "report.json"))
-    if rep:
-        rows.append({"item": "ejecución ENV-01", "value": rep.get("started_utc")})
-        rows.append({"item": "commit de git", "value": rep["git"]["commit"]})
-        for k, v in rep["video"].items():
-            rows.append({"item": f"video.{k}", "value": v})
-        for venv, r in rep["venvs"].items():
-            for k in ("python", "gpu", "driver"):
+    runs = sorted(d for d in glob.glob(os.path.join(runlog.RUNS_DIR, "ENV-01", "*"))
+                  if runlog.read_json(os.path.join(d, "run.json"), {}).get("status") == "ok")
+    if runs:
+        run_dir = runs[-1]
+        meta = runlog.read_json(os.path.join(run_dir, "run.json"))
+        rows.append({"item": "ejecución ENV-01", "value": runlog.rel_exp(run_dir)})
+        rows.append({"item": "inicio (UTC)", "value": meta.get("started_utc")})
+        git = registry.git_columns(meta.get("git", {}))
+        rows.append({"item": "commit del pipeline", "value": git["git_pipeline_commit"]})
+        rows.append({"item": "commit de experimentos", "value": git["git_experiments_commit"]})
+        for part, device in meta.get("devices_used", {}).items():
+            rows.append({"item": f"dispositivo.{part}", "value": device})
+        for venv in runlog.read_json(os.path.join(run_dir, "config.json"), {}).get("env", {}).get("venvs", []):
+            r = runlog.read_json(os.path.join(run_dir, "outputs", f"env_{venv}.json"), {})
+            for k in ("python", "gpu", "driver", "gpu_memory"):
                 if k in r:
                     rows.append({"item": f"{venv}.{k}", "value": r[k]})
             for k, v in (r.get("packages") or {}).items():
@@ -366,7 +374,8 @@ def readme(df):
         ("Detalle - *", "Resultado por elemento de cada ejecución (detecciones correctas, falsas y perdidas, candidatos, rostros elegidos, clusters, personas)"),
         ("GT - *", "Etiquetas manuales: fotogramas (avance de la revisión), rostros, personas y etiquetas de los rostros del pipeline"),
         ("Hallazgos", "Registro de hallazgos (findings.yaml)"),
-        ("Entorno", "Máquina, GPU, versiones de paquetes y dispositivos de ENV-01"),
+        ("Entorno", "Máquina, GPU, versiones de paquetes y dispositivos de la última ejecución de ENV-01 "
+                    "(cada comprobación está en Detalle - entorno)"),
         ("", ""),
         ("Prefijo de columna", "Significado"),
         ("param.<etapa>.<nombre>", "Valor del parámetro usado en la ejecución (stage1 = tracking.py, tracker = yaml del tracker, stage2 = face_recognition.py)"),

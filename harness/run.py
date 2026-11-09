@@ -17,7 +17,10 @@ CONFIG_DIR = runlog.CONFIG_DIR
 CACHE_ROOT = os.path.join(runlog.RUNS_DIR, "_cache")
 PY = {"track": os.path.join(runlog.PIPELINE_DIR, "venvs", "track", "bin", "python"),
       "faces": os.path.join(runlog.PIPELINE_DIR, "venvs", "faces", "bin", "python"),
-      "eval": os.path.join(runlog.EXP_DIR, "venvs", "eval", "bin", "python")}
+      "eval": os.path.join(runlog.EXP_DIR, "venvs", "eval", "bin", "python"),
+      "worker": os.path.join(runlog.PIPELINE_DIR, "venvs", "worker", "bin", "python")}
+OUTSIDE = [os.path.expanduser(p) for p in ("~/.deepface", "~/.config/Ultralytics", "~/.cache/pip", "~/.keras",
+                                           "~/.cache/torch", "~/.cache/huggingface")]
 STAGE_TIMEOUT_S = 7200
 HARNESS_VERSION = 2
 
@@ -371,8 +374,66 @@ def run_xvideo_point(test_id, label, over, cfg, repeat):
     return run_dir, meta
 
 
+def outside_snapshot(since):
+    snap = {}
+    for p in OUTSIDE:
+        files = [os.path.join(d, f) for d, _, fs in os.walk(p) for f in fs]
+        snap[p] = {"exists": os.path.exists(p), "files": len(files),
+                   "written": sorted(f for f in files if os.path.getmtime(f) >= since)}
+    return snap
+
+
+def run_env_point(test_id, label, over, cfg, repeat):
+    run_id = runlog.new_run_id(dict(cfg, _repeat=repeat) if repeat else cfg)
+    run_dir = os.path.join(runlog.RUNS_DIR, test_id, run_id)
+    os.makedirs(os.path.join(run_dir, "outputs"), exist_ok=True)
+    runlog.write_json(os.path.join(run_dir, "config.json"), cfg)
+    videos = [runlog.exp_path(v) for v in cfg["env"]["videos"]]
+    meta = {"run_id": run_id, "test_id": test_id, "kind": "env", "label": label, "overrides": over,
+            "repeat": repeat, "status": "running", "started_utc": runlog.utc_now(),
+            "config_hash": runlog.config_hash(cfg), "git": runlog.git_info(),
+            "video": runlog.video_info(cfg["video"]), "env": runlog.env_info(), "parents": {},
+            "timing_s": {}, "exit_codes": {}, "cache_hits": {}, "devices_used": {}}
+    runlog.write_json(os.path.join(run_dir, "run.json"), meta)
+    events = runlog.EventLog(os.path.join(run_dir, "events.jsonl"), "env")
+    try:
+        runlog.write_json(os.path.join(run_dir, "outputs", "videos.json"),
+                          {runlog.rel_exp(v): runlog.video_info(v) for v in videos})
+        start = time.time()
+        before = outside_snapshot(start)
+        events.emit("outside_before", paths={p: s["files"] for p, s in before.items() if s["exists"]})
+        env = runlog.isolated_env()
+        for venv in cfg["env"]["venvs"]:
+            out = os.path.join(run_dir, "outputs", f"env_{venv}.json")
+            rc, t = run_logged([PY[venv], "-m", "harness.env_probe", "--venv", venv, "--out", out,
+                                "--videos", *videos], os.path.join(run_dir, f"env_{venv}"), env)
+            meta["exit_codes"][venv] = rc
+            meta["timing_s"][venv] = t
+            rep = runlog.read_json(out, {})
+            events.emit("probe", venv=venv, exit_code=rc, ok=rep.get("ok"), error=rep.get("error"))
+        after = outside_snapshot(start)
+        runlog.write_json(os.path.join(run_dir, "outputs", "outside.json"),
+                          {"before": before, "after": after})
+        events.emit("outside_after", written={p: s["written"] for p, s in after.items() if s["written"]})
+        track = runlog.read_json(os.path.join(run_dir, "outputs", "env_track.json"), {}).get("probe", {})
+        faces = runlog.read_json(os.path.join(run_dir, "outputs", "env_faces.json"), {}).get("probe", {})
+        meta["devices_used"] = {"yolo": "GPU" if track.get("yolo_cuda") else "CPU",
+                                "reid": "GPU" if track.get("onnx_cuda") else "CPU",
+                                "retinaface": "GPU" if faces.get("tf_cuda") else "CPU"}
+        meta["status"] = "ok"
+    except Exception:
+        meta["status"] = "failed"
+        meta["error"] = traceback.format_exc()
+    events.close()
+    meta["timing_s"]["total"] = round(sum(v for v in meta["timing_s"].values() if v), 2)
+    meta["finished_utc"] = runlog.utc_now()
+    runlog.write_json(os.path.join(run_dir, "run.json"), meta)
+    return run_dir, meta
+
+
 RUNNERS = {"pipeline": run_pipeline_point, "detect": run_detect_point,
-           "embed": run_embed_point, "cluster": run_cluster_point, "xvideo": run_xvideo_point}
+           "embed": run_embed_point, "cluster": run_cluster_point, "xvideo": run_xvideo_point,
+           "env": run_env_point}
 
 
 def main():

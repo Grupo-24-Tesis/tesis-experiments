@@ -1,0 +1,11 @@
+test_id: ENV-01
+kind: env
+fixed:
+  env:
+    venvs: [track, faces, eval, worker]
+    videos:
+      - videos/Camera_ch6_20261016100358_20261016100614.mp4
+      - videos/Camera6_other_day.mp4
+      - videos/Camera3.mp4
+points:
+  - label: baseline
