@@ -34,3 +34,7 @@ findings.yaml
 .idea/
 .vscode/
 ~$*.xlsx
+
+tmp/
+coverage/
+.pytest_cache/
