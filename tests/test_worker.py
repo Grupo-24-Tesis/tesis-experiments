@@ -297,12 +297,25 @@ def test_tracks_mode_runs_the_two_stages(monkeypatch, tmp_path, stages):
     assert result == (faces_dir, FACES)
 
 
-def test_faces_is_the_default_mode():
+def mode_at_start(value):
     env = {k: v for k, v in os.environ.items() if k != "PIPELINE_MODE"}
+    if value is not None:
+        env["PIPELINE_MODE"] = value
     out = subprocess.run([sys.executable, "-c", "import worker; print(worker.PIPELINE_MODE)"],
                          cwd=PIPELINE_DIR, env=env, capture_output=True, text=True, check=True)
+    return out.stdout.strip()
 
-    assert out.stdout.strip() == "faces"
+
+def test_faces_is_the_default_mode():
+    assert mode_at_start(None) == "faces"
+
+
+def test_empty_mode_falls_back_to_faces():
+    assert mode_at_start("") == "faces"
+
+
+def test_mode_is_read_from_the_environment():
+    assert mode_at_start("tracks") == "tracks"
 
 
 def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):

@@ -43,6 +43,15 @@ def frames_of(identity):
     return [f["frame"] for f in identity]
 
 
+@pytest.fixture(autouse=True)
+def default_environment(monkeypatch):
+    monkeypatch.delenv("FACE_MIN_FACES", raising=False)
+    importlib.reload(identity_linking)
+    yield
+    monkeypatch.delenv("FACE_MIN_FACES", raising=False)
+    importlib.reload(identity_linking)
+
+
 @pytest.fixture
 def min_faces(monkeypatch):
     def set_min(value):
@@ -147,12 +156,42 @@ def test_identities_with_fewer_than_the_minimum_faces_are_dropped():
 
 def test_minimum_faces_comes_from_the_environment(monkeypatch):
     monkeypatch.setenv("FACE_MIN_FACES", "5")
-    try:
-        assert importlib.reload(identity_linking).MIN_FACES == 5
-    finally:
-        monkeypatch.delenv("FACE_MIN_FACES")
+
+    assert importlib.reload(identity_linking).MIN_FACES == 5
+
+
+@pytest.mark.parametrize("value", ["", "  "])
+def test_empty_minimum_faces_uses_the_default(monkeypatch, value):
+    monkeypatch.setenv("FACE_MIN_FACES", value)
+
+    assert importlib.reload(identity_linking).MIN_FACES == 8
+
+
+@pytest.mark.parametrize("value", ["ocho", "2.5", "0", "-3"])
+def test_invalid_minimum_faces_stops_with_a_clear_message(monkeypatch, value):
+    monkeypatch.setenv("FACE_MIN_FACES", value)
+
+    with pytest.raises(SystemExit, match="FACE_MIN_FACES debe ser un entero positivo"):
         importlib.reload(identity_linking)
-    assert identity_linking.MIN_FACES == 8
+
+
+def test_positive_float_setting_reads_the_environment(monkeypatch):
+    monkeypatch.delenv("FACE_INTERVAL_S", raising=False)
+    assert identity_linking.env_positive_float("FACE_INTERVAL_S", 0.1) == 0.1
+
+    monkeypatch.setenv("FACE_INTERVAL_S", "0.5")
+    assert identity_linking.env_positive_float("FACE_INTERVAL_S", 0.1) == 0.5
+
+    monkeypatch.setenv("FACE_INTERVAL_S", "")
+    assert identity_linking.env_positive_float("FACE_INTERVAL_S", 0.1) == 0.1
+
+
+@pytest.mark.parametrize("value", ["rapido", "0", "-0.1", "nan", "inf"])
+def test_invalid_positive_float_setting_stops_with_a_clear_message(monkeypatch, value):
+    monkeypatch.setenv("FACE_INTERVAL_S", value)
+
+    with pytest.raises(SystemExit, match="FACE_INTERVAL_S debe ser un número positivo"):
+        identity_linking.env_positive_float("FACE_INTERVAL_S", 0.1)
 
 
 def test_faces_below_the_minimum_score_are_ignored(min_faces):
