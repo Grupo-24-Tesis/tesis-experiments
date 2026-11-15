@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import sys
 
 import pytest
@@ -249,3 +250,67 @@ def test_heartbeat_extends_visibility_and_reports_progress():
 
 def test_heartbeat_survives_a_failing_queue():
     worker.JobHeartbeat(FakeSqs(fail_send=True), "recibo-1", "job-1").beat()
+
+
+@pytest.fixture
+def stages(monkeypatch):
+    calls = []
+
+    def run_stage(python, script, *args):
+        calls.append((python, script, list(args)))
+        if "--faces-dir" in args:
+            faces_dir = args[args.index("--faces-dir") + 1]
+            os.makedirs(faces_dir, exist_ok=True)
+            with open(os.path.join(faces_dir, "results.json"), "w") as f:
+                json.dump({"tracks_checked": 1, "faces": FACES}, f)
+
+    monkeypatch.setattr(worker, "run_stage", run_stage)
+    return calls
+
+
+def test_faces_mode_runs_face_identities_with_the_faces_interpreter(monkeypatch, tmp_path, stages):
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+    job_dir = str(tmp_path / "job-1")
+
+    faces_dir, faces = worker.run_pipeline("/videos/v.mp4", job_dir)
+
+    assert stages == [(worker.FACES_PYTHON, "face_identities.py",
+                       ["--video", "/videos/v.mp4", "--faces-dir", os.path.join(job_dir, "faces")])]
+    assert faces_dir == os.path.join(job_dir, "faces")
+    assert faces == FACES
+
+
+def test_tracks_mode_runs_the_two_stages(monkeypatch, tmp_path, stages):
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "tracks")
+    job_dir = str(tmp_path / "job-1")
+    candidates_dir = os.path.join(job_dir, "candidates")
+    faces_dir = os.path.join(job_dir, "faces")
+
+    result = worker.run_pipeline("/videos/v.mp4", job_dir)
+
+    assert stages == [
+        (worker.TRACK_PYTHON, "tracking.py",
+         ["--video", "/videos/v.mp4", "--candidates-dir", candidates_dir]),
+        (worker.FACES_PYTHON, "face_recognition.py",
+         ["--candidates-dir", candidates_dir, "--faces-dir", faces_dir]),
+    ]
+    assert result == (faces_dir, FACES)
+
+
+def test_faces_is_the_default_mode():
+    env = {k: v for k, v in os.environ.items() if k != "PIPELINE_MODE"}
+    out = subprocess.run([sys.executable, "-c", "import worker; print(worker.PIPELINE_MODE)"],
+                         cwd=PIPELINE_DIR, env=env, capture_output=True, text=True, check=True)
+
+    assert out.stdout.strip() == "faces"
+
+
+def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "personas")
+
+    with pytest.raises(SystemExit, match="PIPELINE_MODE desconocido 'personas'"):
+        worker.run_local("/videos/v.mp4", "job-1")
+    with pytest.raises(SystemExit, match="PIPELINE_MODE desconocido 'personas'"):
+        worker.poll_forever()
+    assert stages == []
+    assert not os.path.exists(os.path.join(worker.JOBS_DIR, "job-1"))
