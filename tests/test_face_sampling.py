@@ -2,6 +2,7 @@ import importlib
 import os
 import sys
 
+import numpy as np
 import pytest
 
 PIPELINE_DIR = os.path.abspath(os.environ.get(
@@ -11,6 +12,7 @@ PIPELINE_DIR = os.path.abspath(os.environ.get(
 sys.path.insert(0, PIPELINE_DIR)
 
 import face_sampling
+import identity_linking
 
 FPS = 30.0
 HOLD = 30
@@ -216,3 +218,157 @@ def test_invalid_sampling_settings_stop_with_a_clear_message(monkeypatch, name, 
 
     with pytest.raises(SystemExit, match=message):
         importlib.reload(face_sampling)
+
+
+class FakeCapture:
+    def __init__(self, count, fail_at=None):
+        self.count = count
+        self.fail_at = fail_at
+        self.position = -1
+        self.grabs = 0
+
+    def grab(self):
+        if self.position + 1 >= self.count:
+            return False
+        self.position += 1
+        self.grabs += 1
+        return True
+
+    def retrieve(self):
+        if self.position == self.fail_at:
+            return False, None
+        return True, self.position
+
+
+def read_all(cap, first, next_target):
+    return list(face_sampling.read_frames(cap, first, next_target))
+
+
+def test_read_frames_with_a_fixed_step_visits_every_step_once():
+    cap = FakeCapture(10)
+
+    frames = read_all(cap, 0, lambda idx: idx + 3)
+
+    assert frames == [(0, 0), (3, 3), (6, 6), (9, 9)]
+    assert cap.grabs == 10
+
+
+def test_read_frames_follows_a_varying_step_without_skipping_or_repeating():
+    steps = iter([1, 5, 2, 10])
+    cap = FakeCapture(100)
+
+    frames = read_all(cap, 0, lambda idx: idx + next(steps, 30))
+
+    assert frames == [(k, k) for k in (0, 1, 6, 8, 18, 48, 78)]
+
+
+def test_read_frames_stops_at_the_end_of_the_video():
+    assert read_all(FakeCapture(5), 0, lambda idx: idx + 3) == [(0, 0), (3, 3)]
+    assert read_all(FakeCapture(0), 0, lambda idx: idx + 3) == []
+    assert read_all(FakeCapture(5), 7, lambda idx: idx + 3) == []
+
+
+def test_read_frames_stops_when_a_frame_cannot_be_retrieved():
+    assert read_all(FakeCapture(20, fail_at=6), 0, lambda idx: idx + 3) == [(0, 0), (3, 3)]
+
+
+def test_read_frames_stops_when_there_is_no_next_target():
+    targets = iter([4, 9])
+    cap = FakeCapture(100)
+
+    frames = read_all(cap, 2, lambda _: next(targets, None))
+
+    assert frames == [(2, 2), (4, 4), (9, 9)]
+    assert cap.grabs == 10
+    assert read_all(FakeCapture(10), None, lambda idx: idx + 1) == []
+
+
+def person_detector(presence, box=LEFT):
+    def detect(frame_idx, frame, sample):
+        if frame_idx not in presence:
+            return []
+        x1, y1, x2, y2 = box
+        embedding = np.zeros(8, dtype=np.float32)
+        embedding[0] = 1.0
+        return [{"frame": frame_idx, "sample": sample, "box": list(box), "score": 0.995,
+                 "px": min(x2 - x1, y2 - y1), "sharpness": 100.0, "embedding": embedding}]
+    return detect
+
+
+def sampled_faces(count, presence, adaptive=True):
+    visited, detections = [], []
+    for frame_idx, mode, faces in face_sampling.sample_video(FakeCapture(count), FPS, adaptive,
+                                                             person_detector(presence)):
+        visited.append((frame_idx, mode))
+        detections.extend(faces)
+    return visited, detections
+
+
+def test_each_face_is_credited_the_interval_chosen_after_its_frame():
+    visited, faces = sampled_faces(300, set(range(156, 163)))
+
+    assert (156, face_sampling.IDLE) in visited
+    assert [f["frame"] for f in faces] == [156, 159, 162]
+    assert [f["interval_s"] for f in faces] == [0.1, 0.1, 0.1]
+
+
+def test_continuing_faces_after_the_hold_are_credited_the_sparse_interval():
+    visited, faces = sampled_faces(300, set(range(156, 260)))
+
+    credits = {f["frame"]: f["interval_s"] for f in faces}
+    assert credits[156] == 0.1
+    assert credits[186] == pytest.approx(0.3)
+    assert all(f["interval_s"] in (0.1, pytest.approx(0.3)) for f in faces)
+
+
+def test_short_transient_after_an_idle_stretch_does_not_pass_the_presence_rule():
+    _, faces = sampled_faces(300, set(range(156, 163)))
+
+    assert len(faces) == 3
+    assert identity_linking.presence_s(faces) == pytest.approx(0.3)
+    assert identity_linking.link_identities(faces, by_time=True) == []
+
+
+def test_person_present_for_the_minimum_time_passes_the_presence_rule():
+    _, faces = sampled_faces(300, set(range(156, 181)))
+
+    assert identity_linking.presence_s(faces) >= identity_linking.MIN_PRESENCE_S
+    assert identity_linking.link_identities(faces, by_time=True) == [faces]
+
+
+def test_fixed_mode_credits_the_fixed_interval_and_samples_every_step():
+    visited, faces = sampled_faces(90, set(range(30, 60)), adaptive=False)
+
+    assert visited == [(k, face_sampling.FIXED) for k in range(0, 90, 3)]
+    assert [f["frame"] for f in faces] == list(range(30, 60, 3))
+    assert all(f["interval_s"] == 0.1 for f in faces)
+    assert [f["sample"] for f in faces] == list(range(10, 20))
+
+
+def test_base_step_is_the_fixed_step_or_the_dense_step():
+    assert face_sampling.base_step(face_sampling.sampling_steps(FPS, False)) == 3
+    assert face_sampling.base_step(face_sampling.sampling_steps(25.0, True)) == 2
+
+
+def test_frame_repeats_are_one_with_a_fixed_step():
+    sampled = list(range(0, 30, 3))
+
+    assert face_sampling.frame_repeats(sampled, 3) == {k: 1 for k in sampled}
+
+
+def test_frame_repeats_follow_accumulated_time_without_drift():
+    steps = face_sampling.sampling_steps(25.0, True)
+    sampled, frame_idx = [], 0
+    for step in [steps[face_sampling.IDLE]] * 8 + [steps[face_sampling.SPARSE]] * 5:
+        sampled.append(frame_idx)
+        frame_idx += step
+    sampled.append(frame_idx)
+
+    repeats = face_sampling.frame_repeats(sampled, 2)
+
+    written = 0
+    for a, b in zip(sampled, sampled[1:]):
+        written += repeats[a]
+        assert abs(written - (b - sampled[0]) / 2) <= 0.5
+    assert repeats[sampled[-1]] == 1
+    assert face_sampling.frame_repeats([], 2) == {}
