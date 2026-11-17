@@ -191,7 +191,7 @@ def run_video(video, label_dir, env_overrides, extra_args, gated=False):
     face_wall, code = run_logged(name, command, env, os.path.join(faces_dir, "run.log"))
     wall = gate_wall + face_wall
     if code != 0:
-        print(f"[{name}] fallo con código {code}, ver {faces_dir}/run.log")
+        print(f"[{name}] falló con código {code}, ver {faces_dir}/run.log")
         return {"error": f"código de salida {code}", "wall_s": wall}
     identities_doc = load_json(os.path.join(faces_dir, IDENTITIES_NAME))
     detections_doc = load_json(os.path.join(faces_dir, DETECTIONS_NAME))
