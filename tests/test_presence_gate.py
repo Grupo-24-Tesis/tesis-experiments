@@ -44,14 +44,14 @@ class FakeCapture:
 
 
 def test_defaults():
-    assert presence_gate.settings() == {"checks_per_s": 4.0, "rewind_s": 1.0, "exit_s": 2.0,
+    assert presence_gate.settings() == {"checks_per_s": 2.0, "rewind_s": 1.0, "exit_s": 2.0,
                                         "conf": 0.25, "imgsz": 640}
 
 
 def test_check_step_follows_the_frame_rate():
-    assert presence_gate.check_step(30.0) == 8
-    assert presence_gate.check_step(25.0) == 6
-    assert presence_gate.check_step(2.0) == 1
+    assert presence_gate.check_step(30.0) == 15
+    assert presence_gate.check_step(15.0) == 8
+    assert presence_gate.check_step(1.0) == 1
 
 
 def test_settings_come_from_the_environment(monkeypatch):
