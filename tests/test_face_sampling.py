@@ -372,3 +372,93 @@ def test_frame_repeats_follow_accumulated_time_without_drift():
         assert abs(written - (b - sampled[0]) / 2) <= 0.5
     assert repeats[sampled[-1]] == 1
     assert face_sampling.frame_repeats([], 2) == {}
+
+
+class RecordingCapture(FakeCapture):
+    def __init__(self, count):
+        super().__init__(count)
+        self.retrieved = []
+
+    def retrieve(self):
+        self.retrieved.append(self.position)
+        return super().retrieve()
+
+
+def gated_run(count, intervals):
+    cap = RecordingCapture(count)
+    seen = []
+
+    def detect(frame_idx, frame, sample):
+        seen.append((frame_idx, sample))
+        return []
+
+    visited = [idx for idx, _, _ in face_sampling.sample_video(cap, FPS, False, detect,
+                                                               intervals=intervals)]
+    return cap, visited, seen
+
+
+def test_gated_frames_are_the_ungated_grid_frames_inside_the_intervals():
+    intervals = [(10, 20), (35, 50)]
+    _, ungated, _ = gated_run(90, None)
+    cap, gated, _ = gated_run(90, intervals)
+
+    expected = [f for f in ungated if any(s <= f <= e for s, e in intervals)]
+    assert gated == expected == [12, 15, 18, 36, 39, 42, 45, 48]
+    assert set(gated) <= set(ungated)
+
+
+def test_frames_outside_the_intervals_are_never_retrieved():
+    cap, gated, _ = gated_run(90, [(10, 20), (35, 50)])
+
+    assert cap.retrieved == gated
+    assert cap.grabs == 49
+
+
+def test_sample_counter_jumps_across_a_gap_so_tracklets_cannot_link():
+    _, _, seen = gated_run(90, [(10, 20), (35, 50)])
+
+    samples = [s for _, s in seen]
+    gap = samples[3] - samples[2]
+    assert gap == identity_linking.MAX_SKIP + 2
+    assert gap > 1 + identity_linking.MAX_SKIP
+    assert [b - a for a, b in zip(samples[:3], samples[1:3])] == [1, 1]
+    assert [b - a for a, b in zip(samples[3:], samples[4:])] == [1] * 4
+
+
+def test_sample_counter_does_not_jump_inside_one_interval():
+    _, _, seen = gated_run(90, [(0, 89)])
+
+    assert [s for _, s in seen] == list(range(30))
+
+
+def test_one_interval_covering_the_video_matches_the_ungated_run():
+    _, ungated, seen_ungated = gated_run(90, None)
+    _, gated, seen_gated = gated_run(90, [(0, 89)])
+
+    assert gated == ungated
+    assert seen_gated == seen_ungated
+
+
+def test_no_intervals_reads_nothing_from_the_video_frames():
+    cap, visited, _ = gated_run(90, [])
+
+    assert visited == []
+    assert cap.retrieved == []
+
+
+def test_gating_rejects_adaptive_sampling():
+    with pytest.raises(ValueError, match="compuerta"):
+        list(face_sampling.sample_video(FakeCapture(10), FPS, True,
+                                        lambda *args: [], intervals=[(0, 9)]))
+
+
+def test_detections_record_marks_gating_and_keeps_the_intervals():
+    ungated = face_sampling.detections_record(25.0, 3, [0], [])
+    gated = face_sampling.detections_record(
+        25.0, 3, [0], [], presence={"intervals": [(0, 9)], "active_fraction": 0.25})
+
+    assert ungated["gating"] is False
+    assert "intervals" not in ungated
+    assert gated["gating"] is True
+    assert gated["intervals"] == [[0, 9]]
+    assert gated["active_fraction"] == 0.25

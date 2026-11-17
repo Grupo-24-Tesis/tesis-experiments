@@ -268,8 +268,9 @@ def stages(monkeypatch):
     return calls
 
 
-def test_faces_mode_runs_face_identities_with_the_faces_interpreter(monkeypatch, tmp_path, stages):
+def test_faces_mode_without_gating_runs_only_face_identities(monkeypatch, tmp_path, stages):
     monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+    monkeypatch.setattr(worker, "FACE_GATING", False)
     job_dir = str(tmp_path / "job-1")
 
     faces_dir, faces = worker.run_pipeline("/videos/v.mp4", job_dir)
@@ -278,6 +279,49 @@ def test_faces_mode_runs_face_identities_with_the_faces_interpreter(monkeypatch,
                        ["--video", "/videos/v.mp4", "--faces-dir", os.path.join(job_dir, "faces")])]
     assert faces_dir == os.path.join(job_dir, "faces")
     assert faces == FACES
+
+
+def test_faces_mode_with_gating_runs_the_gate_before_the_face_pass(monkeypatch, tmp_path, stages):
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+    monkeypatch.setattr(worker, "FACE_GATING", True)
+    job_dir = str(tmp_path / "job-1")
+    presence = os.path.join(job_dir, "presence.json")
+
+    faces_dir, faces = worker.run_pipeline("/videos/v.mp4", job_dir)
+
+    assert stages == [
+        (worker.TRACK_PYTHON, "presence_gate.py",
+         ["--video", "/videos/v.mp4", "--out", presence]),
+        (worker.FACES_PYTHON, "face_identities.py",
+         ["--video", "/videos/v.mp4", "--faces-dir", os.path.join(job_dir, "faces"),
+          "--presence", presence]),
+    ]
+    assert faces == FACES
+
+
+def test_a_failing_gate_stops_the_job_before_the_face_pass(monkeypatch, tmp_path):
+    calls = []
+
+    def run_stage(python, script, *args):
+        calls.append(script)
+        raise worker.StageError(f"{script} terminó con código 1")
+
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+    monkeypatch.setattr(worker, "FACE_GATING", True)
+    monkeypatch.setattr(worker, "run_stage", run_stage)
+
+    with pytest.raises(worker.StageError, match="presence_gate.py"):
+        worker.run_pipeline("/videos/v.mp4", str(tmp_path / "job-1"))
+    assert calls == ["presence_gate.py"]
+
+
+def test_tracks_mode_ignores_the_gating_flag(monkeypatch, tmp_path, stages):
+    monkeypatch.setattr(worker, "PIPELINE_MODE", "tracks")
+    monkeypatch.setattr(worker, "FACE_GATING", True)
+
+    worker.run_pipeline("/videos/v.mp4", str(tmp_path / "job-1"))
+
+    assert [script for _, script, _ in stages] == ["tracking.py", "face_recognition.py"]
 
 
 def test_tracks_mode_runs_the_two_stages(monkeypatch, tmp_path, stages):
@@ -327,3 +371,28 @@ def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):
         worker.poll_forever()
     assert stages == []
     assert not os.path.exists(os.path.join(worker.JOBS_DIR, "job-1"))
+
+
+def gating_at_start(value):
+    env = {k: v for k, v in os.environ.items() if k != "FACE_GATING"}
+    if value is not None:
+        env["FACE_GATING"] = value
+    return subprocess.run([sys.executable, "-c", "import worker; print(worker.FACE_GATING)"],
+                          cwd=PIPELINE_DIR, env=env, capture_output=True, text=True)
+
+
+def test_gating_is_on_by_default():
+    assert gating_at_start(None).stdout.strip() == "True"
+    assert gating_at_start("").stdout.strip() == "True"
+
+
+def test_gating_is_read_from_the_environment():
+    assert gating_at_start("1").stdout.strip() == "True"
+    assert gating_at_start("0").stdout.strip() == "False"
+
+
+def test_invalid_gating_value_stops_the_worker_with_a_clear_message():
+    result = gating_at_start("si")
+
+    assert result.returncode != 0
+    assert "FACE_GATING debe ser 0 o 1, no 'si'" in result.stderr

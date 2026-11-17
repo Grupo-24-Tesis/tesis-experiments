@@ -330,3 +330,25 @@ def test_invalid_presence_settings_stop_with_a_clear_message(monkeypatch, name, 
 
     with pytest.raises(SystemExit, match=message):
         importlib.reload(identity_linking)
+
+
+def test_tracklets_do_not_link_across_a_sample_jump_of_a_skipped_gap():
+    box = (100, 100, 140, 150)
+    skip = identity_linking.MAX_SKIP
+    before = track(0, 3, box, axis(0))
+    after = track(2 + skip + 2, 3, box, axis(0))
+
+    tracklets = identity_linking.build_tracklets(before + after)
+
+    assert [len(t) for t in tracklets] == [3, 3]
+
+
+def test_tracklets_still_link_over_the_largest_ordinary_skip():
+    box = (100, 100, 140, 150)
+    skip = identity_linking.MAX_SKIP
+    before = track(0, 3, box, axis(0))
+    after = track(2 + skip + 1, 3, box, axis(0))
+
+    tracklets = identity_linking.build_tracklets(before + after)
+
+    assert [len(t) for t in tracklets] == [6]

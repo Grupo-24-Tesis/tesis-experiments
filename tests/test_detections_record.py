@@ -16,7 +16,7 @@ def face(frame, box=(1, 2, 11, 22), score=0.99, px=10, **extra):
 
 def test_record_has_expected_keys():
     record = face_sampling.detections_record(25.0, 3, [0, 3, 6], [face(3)])
-    assert set(record) == {"fps", "step", "frames_analysed", "detections"}
+    assert set(record) == {"fps", "step", "gating", "frames_analysed", "detections"}
     assert record["fps"] == 25.0
     assert record["step"] == 3
     assert record["frames_analysed"] == [0, 3, 6]
