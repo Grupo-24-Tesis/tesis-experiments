@@ -21,7 +21,10 @@ RECALL_NOTE = ("La exhaustividad simulada se mide sobre los fotogramas analizado
 ESTIMATE_NOTE = ("El tiempo de rostros es una estimación: la parte del tiempo de la base que "
                  "supera la sobrecarga fija de carga de modelos (--overhead-s) se escala por la "
                  "razón entre fotogramas analizados simulados y de la base, y la sobrecarga se "
-                 "suma una vez por video")
+                 "suma una vez por video. No se modela la decodificación secuencial de los "
+                 "fotogramas omitidos (grab() en la pasada de rostros y la segunda lectura al "
+                 "escribir los rostros), así que los tiempos absolutos son optimistas; el orden "
+                 "entre ajustes casi no cambia, porque ese costo es el mismo para todos")
 MISSING_CONFIDENCES_NOTE = ("AVISO: presence.json sin confidences; se toma cada revisión "
                             "encontrada como confianza 1.0 y cada no encontrada como 0.0")
 
