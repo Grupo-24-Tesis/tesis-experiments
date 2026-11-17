@@ -70,7 +70,12 @@ def test_frame_in_intervals():
 
 
 def test_frame_in_intervals_accepts_lists_as_read_from_json():
-    assert pi.frame_in_intervals(15, [(10, 20)])
+    intervals = [[10, 20], [30, 40]]
+    assert pi.frame_in_intervals(15, intervals)
+    assert pi.frame_in_intervals(30, intervals)
+    assert not pi.frame_in_intervals(25, intervals)
+    assert not pi.frame_in_intervals(41, intervals)
+    assert not pi.frame_in_intervals(0, intervals)
 
 
 def test_next_allowed_stays_on_the_grid_anchored_at_zero():

@@ -373,10 +373,15 @@ def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):
     assert not os.path.exists(os.path.join(worker.JOBS_DIR, "job-1"))
 
 
-def gating_at_start(value):
-    env = {k: v for k, v in os.environ.items() if k != "FACE_GATING"}
+def gating_at_start(value, adaptive=None, mode=None):
+    env = {k: v for k, v in os.environ.items()
+           if k not in ("FACE_GATING", "FACE_ADAPTIVE", "PIPELINE_MODE")}
     if value is not None:
         env["FACE_GATING"] = value
+    if adaptive is not None:
+        env["FACE_ADAPTIVE"] = adaptive
+    if mode is not None:
+        env["PIPELINE_MODE"] = mode
     return subprocess.run([sys.executable, "-c", "import worker; print(worker.FACE_GATING)"],
                           cwd=PIPELINE_DIR, env=env, capture_output=True, text=True)
 
@@ -396,3 +401,16 @@ def test_invalid_gating_value_stops_the_worker_with_a_clear_message():
 
     assert result.returncode != 0
     assert "FACE_GATING debe ser 0 o 1, no 'si'" in result.stderr
+
+
+def test_adaptive_sampling_with_gating_stops_the_worker_at_start():
+    result = gating_at_start(None, adaptive="1")
+
+    assert result.returncode != 0
+    assert "FACE_ADAPTIVE=1" in result.stderr and "FACE_GATING" in result.stderr
+
+
+def test_adaptive_sampling_is_fine_without_gating_or_in_tracks_mode():
+    assert gating_at_start("0", adaptive="1").stdout.strip() == "False"
+    assert gating_at_start("1", adaptive="1", mode="tracks").returncode == 0
+    assert gating_at_start("1", adaptive="0").stdout.strip() == "True"

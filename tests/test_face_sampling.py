@@ -462,3 +462,44 @@ def test_detections_record_marks_gating_and_keeps_the_intervals():
     assert gated["gating"] is True
     assert gated["intervals"] == [[0, 9]]
     assert gated["active_fraction"] == 0.25
+
+
+def test_counting_capture_counts_successful_grabs_only():
+    cap = face_sampling.CountingCapture(FakeCapture(3))
+
+    results = [cap.grab() for _ in range(5)]
+
+    assert results == [True, True, True, False, False]
+    assert cap.grabbed == 3
+    assert cap.retrieve() == (True, 2)
+
+
+def test_frame_count_gap_is_quiet_when_the_pass_reaches_the_presence_frames():
+    assert not face_sampling.frame_count_mismatch(2370, 2369, 30.0, [(0, 2369)], 3)
+    assert not face_sampling.frame_count_mismatch(2370, 1300, 30.0, [(0, 1320)], 3)
+
+
+def test_frame_count_gap_flags_a_video_shorter_than_the_presence_file():
+    assert face_sampling.frame_count_mismatch(2370, 1000, 30.0, [(0, 2369)], 3)
+
+
+def test_frame_count_gap_tolerates_one_second_of_frames():
+    assert not face_sampling.frame_count_mismatch(1000, 970, 30.0, [(0, 999)], 3)
+    assert face_sampling.frame_count_mismatch(1000, 969, 30.0, [(0, 999)], 3)
+
+
+def test_frame_count_gap_ignores_the_tail_after_the_last_interval():
+    assert not face_sampling.frame_count_mismatch(100000, 1300, 30.0, [(0, 1320)], 3)
+
+
+def test_frame_count_gap_with_no_intervals_is_quiet():
+    assert not face_sampling.frame_count_mismatch(1000, 0, 30.0, [], 3)
+
+
+def test_detections_record_keeps_both_frame_counts_when_gated():
+    gated = face_sampling.detections_record(
+        25.0, 3, [0], [], presence={"intervals": [(0, 9)], "active_fraction": 0.25,
+                                    "total_frames": 100, "frames_read": 98})
+
+    assert gated["presence_total_frames"] == 100
+    assert gated["frames_read"] == 98

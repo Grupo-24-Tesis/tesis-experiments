@@ -267,8 +267,9 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
             failures.append(f"{name}: una de las ejecuciones falló")
             continue
         lines.append(f"  factor de tiempo: {fmt_ratio(base['factor'])} -> {fmt_ratio(cand['factor'])}")
+        analysed_label = "fracción analizada" if cand.get("gated") else "razón"
         lines.append(f"  fotogramas analizados: {base['analysed_frames']} -> "
-                     f"{cand['analysed_frames']} (fracción analizada {fmt_ratio(ratio(cand['analysed_frames'], base['analysed_frames']))})")
+                     f"{cand['analysed_frames']} ({analysed_label} {fmt_ratio(ratio(cand['analysed_frames'], base['analysed_frames']))})")
         if cand.get("gated"):
             lines.append(f"  compuerta: {cand['gate_wall_s']:.1f} s, rostros: "
                          f"{cand['face_wall_s']:.1f} s, total {cand['wall_s']:.1f} s "

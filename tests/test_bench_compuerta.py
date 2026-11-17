@@ -182,3 +182,13 @@ def test_compare_of_ungated_runs_adds_no_gate_lines():
     lines, _ = bench_compuerta.compare_documents(document(entry()), document(entry()), 0.5,
                                                  no_detections)
     assert not any("compuerta" in line or "tramo" in line for line in lines)
+
+
+def test_analysed_fraction_label_only_for_gated_candidates():
+    gated, _ = bench_compuerta.compare_documents(
+        document(entry()), document(gated_entry()), 0.5, no_detections)
+    plain, _ = bench_compuerta.compare_documents(
+        document(entry()), document(entry()), 0.5, no_detections)
+    assert any("fracción analizada" in line for line in gated)
+    assert not any("fracción analizada" in line for line in plain)
+    assert any("(razón " in line for line in plain)

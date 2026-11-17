@@ -68,9 +68,12 @@ def test_settings_come_from_the_environment(monkeypatch):
 
 @pytest.mark.parametrize("name,value,message", [
     ("GATE_CHECKS_PER_S", "0", "GATE_CHECKS_PER_S debe ser un número positivo"),
-    ("GATE_REWIND_S", "-1", "GATE_REWIND_S debe ser un número positivo"),
-    ("GATE_EXIT_S", "abc", "GATE_EXIT_S debe ser un número positivo"),
+    ("GATE_REWIND_S", "-1", "GATE_REWIND_S debe ser un número no negativo"),
+    ("GATE_EXIT_S", "abc", "GATE_EXIT_S debe ser un número no negativo"),
+    ("GATE_EXIT_S", "inf", "GATE_EXIT_S debe ser un número no negativo"),
     ("GATE_CONF", "nan", "GATE_CONF debe ser un número positivo"),
+    ("GATE_CONF", "0", "GATE_CONF debe ser un número positivo"),
+    ("GATE_CONF", "1.5", "GATE_CONF debe estar entre 0 y 1"),
     ("GATE_IMGSZ", "1.5", "GATE_IMGSZ debe ser un entero positivo"),
 ])
 def test_invalid_settings_stop_with_a_clear_message(monkeypatch, name, value, message):
@@ -89,19 +92,50 @@ def test_read_checks_retrieves_only_every_step_from_frame_zero():
     assert frames_read == 20
 
 
-def test_read_checks_stops_when_a_frame_cannot_be_retrieved():
+def test_a_failed_retrieve_counts_as_found_and_checking_goes_on(capsys):
     cap = FakeCapture(20)
-    cap.retrieve = lambda: (False, None)
+    real_retrieve = cap.retrieve
 
-    checks, _ = presence_gate.read_checks(cap, 4, lambda frame: True)
+    def retrieve():
+        if cap.position == 8:
+            return False, None
+        return real_retrieve()
 
-    assert checks == []
+    cap.retrieve = retrieve
+
+    checks, frames_read = presence_gate.read_checks(cap, 4, lambda frame: False)
+
+    assert checks == [[0, False], [4, False], [8, True], [12, False], [16, False]]
+    assert frames_read == 20
+    assert "fotograma 8" in capsys.readouterr().err
+
+
+def test_rewind_and_exit_may_be_zero(monkeypatch):
+    monkeypatch.setenv("GATE_REWIND_S", "0")
+    monkeypatch.setenv("GATE_EXIT_S", "0")
+    importlib.reload(presence_gate)
+
+    document = presence_gate.build_document("v.mp4", 10.0, 3, [[30, True]], 100, 0.1)
+
+    assert document["intervals"] == [[30, 30]]
+
+
+def test_conf_of_exactly_one_is_valid(monkeypatch):
+    monkeypatch.setenv("GATE_CONF", "1")
+    importlib.reload(presence_gate)
+    assert presence_gate.settings()["conf"] == 1.0
+
+
+def test_weights_path_is_absolute_and_beside_the_script():
+    assert os.path.isabs(presence_gate.YOLO_WEIGHTS)
+    assert os.path.dirname(presence_gate.YOLO_WEIGHTS) == os.path.abspath(PIPELINE_DIR)
+    assert os.path.basename(presence_gate.YOLO_WEIGHTS) == "yolo26m.pt"
 
 
 def test_document_has_the_documented_fields():
     checks = [[0, False], [8, True], [16, False]]
 
-    document = presence_gate.build_document("/v/clip.mp4", 8.0, 20, 2, checks, 20, 1.5)
+    document = presence_gate.build_document("/v/clip.mp4", 8.0, 2, checks, 20, 1.5)
 
     assert set(document) == {"video", "fps", "total_frames", "check_step", "settings", "checks",
                              "intervals", "switches", "active_frames", "active_fraction",
@@ -115,16 +149,28 @@ def test_document_has_the_documented_fields():
 
 
 def test_document_without_people_has_no_intervals():
-    document = presence_gate.build_document("v.mp4", 10.0, 100, 3, [[0, False]], 100, 0.1)
+    document = presence_gate.build_document("v.mp4", 10.0, 3, [[0, False]], 100, 0.1)
 
     assert document["intervals"] == []
     assert document["switches"] == []
     assert document["active_fraction"] == 0.0
 
 
-def test_document_uses_the_frames_read_when_the_video_declares_none():
-    document = presence_gate.build_document("v.mp4", 10.0, 0, 3, [[30, True]], 100, 0.1)
+def test_document_total_is_the_frames_actually_read():
+    document = presence_gate.build_document("v.mp4", 10.0, 3, [[30, True]], 100, 0.1)
 
     assert document["total_frames"] == 100
     assert document["intervals"] == [[20, 50]]
     assert document["active_fraction"] == pytest.approx(0.31)
+
+
+def test_a_container_that_under_declares_frames_cannot_clip_intervals():
+    cap = FakeCapture(100)
+    declared_frames = 40
+
+    checks, frames_read = presence_gate.read_checks(cap, 10, lambda frame: frame == 90)
+    document = presence_gate.build_document("v.mp4", 10.0, 10, checks, frames_read, 0.1)
+
+    assert declared_frames < frames_read
+    assert document["total_frames"] == 100
+    assert document["intervals"] == [[80, 99]]
