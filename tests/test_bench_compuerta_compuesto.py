@@ -65,4 +65,3 @@ def test_a_composite_map_with_a_missing_xml_names_the_file(tmp_path, monkeypatch
           json.dumps({"frames": [["Z", 1]], "empty_labelled": True}))
     with pytest.raises(FileNotFoundError, match="Z.xml"):
         bench_compuerta.find_ground_truth("largo")
-

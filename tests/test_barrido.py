@@ -105,20 +105,43 @@ def test_a_person_with_some_detections_kept_is_not_flagged():
     assert result["persons_lost"] == ["p2"]
 
 
-def test_estimated_face_time_scales_with_the_analysed_frames():
-    result = barrido.score_video(make_case(base_wall=100.0), make_presence(), 0.5, 1.0, 1.0)
+def test_estimated_face_time_scales_only_the_part_above_the_overhead():
+    result = barrido.score_video(make_case(base_wall=100.0), make_presence(), 0.5, 1.0, 1.0,
+                                 overhead_s=20.0)
     assert result["analysed_frames"] == 5
     assert result["analysed_fraction"] == pytest.approx(0.25)
-    assert result["estimated_face_s"] == pytest.approx(25.0)
+    assert result["estimated_face_s"] == pytest.approx(20.0 + 80.0 * 0.25)
+
+
+def test_overhead_never_exceeds_the_baseline_time():
+    result = barrido.score_video(make_case(base_wall=10.0), make_presence(), 0.5, 1.0, 1.0,
+                                 overhead_s=20.0)
+    assert result["estimated_face_s"] == pytest.approx(10.0)
+
+
+def test_threshold_is_strictly_greater_than():
+    presence = make_presence()
+    at_edge, _ = barrido.simulate_intervals(presence, 0.3, 1.0, 1.0)
+    assert at_edge == [(20, 40)]
+
+
+def test_person_ids_of_different_composite_sources_do_not_merge():
+    gts = {"A": {1: [("p1", (10.0, 10.0))]}, "B": {1: [("p1", (10.0, 10.0))]}}
+    frame_map = {"frames": [["A", 1], ["B", 1]], "empty_labelled": True}
+    detections = [detection(0, BOX_P1), detection(1, BOX_P1)]
+    found = barrido.person_true_positive_frames(detections, [0, 1], gts, frame_map)
+    assert found == {"A:p1": {0}, "B:p1": {1}}
+    assert barrido.persons_fully_lost(found, [0]) == ["B:p1"]
 
 
 def summary(change=0.0, lost=0, worst=0.0, total=10.0):
     return {"recall_change_points": change, "persons_lost": lost, "max_video_drop_points": worst,
-            "estimated_total_s": total}
+            "factor": total}
 
 
-def setting(exit_s, rewind_s, **kwargs):
-    return {"exit_s": exit_s, "rewind_s": rewind_s, "summary": summary(**kwargs)}
+def setting(exit_s, rewind_s, missing=None, **kwargs):
+    return {"exit_s": exit_s, "rewind_s": rewind_s, "missing": missing or [],
+            "summary": summary(**kwargs)}
 
 
 def test_recommendation_picks_the_cheapest_setting_that_is_safe():
@@ -138,6 +161,18 @@ def test_recommendation_breaks_ties_with_higher_exit_then_rewind():
     assert barrido.recommend([a, b]) is b
 
 
+def test_an_incomplete_setting_is_never_recommended_even_if_cheapest():
+    incomplete = setting(1, 1, total=0.1, missing=["w"])
+    complete = setting(1, 1, total=0.9)
+    assert barrido.recommend([incomplete, complete]) is complete
+    assert barrido.recommend([incomplete]) is None
+
+
+def test_recommendation_ranks_by_factor():
+    assert barrido.recommend([setting(1, 1, total=0.8), setting(2, 2, total=0.7)])["summary"][
+        "factor"] == 0.7
+
+
 def test_recommendation_is_none_when_no_setting_is_safe():
     assert barrido.recommend([setting(1, 1, lost=2)]) is None
 
@@ -154,10 +189,53 @@ def test_summary_aggregates_accuracy_over_precision_videos_and_cost_over_cost_vi
     assert result["persons_lost"] == 1
     assert result["videos_cost"] == ["w"]
     assert result["gate_s"] == pytest.approx(2.0)
-    assert result["estimated_face_s"] == pytest.approx(50.0 * 10 / 20)
-    assert result["estimated_total_s"] == pytest.approx(27.0)
+    assert result["estimated_face_s"] == pytest.approx(20.0 + 30.0 * 10 / 20)
+    assert result["estimated_total_s"] == pytest.approx(37.0)
     assert result["base_total_s"] == pytest.approx(50.0)
-    assert result["factor"] == pytest.approx(0.54)
+    assert result["factor"] == pytest.approx(0.74)
+
+
+def test_a_truncated_presence_file_is_rerun_and_no_partial_file_is_left(tmp_path, monkeypatch):
+    calls = []
+
+    def fake_run(name, command, env, log_path):
+        calls.append(command)
+        out = command[command.index("--out") + 1]
+        with open(out, "w") as f:
+            f.write("{}")
+        return 1.0, 0
+
+    monkeypatch.setattr(bench_compuerta, "run_logged", fake_run)
+    out = tmp_path / "gates"
+    broken = out / "c4_i640" / "clip" / "presence.json"
+    broken.parent.mkdir(parents=True)
+    broken.write_text('{"checks": [[0, tr')
+    args = barrido.build_parser().parse_args(
+        ["gate", "--out", str(out), "--checks-per-s", "4", "--imgsz", "640",
+         str(tmp_path / "clip.mp4")])
+
+    assert args.handler(args) == 0
+
+    assert len(calls) == 1
+    assert calls[0][calls[0].index("--out") + 1] != str(broken)
+    assert json.loads(broken.read_text()) == {}
+    assert sorted(os.listdir(broken.parent)) == ["presence.json"]
+
+
+def test_a_failed_gate_leaves_no_presence_file(tmp_path, monkeypatch):
+    def fake_run(name, command, env, log_path):
+        out = command[command.index("--out") + 1]
+        with open(out, "w") as f:
+            f.write('{"che')
+        return 1.0, 1
+
+    monkeypatch.setattr(bench_compuerta, "run_logged", fake_run)
+    args = barrido.build_parser().parse_args(
+        ["gate", "--out", str(tmp_path / "g"), "--checks-per-s", "4", "--imgsz", "640",
+         str(tmp_path / "clip.mp4")])
+
+    assert args.handler(args) == 1
+    assert not (tmp_path / "g" / "c4_i640" / "clip" / "presence.json").exists()
 
 
 def test_gate_runs_every_pair_skips_existing_files_and_records_times(tmp_path, monkeypatch):
@@ -202,6 +280,49 @@ XML = """<sequence name="V">
 </sequence>"""
 
 
+def write_end_to_end_inputs(tmp_path, monkeypatch, videos):
+    chokepoint = tmp_path / "cp"
+    (chokepoint / "groundtruth").mkdir(parents=True)
+    (chokepoint / "videos").mkdir()
+    monkeypatch.setenv("TESIS_CHOKEPOINT_DIR", str(chokepoint))
+    base = tmp_path / "base"
+    entries = {}
+    for name in videos:
+        (chokepoint / "groundtruth" / f"{name}.xml").write_text(XML)
+        (chokepoint / "videos" / f"{name}.frames.json").write_text(json.dumps(list(range(TOTAL))))
+        (base / name).mkdir(parents=True)
+        (base / name / "detections.json").write_text(json.dumps(
+            {"fps": FPS, "step": 5, "frames_analysed": FRAMES, "detections": DETECTIONS}))
+        entries[name] = {"wall_s": 100.0, "detections_file": f"{name}/detections.json"}
+    (base / "results.json").write_text(json.dumps({"videos": entries}))
+    return base / "results.json"
+
+
+def test_a_gate_folder_missing_a_selected_video_is_incomplete_and_not_recommended(
+        tmp_path, monkeypatch, capsys):
+    results = write_end_to_end_inputs(tmp_path, monkeypatch, ["V", "W"])
+    gates = tmp_path / "gates"
+    for folder, names in (("c2_i640", ["V"]), ("c4_i640", ["V", "W"])):
+        for name in names:
+            path = gates / folder / name
+            path.mkdir(parents=True)
+            (path / "presence.json").write_text(json.dumps(make_presence()))
+    out = tmp_path / "salida.json"
+    args = barrido.build_parser().parse_args(
+        ["puntuar", "--baseline", str(results), "--gates", str(gates), "--conf", "0.1",
+         "--exit", "1", "--rewind", "1", "--out", str(out)])
+
+    assert args.handler(args) == 0
+
+    text = capsys.readouterr().out
+    assert "INCOMPLETO" in text
+    document = json.loads(out.read_text())
+    by_folder = {s["checks_per_s"]: s for s in document["settings"]}
+    assert by_folder[2.0]["missing"] == ["W"]
+    assert by_folder[4.0]["missing"] == []
+    assert document["recommended"]["checks_per_s"] == 4.0
+
+
 def test_puntuar_end_to_end_writes_json_and_marks_the_recommended_setting(tmp_path, monkeypatch,
                                                                           capsys):
     chokepoint = tmp_path / "cp"
@@ -235,3 +356,4 @@ def test_puntuar_end_to_end_writes_json_and_marks_the_recommended_setting(tmp_pa
     assert document["recommended"]["conf"] == 0.1
     assert document["settings"][1]["summary"]["persons_lost"] == 1
     assert document["settings"][0]["summary"]["gate_s"] == pytest.approx(4.0)
+    assert document["overhead_s"] == barrido.DEFAULT_OVERHEAD_S

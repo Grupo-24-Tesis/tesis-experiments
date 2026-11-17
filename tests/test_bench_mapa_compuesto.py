@@ -131,3 +131,11 @@ def test_an_int_entry_inside_a_composite_map_raises_a_clear_error():
     frame_map = {"frames": [["A", 1], 7], "empty_labelled": True}
     with pytest.raises(ValueError, match="mapa compuesto.*fotograma 1"):
         metrics.people_at(GTS, frame_map, 1)
+
+
+def test_a_legacy_int_map_never_reaches_the_composite_error():
+    gt = {7: [("a", (1.0, 1.0))]}
+    assert metrics.people_at(gt, [7, 8], 1) is None
+    assert metrics.people_at(gt, [7, 8], 0) == [("a", (1.0, 1.0))]
+    assert not metrics.is_composite_map([7, 8])
+

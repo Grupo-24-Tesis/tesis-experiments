@@ -14,11 +14,14 @@ GATE_TIMES_NAME = "gate_times.json"
 SETTING_FOLDER = re.compile(r"^c([0-9.]+)_i([0-9]+)$")
 MAX_RECALL_DROP_POINTS = 0.5
 MAX_VIDEO_DROP_POINTS = 1.0
+DEFAULT_OVERHEAD_S = 20.0
 RECALL_NOTE = ("La exhaustividad simulada se mide sobre los fotogramas analizados de la base: "
                "una persona etiquetada en un fotograma que la compuerta omite cuenta como "
                "no encontrada")
-ESTIMATE_NOTE = ("El tiempo de rostros es una estimación: tiempo de rostros de la base por la "
-                 "razón entre fotogramas analizados simulados y de la base")
+ESTIMATE_NOTE = ("El tiempo de rostros es una estimación: la parte del tiempo de la base que "
+                 "supera la sobrecarga fija de carga de modelos (--overhead-s) se escala por la "
+                 "razón entre fotogramas analizados simulados y de la base, y la sobrecarga se "
+                 "suma una vez por video")
 MISSING_CONFIDENCES_NOTE = ("AVISO: presence.json sin confidences; se toma cada revisión "
                             "encontrada como confianza 1.0 y cada no encontrada como 0.0")
 
@@ -56,6 +59,13 @@ def parse_name_list(text):
     return [part.strip() for part in text.split(",") if part.strip()]
 
 
+def read_presence(path):
+    try:
+        return bench_compuerta.load_json(path)
+    except (OSError, ValueError):
+        return None
+
+
 def read_gate_times(out_dir):
     path = os.path.join(out_dir, GATE_TIMES_NAME)
     if os.path.exists(path):
@@ -85,19 +95,26 @@ def command_gate(args):
                 name = bench_compuerta.video_name(video)
                 video_dir = os.path.join(args.out, folder, name)
                 presence_path = os.path.join(video_dir, bench_compuerta.PRESENCE_NAME)
-                if os.path.exists(presence_path):
+                if read_presence(presence_path) is not None:
                     print(f"[{folder}/{name}] ya existe, se omite")
                     continue
                 os.makedirs(video_dir, exist_ok=True)
+                partial_path = presence_path + ".parcial"
                 command = [interpreter, "presence_gate.py", "--video", os.path.abspath(video),
-                           "--out", presence_path]
+                           "--out", partial_path]
                 wall, code = bench_compuerta.run_logged(f"{folder}/{name}", command, env,
                                                         os.path.join(video_dir, "gate.log"))
+                if code == 0 and read_presence(partial_path) is None:
+                    code = 1
                 if code != 0:
+                    for stale in (partial_path, presence_path):
+                        if os.path.exists(stale):
+                            os.remove(stale)
                     print(f"[{folder}/{name}] la compuerta falló con código {code}, "
                           f"ver {video_dir}/gate.log")
                     failures += 1
                     continue
+                os.replace(partial_path, presence_path)
                 times.setdefault(folder, {})[name] = wall
                 write_gate_times(args.out, times)
                 print(f"[{folder}/{name}] compuerta {wall:.1f} s")
@@ -119,7 +136,7 @@ def checks_at(presence, conf):
     confidences = presence.get("confidences")
     if confidences is None:
         return list(presence["checks"]), True
-    return [[frame, value >= conf] for frame, value in confidences], False
+    return [[frame, value > conf] for frame, value in confidences], False
 
 
 def simulate_intervals(presence, conf, exit_s, rewind_s):
@@ -196,7 +213,14 @@ def build_case(name, entry, detections_doc):
     return case
 
 
-def score_video(case, presence, conf, exit_s, rewind_s):
+def estimate_face_s(base_wall_s, kept, analysed, overhead_s):
+    if not analysed:
+        return 0.0
+    overhead = min(overhead_s, base_wall_s)
+    return overhead + (base_wall_s - overhead) * kept / analysed
+
+
+def score_video(case, presence, conf, exit_s, rewind_s, overhead_s=DEFAULT_OVERHEAD_S):
     intervals, missing = simulate_intervals(presence, conf, exit_s, rewind_s)
     kept = retained_frames(case["frames"], intervals)
     kept_set = set(kept)
@@ -207,7 +231,8 @@ def score_video(case, presence, conf, exit_s, rewind_s):
     result = {
         "analysed_frames": len(kept),
         "analysed_fraction": len(kept) / analysed if analysed else 0.0,
-        "estimated_face_s": case["base_wall_s"] * len(kept) / analysed if analysed else 0.0,
+        "estimated_face_s": estimate_face_s(case["base_wall_s"], len(kept), analysed,
+                                            overhead_s),
         "lost": lost_detection_records(case["detections"], kept, intervals,
                                        presence["total_frames"], case["fps"]),
         "persons_lost": persons_fully_lost(case["person_frames"], kept),
@@ -260,11 +285,11 @@ def is_safe(summary):
 
 
 def recommend(settings):
-    safe = [s for s in settings if is_safe(s["summary"])]
+    safe = [s for s in settings if not s["missing"] and s["summary"]["factor"] is not None
+            and is_safe(s["summary"])]
     if not safe:
         return None
-    return min(safe, key=lambda s: (s["summary"]["estimated_total_s"], -s["exit_s"],
-                                    -s["rewind_s"]))
+    return min(safe, key=lambda s: (s["summary"]["factor"], -s["exit_s"], -s["rewind_s"]))
 
 
 def discover_gates(gates_dir):
@@ -290,7 +315,8 @@ def load_baselines(paths):
     return cases
 
 
-def sweep(cases, gates_dir, confs, exits, rewinds, precision_names, cost_names):
+def sweep(cases, gates_dir, confs, exits, rewinds, precision_names, cost_names,
+          overhead_s=DEFAULT_OVERHEAD_S):
     gate_folders = discover_gates(gates_dir)
     times = read_gate_times(gates_dir)
     settings = []
@@ -299,10 +325,12 @@ def sweep(cases, gates_dir, confs, exits, rewinds, precision_names, cost_names):
         presences = {}
         for name in cases:
             path = os.path.join(gates_dir, folder, name, bench_compuerta.PRESENCE_NAME)
-            if os.path.exists(path):
-                presences[name] = bench_compuerta.load_json(path)
+            presence = read_presence(path)
+            if presence is not None:
+                presences[name] = presence
         if not presences:
             continue
+        missing = sorted((precision_names | cost_names) - set(presences))
         gate_times = {n: times.get(folder, {}).get(n, p.get("wall_s", 0.0))
                       for n, p in presences.items()}
         for conf in confs:
@@ -311,14 +339,15 @@ def sweep(cases, gates_dir, confs, exits, rewinds, precision_names, cost_names):
                     per_video = {}
                     for name, presence in presences.items():
                         per_video[name] = score_video(cases[name], presence, conf, exit_s,
-                                                      rewind_s)
+                                                      rewind_s, overhead_s)
                         if per_video[name]["confidences_missing"]:
                             missing_notes.add(f"{folder}/{name}")
                     summary = summarise_setting(per_video, cases, precision_names, cost_names,
                                                 gate_times)
                     settings.append({"checks_per_s": checks, "imgsz": imgsz, "conf": conf,
                                      "exit_s": exit_s, "rewind_s": rewind_s,
-                                     "summary": summary, "per_video": per_video})
+                                     "missing": missing, "summary": summary,
+                                     "per_video": per_video})
     return settings, sorted(missing_notes)
 
 
@@ -337,7 +366,9 @@ def format_table(settings, recommended):
                      f"{s['mean_analysed_fraction']:.1%}", f"{s['gate_s']:.1f}",
                      f"{s['estimated_total_s']:.1f}",
                      "n/d" if s["factor"] is None else f"{s['factor']:.2f}",
-                     "RECOMENDADO" if setting is recommended else ""])
+                     "RECOMENDADO" if setting is recommended
+                     else (f"INCOMPLETO (faltan {', '.join(setting['missing'])})"
+                           if setting["missing"] else "")])
     widths = [max(len(row[i]) for row in rows) for i in range(len(header))]
     return ["  ".join(cell.ljust(widths[i]) for i, cell in enumerate(row)).rstrip()
             for row in rows]
@@ -358,7 +389,7 @@ def command_puntuar(args):
     if unknown:
         raise SystemExit(f"Videos que no están en la base: {', '.join(unknown)}")
     settings, missing = sweep(cases, args.gates, confs, exits, rewinds, precision_names,
-                              cost_names)
+                              cost_names, args.overhead_s)
     if not settings:
         raise SystemExit("No hay compuertas que coincidan con videos de la base")
     recommended = recommend(settings)
@@ -373,7 +404,9 @@ def command_puntuar(args):
     if recommended is None:
         lines.append("Ningún ajuste cumple la regla de recomendación")
     print("\n".join(lines))
-    document = {"created": time.strftime("%Y-%m-%dT%H:%M:%S"), "estimate_note": ESTIMATE_NOTE, "recall_note": RECALL_NOTE,
+    document = {"created": time.strftime("%Y-%m-%dT%H:%M:%S"), "estimate_note": ESTIMATE_NOTE,
+                "recall_note": RECALL_NOTE,
+                "overhead_s": args.overhead_s,
                 "baselines": args.baseline, "gates": args.gates,
                 "videos_precision": sorted(precision_names),
                 "videos_cost": sorted(cost_names),
@@ -395,8 +428,10 @@ def build_parser():
     sub = parser.add_subparsers(dest="command", required=True)
     gate = sub.add_parser("gate", help="corre presence_gate.py por video y ajuste")
     gate.add_argument("--out", required=True, help="carpeta de salida DIR/c<rev>_i<imgsz>/VIDEO")
-    gate.add_argument("--checks-per-s", required=True, help="revisiones por segundo, separadas por comas")
-    gate.add_argument("--imgsz", required=True, help="tamaños de imagen de YOLO, separados por comas")
+    gate.add_argument("--checks-per-s", required=True,
+                      help="revisiones por segundo, separadas por comas")
+    gate.add_argument("--imgsz", required=True,
+                      help="tamaños de imagen de YOLO, separados por comas")
     gate.add_argument("videos", nargs="+", metavar="VIDEO", help="videos a revisar")
     gate.set_defaults(handler=command_gate)
     score = sub.add_parser("puntuar", help="puntúa los ajustes sin conexión desde la base")
@@ -407,10 +442,14 @@ def build_parser():
     score.add_argument("--exit", required=True, help="segundos de salida, separados por comas")
     score.add_argument("--rewind", required=True, help="segundos de retroceso, separados por comas")
     score.add_argument("--out", required=True, help="archivo JSON de salida")
+    score.add_argument("--overhead-s", type=float, default=DEFAULT_OVERHEAD_S, metavar="S",
+                       help="segundos fijos por video (carga de modelos) que no se escalan con "
+                            "los fotogramas analizados (por defecto 20)")
     score.add_argument("--videos-coste", default=None, metavar="NOMBRE,...",
                        help="videos que cuentan para las columnas de costo (por defecto todos)")
     score.add_argument("--videos-precision", default=None, metavar="NOMBRE,...",
-                       help="videos que cuentan para las columnas de precisión (por defecto todos)")
+                       help="videos que cuentan para las columnas de precisión (por defecto "
+                            "todos)")
     score.set_defaults(handler=command_puntuar)
     return parser
 

@@ -85,7 +85,8 @@ def test_invalid_settings_stop_with_a_clear_message(monkeypatch, name, value, me
 def test_read_checks_retrieves_only_every_step_from_frame_zero():
     cap = FakeCapture(20)
 
-    checks, confidences, frames_read = presence_gate.read_checks(cap, 8, lambda frame: frame == 8)
+    checks, confidences, frames_read = presence_gate.read_checks(
+        cap, 8, lambda frame: frame == 8)
 
     assert cap.retrieved == [0, 8, 16]
     assert checks == [[0, False], [8, True], [16, False]]
@@ -103,7 +104,8 @@ def test_a_failed_retrieve_counts_as_found_and_checking_goes_on(capsys):
 
     cap.retrieve = retrieve
 
-    checks, confidences, frames_read = presence_gate.read_checks(cap, 4, lambda frame: False)
+    checks, confidences, frames_read = presence_gate.read_checks(
+        cap, 4, lambda frame: False)
 
     assert checks == [[0, False], [4, False], [8, True], [12, False], [16, False]]
     assert frames_read == 20
@@ -137,9 +139,9 @@ def test_document_has_the_documented_fields():
 
     document = presence_gate.build_document("/v/clip.mp4", 8.0, 2, checks, 20, 1.5)
 
-    assert set(document) == {"video", "fps", "total_frames", "check_step", "settings", "checks", "confidences",
-                             "intervals", "switches", "active_frames", "active_fraction",
-                             "wall_s"}
+    assert set(document) == {"video", "fps", "total_frames", "check_step", "settings", "checks",
+                             "confidences", "intervals", "switches", "active_frames",
+                             "active_fraction", "wall_s"}
     assert document["video"] == "clip.mp4"
     assert document["intervals"] == [[0, 19]]
     assert document["active_frames"] == 20
@@ -168,7 +170,8 @@ def test_a_container_that_under_declares_frames_cannot_clip_intervals():
     cap = FakeCapture(100)
     declared_frames = 40
 
-    checks, confidences, frames_read = presence_gate.read_checks(cap, 10, lambda frame: frame == 90)
+    checks, confidences, frames_read = presence_gate.read_checks(
+        cap, 10, lambda frame: frame == 90)
     document = presence_gate.build_document("v.mp4", 10.0, 10, checks, frames_read, 0.1)
 
     assert declared_frames < frames_read
@@ -204,7 +207,8 @@ def test_document_carries_confidences_aligned_with_checks():
     document = presence_gate.build_document("v.mp4", 30.0, 8, checks, 16, 0.1, confidences)
 
     assert document["confidences"] == confidences
-    assert [frame for frame, _ in document["confidences"]] == [frame for frame, _ in document["checks"]]
+    assert ([frame for frame, _ in document["confidences"]]
+            == [frame for frame, _ in document["checks"]])
 
 
 def test_document_without_confidences_derives_them_from_checks():
