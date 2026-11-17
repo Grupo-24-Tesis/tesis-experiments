@@ -56,7 +56,7 @@ def run(frames, adaptive=True):
 
 
 def test_defaults_in_seconds_become_frame_steps():
-    assert face_sampling.ADAPTIVE is True
+    assert face_sampling.ADAPTIVE is False
     assert face_sampling.sampling_steps(FPS, True) == {
         face_sampling.DENSE: 3, face_sampling.SPARSE: 9, face_sampling.IDLE: 30}
     assert face_sampling.hold_frames(FPS) == HOLD
