@@ -59,10 +59,15 @@ def load_chokepoint_xml(source, include_empty=False):
 def find_ground_truth(name):
     frame_map = find_frame_map(name)
     if frame_map is not None and metrics.is_composite_map(frame_map):
-        gts = {source: load_chokepoint_xml(source, include_empty=True)
-               for source in metrics.referenced_sources(frame_map)}
-        if all(gt is not None for gt in gts.values()):
-            return KIND_CHOKEPOINT, gts, frame_map
+        gts = {}
+        for source in metrics.referenced_sources(frame_map):
+            gt = load_chokepoint_xml(source, include_empty=True)
+            if gt is None:
+                raise FileNotFoundError(
+                    f"El mapa compuesto de {name} usa {source}.xml y no existe en "
+                    f"{os.path.join(chokepoint_dir(), 'groundtruth')}")
+            gts[source] = gt
+        return KIND_CHOKEPOINT, gts, frame_map
     elif frame_map is not None:
         gt = load_chokepoint_xml(name)
         if gt is not None:

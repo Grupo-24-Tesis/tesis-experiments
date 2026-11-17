@@ -118,7 +118,8 @@ def people_at(gt, frame_map, frame):
     if entry is None:
         return [] if isinstance(frame_map, dict) and frame_map.get("empty_labelled") else None
     if isinstance(entry, int):
-        return None
+        raise ValueError(f"El mapa compuesto tiene una entrada entera en el fotograma {frame}: "
+                         f"cada entrada debe ser null o [fuente, número]")
     name, number = entry
     source = gt.get(name)
     if source is None or number < 0:

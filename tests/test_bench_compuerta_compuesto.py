@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")))
 
 from bench import bench_compuerta
@@ -55,3 +57,12 @@ def test_composite_map_keeps_empty_frames_of_the_xml_as_labelled_empty(tmp_path,
           json.dumps({"frames": [["A", 5]], "empty_labelled": True}))
     _, gts, _ = bench_compuerta.find_ground_truth("c")
     assert gts["A"][5] == []
+
+
+def test_a_composite_map_with_a_missing_xml_names_the_file(tmp_path, monkeypatch):
+    monkeypatch.setenv("TESIS_CHOKEPOINT_DIR", str(tmp_path))
+    write(str(tmp_path / "runs" / "gating" / "videos_prueba" / "largo.frames.json"),
+          json.dumps({"frames": [["Z", 1]], "empty_labelled": True}))
+    with pytest.raises(FileNotFoundError, match="Z.xml"):
+        bench_compuerta.find_ground_truth("largo")
+

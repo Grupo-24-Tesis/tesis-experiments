@@ -125,3 +125,9 @@ def test_parse_chokepoint_gt_can_keep_self_closing_frames_as_empty():
     assert sorted(gt) == [1, 2, 3]
     assert gt[1] == [] and gt[3] == []
     assert gt[2] == [("0001", (15.0, 20.0))]
+
+
+def test_an_int_entry_inside_a_composite_map_raises_a_clear_error():
+    frame_map = {"frames": [["A", 1], 7], "empty_labelled": True}
+    with pytest.raises(ValueError, match="mapa compuesto.*fotograma 1"):
+        metrics.people_at(GTS, frame_map, 1)
