@@ -14,6 +14,7 @@ DEFAULT_PIPELINE_DIR = "/data/TesisFaceRecognition/wt/tesis_face_recognition_pip
 DEFAULT_CHOKEPOINT_DIR = "/data/TesisFaceRecognition/chokepoint"
 RESULTS_NAME = "results.json"
 DETECTIONS_NAME = "detections.json"
+PRESENCE_NAME = "presence.json"
 IDENTITIES_NAME = "identities.json"
 KIND_CHOKEPOINT = "chokepoint"
 KIND_CCTV = "cctv"
@@ -88,24 +89,65 @@ def parse_env(pairs):
     return env
 
 
-def run_video(video, label_dir, env_overrides, extra_args):
+def run_logged(name, command, env, log_path):
+    print(f"[{name}] ejecutando: {' '.join(command)}", flush=True)
+    started = time.monotonic()
+    with open(log_path, "w") as log:
+        completed = subprocess.run(command, cwd=pipeline_dir(), env=env, stdout=log,
+                                   stderr=subprocess.STDOUT)
+    return time.monotonic() - started, completed.returncode
+
+
+def gate_fields(presence, gate_wall, face_wall):
+    return {
+        "gated": True,
+        "gate_wall_s": gate_wall,
+        "face_wall_s": face_wall,
+        "active_fraction": presence["active_fraction"],
+        "switch_count": len(presence["switches"]),
+        "presence_file": PRESENCE_NAME,
+    }
+
+
+def omission_info(detection, presence):
+    frame = detection["frame"]
+    switches = [switch["frame"] for switch in presence["switches"]]
+    distance = min((abs(frame - switch) for switch in switches), default=None)
+    return {
+        "omitted": not frame_in_intervals(frame, presence["intervals"]),
+        "distance_s": None if distance is None else distance / presence["fps"],
+    }
+
+
+def frame_in_intervals(frame, intervals):
+    return any(start <= frame <= end for start, end in intervals)
+
+
+def run_video(video, label_dir, env_overrides, extra_args, gated=False):
     name = video_name(video)
     faces_dir = os.path.join(label_dir, name)
     os.makedirs(faces_dir, exist_ok=True)
     pipeline = pipeline_dir()
-    python = os.path.join(pipeline, "venvs", "faces", "bin", "python")
-    command = [python, "face_identities.py", "--video", video, "--faces-dir", faces_dir,
-               *extra_args]
     env = {**os.environ, **env_overrides}
-    print(f"[{name}] ejecutando: {' '.join(command)}", flush=True)
-    started = time.monotonic()
-    with open(os.path.join(faces_dir, "run.log"), "w") as log:
-        completed = subprocess.run(command, cwd=pipeline, env=env, stdout=log,
-                                   stderr=subprocess.STDOUT)
-    wall = time.monotonic() - started
-    if completed.returncode != 0:
-        print(f"[{name}] fallo con código {completed.returncode}, ver {faces_dir}/run.log")
-        return {"error": f"código de salida {completed.returncode}", "wall_s": wall}
+    gate_wall = 0.0
+    face_extra = list(extra_args)
+    if gated:
+        presence_path = os.path.join(faces_dir, PRESENCE_NAME)
+        gate_command = [os.path.join(pipeline, "venvs", "track", "bin", "python"),
+                        "presence_gate.py", "--video", video, "--out", presence_path]
+        gate_wall, code = run_logged(name, gate_command, env,
+                                     os.path.join(faces_dir, "gate.log"))
+        if code != 0:
+            print(f"[{name}] la compuerta falló con código {code}, ver {faces_dir}/gate.log")
+            return {"error": f"la compuerta terminó con código {code}", "wall_s": gate_wall}
+        face_extra += ["--presence", presence_path]
+    command = [os.path.join(pipeline, "venvs", "faces", "bin", "python"), "face_identities.py",
+               "--video", video, "--faces-dir", faces_dir, *face_extra]
+    face_wall, code = run_logged(name, command, env, os.path.join(faces_dir, "run.log"))
+    wall = gate_wall + face_wall
+    if code != 0:
+        print(f"[{name}] fallo con código {code}, ver {faces_dir}/run.log")
+        return {"error": f"código de salida {code}", "wall_s": wall}
     identities_doc = load_json(os.path.join(faces_dir, IDENTITIES_NAME))
     detections_doc = load_json(os.path.join(faces_dir, DETECTIONS_NAME))
     duration = video_duration(video)
@@ -120,6 +162,8 @@ def run_video(video, label_dir, env_overrides, extra_args):
         "detections_file": os.path.join(name, DETECTIONS_NAME),
     }
     entry.update(evaluate_video(name, identities_doc, detections_doc))
+    if gated:
+        entry.update(gate_fields(load_json(presence_path), gate_wall, face_wall))
     describe(name, entry)
     return entry
 
@@ -130,6 +174,9 @@ def describe(name, entry):
           + (f", factor {factor:.2f}" if factor is not None else "")
           + f", {entry['analysed_frames']} fotogramas, {entry['detections_count']} detecciones, "
             f"{entry['identities_count']} identidades")
+    if entry.get("gated"):
+        print(f"[{name}] compuerta {entry['gate_wall_s']:.1f} s + rostros {entry['face_wall_s']:.1f} s | "
+              f"activo {entry['active_fraction']:.1%} | {entry['switch_count']} cambios")
     identity, detection = entry.get("identity"), entry.get("detection")
     if identity:
         print(f"[{name}] etiquetadas {identity['labelled']} | encontradas {identity['found']} | "
@@ -148,8 +195,9 @@ def command_run(args):
     videos = {}
     for video in args.videos:
         videos[video_name(video)] = run_video(os.path.abspath(video), label_dir, env_overrides,
-                                              args.extra_arg)
+                                              args.extra_arg, args.gated)
     document = {"label": args.label, "env": env_overrides, "extra_args": args.extra_arg,
+                "gated": args.gated,
                 "created": time.strftime("%Y-%m-%dT%H:%M:%S"), "videos": videos}
     results_path = os.path.join(label_dir, RESULTS_NAME)
     with open(results_path, "w") as f:
@@ -199,7 +247,15 @@ def total_identity(videos):
             "mixed": sum(p["mixed"] for p in parts), "purity": pure / max(1, matched)}
 
 
-def compare_documents(baseline, candidate, max_recall_drop, load_detections):
+def omission_text(detection, presence):
+    info = omission_info(detection, presence)
+    place = "tramo omitido" if info["omitted"] else "dentro de un tramo activo"
+    if info["distance_s"] is None:
+        return place
+    return f"{place}, a {info['distance_s']:.1f} s del cambio más cercano"
+
+
+def compare_documents(baseline, candidate, max_recall_drop, load_detections, load_presence=None):
     lines = []
     failures = []
     names = [n for n in baseline["videos"] if n in candidate["videos"]]
@@ -212,7 +268,14 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections):
             continue
         lines.append(f"  factor de tiempo: {fmt_ratio(base['factor'])} -> {fmt_ratio(cand['factor'])}")
         lines.append(f"  fotogramas analizados: {base['analysed_frames']} -> "
-                     f"{cand['analysed_frames']} (razón {fmt_ratio(ratio(cand['analysed_frames'], base['analysed_frames']))})")
+                     f"{cand['analysed_frames']} (fracción analizada {fmt_ratio(ratio(cand['analysed_frames'], base['analysed_frames']))})")
+        if cand.get("gated"):
+            lines.append(f"  compuerta: {cand['gate_wall_s']:.1f} s, rostros: "
+                         f"{cand['face_wall_s']:.1f} s, total {cand['wall_s']:.1f} s "
+                         f"(factor total {fmt_ratio(ratio(cand['wall_s'], base['wall_s']))} "
+                         f"del tiempo de la base)")
+            lines.append(f"  tiempo activo: {fmt_pct(cand['active_fraction'])} del video, "
+                         f"{cand['switch_count']} cambios")
         if base.get("detection") and cand.get("detection"):
             bd, cd = base["detection"], cand["detection"]
             for key, title in (("precision", "precisión"), ("recall", "exhaustividad"),
@@ -230,9 +293,12 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections):
         missing = metrics.missing_detections(load_detections(baseline, base),
                                              load_detections(candidate, cand))
         lines.append(f"  detecciones de la base ausentes en el candidato: {len(missing)}")
+        presence = load_presence(candidate, cand) if cand.get("gated") and load_presence else None
         for detection in missing:
+            suffix = f" | {omission_text(detection, presence)}" if presence else ""
             lines.append(f"    fotograma {detection['frame']} | "
-                         f"{metrics.format_time(detection['time_s'])} | caja {detection['box']}")
+                         f"{metrics.format_time(detection['time_s'])} | caja {detection['box']}"
+                         f"{suffix}")
     for name in baseline["videos"]:
         if name not in candidate["videos"]:
             lines.append(f"Video {name}: ausente en el candidato")
@@ -290,7 +356,13 @@ def command_compare(args):
         path = os.path.join(os.path.dirname(os.path.abspath(base_dir)), entry["detections_file"])
         return load_json(path)["detections"]
 
-    lines, code = compare_documents(baseline, candidate, args.max_recall_drop, load_detections)
+    def load_presence(document, entry):
+        return load_json(os.path.join(os.path.dirname(os.path.abspath(args.candidate)),
+                                      os.path.dirname(entry["detections_file"]),
+                                      entry["presence_file"]))
+
+    lines, code = compare_documents(baseline, candidate, args.max_recall_drop, load_detections,
+                                    load_presence)
     print("\n".join(lines))
     return code
 
@@ -308,6 +380,8 @@ def build_parser():
     run.add_argument("--extra-arg", action="append", default=[], metavar="ARG",
                      help="argumento adicional para face_identities.py (se puede repetir); para pasar "
                           "una opción usar la forma con igual: --extra-arg=--opcion")
+    run.add_argument("--gated", action="store_true",
+                     help="corre antes presence_gate.py y pasa su presence.json a face_identities.py")
     run.add_argument("videos", nargs="+", metavar="VIDEO", help="videos a procesar")
     run.set_defaults(handler=command_run)
     compare = sub.add_parser("compare", help="compara dos results.json")

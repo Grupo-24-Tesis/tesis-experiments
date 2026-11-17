@@ -104,3 +104,81 @@ def test_totals_include_detection_and_identity_summaries():
     assert "duplicados total: 0 -> 0" in text
     assert "mezcladas total: 0 -> 0" in text
     assert "pureza total: 100.0% -> 100.0%" in text
+
+
+PRESENCE = {
+    "fps": 10.0,
+    "intervals": [[100, 200], [500, 600]],
+    "switches": [{"frame": 100}, {"frame": 201}, {"frame": 500}, {"frame": 601}],
+    "active_fraction": 0.2,
+}
+
+
+def test_gated_flag_is_parsed():
+    parser = bench_compuerta.build_parser()
+    assert parser.parse_args(["run", "--label", "a", "--out", "o", "--gated", "v.mp4"]).gated
+    assert not parser.parse_args(["run", "--label", "a", "--out", "o", "v.mp4"]).gated
+
+
+def test_gate_fields_record_times_fraction_and_switches():
+    fields = bench_compuerta.gate_fields(PRESENCE, 12.5, 30.0)
+    assert fields == {"gated": True, "gate_wall_s": 12.5, "face_wall_s": 30.0,
+                      "active_fraction": 0.2, "switch_count": 4,
+                      "presence_file": "presence.json"}
+
+
+@pytest.mark.parametrize("frame,omitted", [(99, True), (100, False), (200, False), (201, True),
+                                           (350, True), (500, False), (601, True)])
+def test_omission_info_classifies_the_frame_against_the_intervals(frame, omitted):
+    assert bench_compuerta.omission_info({"frame": frame}, PRESENCE)["omitted"] is omitted
+
+
+def test_omission_info_gives_the_distance_in_seconds_to_the_nearest_switch():
+    assert bench_compuerta.omission_info({"frame": 130}, PRESENCE)["distance_s"] == 3.0
+    assert bench_compuerta.omission_info({"frame": 190}, PRESENCE)["distance_s"] == 1.1
+    assert bench_compuerta.omission_info({"frame": 350}, PRESENCE)["distance_s"] == 14.9
+
+
+def test_omission_info_without_switches_has_no_distance():
+    presence = {"fps": 10.0, "intervals": [], "switches": []}
+    info = bench_compuerta.omission_info({"frame": 5}, presence)
+    assert info == {"omitted": True, "distance_s": None}
+
+
+def gated_entry(**kwargs):
+    e = entry(**kwargs)
+    e.update({"gated": True, "gate_wall_s": 2.0, "face_wall_s": 4.0, "wall_s": 6.0,
+              "active_fraction": 0.2, "switch_count": 4, "presence_file": "presence.json"})
+    return e
+
+
+def test_compare_shows_gate_time_total_factor_and_active_fraction():
+    lines, code = bench_compuerta.compare_documents(
+        document(entry(wall=12.0)), document(gated_entry()), 0.5, no_detections)
+    text = "\n".join(lines)
+    assert "compuerta: 2.0 s, rostros: 4.0 s, total 6.0 s" in text
+    assert "factor total 0.50 del tiempo de la base" in text
+    assert "tiempo activo: 20.0% del video, 4 cambios" in text
+    assert "fracción analizada 1.00" in text
+
+
+def test_compare_classifies_each_missing_detection_against_the_candidate_intervals():
+    detections = {"base": [{"frame": 130, "time_s": 13.0, "box": [0, 0, 5, 5]},
+                           {"frame": 350, "time_s": 35.0, "box": [1, 1, 6, 6]}]}
+
+    def loader(doc, e):
+        return detections["base"] if doc is base else []
+
+    base = document(entry())
+    candidate = document(gated_entry())
+    lines, _ = bench_compuerta.compare_documents(base, candidate, 0.5, loader,
+                                                 lambda doc, e: PRESENCE)
+    text = "\n".join(lines)
+    assert "dentro de un tramo activo, a 3.0 s del cambio más cercano" in text
+    assert "tramo omitido, a 14.9 s del cambio más cercano" in text
+
+
+def test_compare_of_ungated_runs_adds_no_gate_lines():
+    lines, _ = bench_compuerta.compare_documents(document(entry()), document(entry()), 0.5,
+                                                 no_detections)
+    assert not any("compuerta" in line or "tramo" in line for line in lines)
