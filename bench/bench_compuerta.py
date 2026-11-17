@@ -180,10 +180,23 @@ def fmt_points(value):
     return f"{value:+.1f} pp"
 
 
-def totals_recall(videos):
-    tp = sum(v["detection"]["tp"] for v in videos.values() if v.get("detection"))
-    fn = sum(v["detection"]["fn"] for v in videos.values() if v.get("detection"))
-    return tp / (tp + fn) if tp + fn else None
+def total_detection(videos):
+    parts = [v["detection"] for v in videos.values() if v.get("detection")]
+    if not parts:
+        return None
+    return metrics.precision_recall_f1(sum(p["tp"] for p in parts), sum(p["fp"] for p in parts),
+                                       sum(p["fn"] for p in parts))
+
+
+def total_identity(videos):
+    parts = [v["identity"] for v in videos.values() if v.get("identity")]
+    if not parts:
+        return None
+    matched = sum(p["faces_matched"] for p in parts)
+    pure = sum(p["purity"] * p["faces_matched"] for p in parts)
+    return {"found": sum(p["found"] for p in parts),
+            "duplicates": sum(p["duplicates"] for p in parts),
+            "mixed": sum(p["mixed"] for p in parts), "purity": pure / max(1, matched)}
 
 
 def compare_documents(baseline, candidate, max_recall_drop, load_detections):
@@ -220,14 +233,24 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections):
         for detection in missing:
             lines.append(f"    fotograma {detection['frame']} | "
                          f"{metrics.format_time(detection['time_s'])} | caja {detection['box']}")
+    for name in baseline["videos"]:
+        if name not in candidate["videos"]:
+            lines.append(f"Video {name}: ausente en el candidato")
+            failures.append(f"{name}: ausente en el candidato")
+    common = [n for n in names
+              if "error" not in baseline["videos"][n] and "error" not in candidate["videos"][n]]
+    for name in names:
+        if name not in common:
+            lines.append(f"Excluido de los totales: {name} (una de las ejecuciones falló)")
     lines.append("Totales")
-    base_videos = {n: baseline["videos"][n] for n in names if "error" not in baseline["videos"][n]}
-    cand_videos = {n: candidate["videos"][n] for n in names if "error" not in candidate["videos"][n]}
-    for title, key in (("tiempo de pared", "wall_s"), ("duración", "duration_s")):
-        lines.append(f"  {title}: {sum(v[key] or 0 for v in base_videos.values()):.1f} s -> "
-                     f"{sum(v[key] or 0 for v in cand_videos.values()):.1f} s")
+    base_videos = {n: baseline["videos"][n] for n in common}
+    cand_videos = {n: candidate["videos"][n] for n in common}
+    lines.append(f"  videos comparados: {len(common)}")
+    lines.append(f"  tiempo de pared: {sum(v['wall_s'] for v in base_videos.values()):.1f} s -> "
+                 f"{sum(v['wall_s'] for v in cand_videos.values()):.1f} s")
     base_duration = sum(v["duration_s"] or 0 for v in base_videos.values())
     cand_duration = sum(v["duration_s"] or 0 for v in cand_videos.values())
+    lines.append(f"  duración: {base_duration:.1f} s -> {cand_duration:.1f} s")
     if base_duration and cand_duration:
         lines.append(f"  factor de tiempo: "
                      f"{sum(v['wall_s'] for v in base_videos.values()) / base_duration:.2f} -> "
@@ -235,14 +258,24 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections):
     lines.append(f"  fotogramas analizados: "
                  f"{sum(v['analysed_frames'] for v in base_videos.values())} -> "
                  f"{sum(v['analysed_frames'] for v in cand_videos.values())}")
-    base_recall, cand_recall = totals_recall(base_videos), totals_recall(cand_videos)
-    if base_recall is not None and cand_recall is not None:
-        drop = points(base_recall, cand_recall)
-        lines.append(f"  exhaustividad total: {fmt_pct(base_recall)} -> {fmt_pct(cand_recall)} "
-                     f"({fmt_points(points(cand_recall, base_recall))})")
+    base_detection, cand_detection = total_detection(base_videos), total_detection(cand_videos)
+    if base_detection and cand_detection:
+        for key, title in (("precision", "precisión"), ("recall", "exhaustividad"),
+                           ("f1", "F1")):
+            lines.append(f"  {title} total: {fmt_pct(base_detection[key])} -> "
+                         f"{fmt_pct(cand_detection[key])} "
+                         f"({fmt_points(points(cand_detection[key], base_detection[key]))})")
+        drop = points(base_detection["recall"], cand_detection["recall"])
         if drop > max_recall_drop:
             failures.append(f"exhaustividad total baja {drop:.1f} pp, más del máximo de "
                             f"{max_recall_drop:.1f} pp")
+    base_identity, cand_identity = total_identity(base_videos), total_identity(cand_videos)
+    if base_identity and cand_identity:
+        for key, title in (("found", "personas encontradas"), ("duplicates", "duplicados"),
+                           ("mixed", "mezcladas")):
+            lines.append(f"  {title} total: {base_identity[key]} -> {cand_identity[key]}")
+        lines.append(f"  pureza total: {fmt_pct(base_identity['purity'])} -> "
+                     f"{fmt_pct(cand_identity['purity'])}")
     for failure in failures:
         lines.append(f"REGRESIÓN: {failure}")
     return lines, 1 if failures else 0
@@ -273,7 +306,8 @@ def build_parser():
     run.add_argument("--env", action="append", default=[], metavar="CLAVE=VALOR",
                      help="variable de entorno para el pipeline (se puede repetir)")
     run.add_argument("--extra-arg", action="append", default=[], metavar="ARG",
-                     help="argumento adicional para face_identities.py (se puede repetir)")
+                     help="argumento adicional para face_identities.py (se puede repetir); para pasar "
+                          "una opción usar la forma con igual: --extra-arg=--opcion")
     run.add_argument("videos", nargs="+", metavar="VIDEO", help="videos a procesar")
     run.set_defaults(handler=command_run)
     compare = sub.add_parser("compare", help="compara dos results.json")

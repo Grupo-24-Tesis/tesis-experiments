@@ -163,3 +163,10 @@ def test_missing_detections():
 def test_format_time():
     assert metrics.format_time(0) == "00:00:00.0"
     assert metrics.format_time(3725.46) == "01:02:05.4"
+
+
+def test_cctv_detection_shared_analysed_frame_counts_fp_once():
+    gt = [(1.0, [([0, 0, 10, 10], "A")]), (1.05, [([0, 0, 10, 10], "A")])]
+    detections = [det(10, [0, 0, 10, 10]), det(10, [200, 200, 210, 210])]
+    r = metrics.cctv_detection_metrics(detections, [10], 10.0, gt)
+    assert (r["tp"], r["fn"], r["fp"]) == (2, 0, 1)

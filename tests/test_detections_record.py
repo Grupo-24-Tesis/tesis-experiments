@@ -53,4 +53,3 @@ def test_record_is_independent_of_inputs():
 def test_empty_input():
     record = face_sampling.detections_record(30.0, 3, [], [])
     assert record["frames_analysed"] == [] and record["detections"] == []
-

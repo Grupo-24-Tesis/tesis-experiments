@@ -174,22 +174,24 @@ def cctv_detection_metrics(detections, frames_analysed, fps, gt, max_dt=CCTV_MAX
         by_frame.setdefault(detection["frame"], []).append(detection["box"])
     analysed = sorted(frames_analysed)
     analysed_times = [frame / fps for frame in analysed]
-    tp = fp = fn = 0
+    tp = fn = 0
+    unmatched_boxes = {}
     for t, faces in gt:
         gt_boxes = [box for box, _ in faces]
-        boxes = []
-        if analysed_times:
-            k = nearest_index(analysed_times, t)
-            if abs(analysed_times[k] - t) <= max_dt:
-                boxes = by_frame.get(analysed[k], [])
-            else:
-                fn += len(gt_boxes)
-                continue
+        if not analysed_times:
+            fn += len(gt_boxes)
+            continue
+        k = nearest_index(analysed_times, t)
+        if abs(analysed_times[k] - t) > max_dt:
+            fn += len(gt_boxes)
+            continue
+        boxes = by_frame.get(analysed[k], [])
         matched = match_boxes(gt_boxes, boxes, min_iou)
         tp += matched
         fn += len(gt_boxes) - matched
-        fp += len(boxes) - matched
-    return precision_recall_f1(tp, fp, fn)
+        unmatched = len(boxes) - matched
+        unmatched_boxes[k] = min(unmatched, unmatched_boxes.get(k, unmatched))
+    return precision_recall_f1(tp, sum(unmatched_boxes.values()), fn)
 
 
 def missing_detections(baseline, candidate, min_iou=SAME_DETECTION_IOU):
