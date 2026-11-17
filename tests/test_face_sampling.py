@@ -414,15 +414,65 @@ def test_frames_outside_the_intervals_are_never_retrieved():
     assert cap.grabs == 49
 
 
-def test_sample_counter_jumps_across_a_gap_so_tracklets_cannot_link():
-    _, _, seen = gated_run(90, [(10, 20), (35, 50)])
+def test_gated_sample_numbers_are_the_grid_indices_of_the_frames():
+    _, gated, seen = gated_run(90, [(10, 20), (35, 50)])
 
-    samples = [s for _, s in seen]
-    gap = samples[3] - samples[2]
-    assert gap == identity_linking.MAX_SKIP + 2
-    assert gap > 1 + identity_linking.MAX_SKIP
-    assert [b - a for a, b in zip(samples[:3], samples[1:3])] == [1, 1]
-    assert [b - a for a, b in zip(samples[3:], samples[4:])] == [1] * 4
+    assert [s for _, s in seen] == [f // 3 for f in gated] == [4, 5, 6, 12, 13, 14, 15, 16]
+
+
+def test_gated_sample_numbers_equal_the_ungated_ones_on_the_same_frames():
+    _, _, seen_ungated = gated_run(90, None)
+    _, _, seen_gated = gated_run(90, [(10, 20), (35, 50), (70, 71)])
+
+    ungated = dict(seen_ungated)
+    assert seen_gated
+    assert all(ungated[frame] == sample for frame, sample in seen_gated)
+
+
+def test_ungated_sample_numbers_are_the_grid_indices_when_a_frame_cannot_be_retrieved():
+    seen = []
+
+    def detect(frame_idx, frame, sample):
+        seen.append((frame_idx, sample))
+        return []
+
+    list(face_sampling.sample_video(FakeCapture(90, fail_at=30), FPS, False, detect))
+
+    assert seen == [(f, f // 3) for f in range(0, 30, 3)]
+
+
+def linked_tracklets(intervals, face_frames):
+    detections = []
+    for _, _, faces in face_sampling.sample_video(FakeCapture(90), FPS, False,
+                                                  person_detector(face_frames),
+                                                  intervals=intervals):
+        detections.extend(faces)
+    return [[d["frame"] for d in t] for t in identity_linking.build_tracklets(detections)]
+
+
+def test_a_gap_of_one_grid_frame_links_like_the_ungated_run():
+    face_frames = set(range(90)) - {12}
+    gated = linked_tracklets([(0, 10), (14, 30)], face_frames)
+    ungated = linked_tracklets(None, set(range(31)) - {12})
+
+    assert gated == ungated == [[0, 3, 6, 9, 15, 18, 21, 24, 27, 30]]
+
+
+def test_a_gap_of_max_skip_grid_frames_still_links():
+    skip = identity_linking.MAX_SKIP
+    resume = 3 * (3 + skip + 1)
+    gated = linked_tracklets([(0, 9), (resume, 60)], set(range(90)))
+
+    assert len(gated) == 1
+
+
+def test_a_gap_longer_than_max_skip_grid_frames_breaks_the_tracklet():
+    skip = identity_linking.MAX_SKIP
+    resume = 3 * (3 + skip + 2)
+    gated = linked_tracklets([(0, 9), (resume, 60)], set(range(90)))
+
+    assert [t[0] for t in gated] == [0, resume]
+    assert gated[0][-1] == 9
 
 
 def test_sample_counter_does_not_jump_inside_one_interval():
