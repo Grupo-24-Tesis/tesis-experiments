@@ -553,3 +553,17 @@ def test_detections_record_keeps_both_frame_counts_when_gated():
 
     assert gated["presence_total_frames"] == 100
     assert gated["frames_read"] == 98
+
+
+def test_frame_count_warning_names_both_frame_counts():
+    presence = {"total_frames": 2370, "intervals": [(0, 2369)]}
+
+    warning = face_sampling.frame_count_warning(presence, 1000, 30.0, 3)
+
+    assert "presence.json cuenta 2370 fotogramas y el video solo entregó 1000" in warning
+
+
+def test_frame_count_warning_is_quiet_when_the_counts_agree():
+    presence = {"total_frames": 2370, "intervals": [(0, 2369)]}
+
+    assert face_sampling.frame_count_warning(presence, 2369, 30.0, 3) is None
