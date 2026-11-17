@@ -192,12 +192,8 @@ def persons_fully_lost(person_frames, kept_frames):
 
 
 def detection_metrics(case, detections, frames):
-    if case["kind"] == bench_compuerta.KIND_CHOKEPOINT:
-        return metrics.chokepoint_detection_metrics(detections, frames, case["gt"],
-                                                    case["frame_map"])
-    if case["kind"] == bench_compuerta.KIND_CCTV:
-        return metrics.cctv_detection_metrics(detections, frames, case["fps"], case["gt"])
-    return None
+    return bench_compuerta.detection_metrics(case["kind"], case["gt"], case["frame_map"],
+                                             case["fps"], detections, frames)
 
 
 def build_case(name, entry, detections_doc):

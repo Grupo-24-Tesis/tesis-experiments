@@ -19,6 +19,10 @@ IDENTITIES_NAME = "identities.json"
 KIND_CHOKEPOINT = "chokepoint"
 KIND_CCTV = "cctv"
 DEFAULT_MAX_RECALL_DROP = 0.5
+DEFAULT_MAX_MISSING = 0
+GATED_RECALL_NOTE = ("exhaustividad con compuerta medida sobre los fotogramas analizados de la "
+                     "base: una persona etiquetada en un fotograma omitido cuenta como no "
+                     "encontrada")
 
 
 def pipeline_dir():
@@ -78,21 +82,36 @@ def find_ground_truth(name):
     return None, None, None
 
 
+def detection_metrics(kind, gt, frame_map, fps, detections, frames):
+    if kind == KIND_CHOKEPOINT:
+        return metrics.chokepoint_detection_metrics(detections, frames, gt, frame_map)
+    if kind == KIND_CCTV:
+        return metrics.cctv_detection_metrics(detections, frames, fps, gt)
+    return None
+
+
 def evaluate_video(name, identities_doc, detections_doc):
     kind, gt, frame_map = find_ground_truth(name)
     result = {"kind": kind, "identity": None, "detection": None}
     identities = identities_doc["identities"]
-    detections = detections_doc["detections"]
-    analysed = detections_doc["frames_analysed"]
+    fps = detections_doc["fps"]
     if kind == KIND_CHOKEPOINT:
         result["identity"] = metrics.chokepoint_identity_metrics(identities, gt, frame_map)
-        result["detection"] = metrics.chokepoint_detection_metrics(detections, analysed, gt,
-                                                                   frame_map)
     elif kind == KIND_CCTV:
-        fps = detections_doc["fps"]
         result["identity"] = metrics.cctv_identity_metrics(identities, fps, gt)
-        result["detection"] = metrics.cctv_detection_metrics(detections, analysed, fps, gt)
+    result["detection"] = detection_metrics(kind, gt, frame_map, fps,
+                                            detections_doc["detections"],
+                                            detections_doc["frames_analysed"])
     return result
+
+
+def gated_detection_over_baseline(name, baseline_doc, candidate_doc,
+                                  ground_truth=find_ground_truth):
+    kind, gt, frame_map = ground_truth(name)
+    if kind != KIND_CHOKEPOINT:
+        return None
+    return detection_metrics(kind, gt, frame_map, candidate_doc["fps"],
+                             candidate_doc["detections"], baseline_doc["frames_analysed"])
 
 
 def video_duration(path):
@@ -281,9 +300,13 @@ def omission_text(detection, presence):
     return f"{place}, a {info['distance_s']:.1f} s del cambio más cercano"
 
 
-def compare_documents(baseline, candidate, max_recall_drop, load_detections, load_presence=None):
+def compare_documents(baseline, candidate, max_recall_drop, load_detections, load_presence=None,
+                      max_missing=DEFAULT_MAX_MISSING, rescore_gated=None):
     lines = []
     failures = []
+    effective = {}
+    rescored = 0
+    total_missing = 0
     names = [n for n in baseline["videos"] if n in candidate["videos"]]
     for name in names:
         base, cand = baseline["videos"][name], candidate["videos"][name]
@@ -292,6 +315,12 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
             lines.append("  sin resultados comparables (una de las ejecuciones falló)")
             failures.append(f"{name}: una de las ejecuciones falló")
             continue
+        detection = (rescore_gated(name, base, cand)
+                     if cand.get("gated") and rescore_gated else None)
+        if detection is not None:
+            cand = {**cand, "detection": detection}
+            rescored += 1
+        effective[name] = cand
         lines.append(f"  factor de tiempo: {fmt_ratio(base['factor'])} -> {fmt_ratio(cand['factor'])}")
         analysed_label = "fracción analizada" if cand.get("gated") else "razón"
         lines.append(f"  fotogramas analizados: {base['analysed_frames']} -> "
@@ -309,6 +338,8 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
                                ("f1", "F1")):
                 lines.append(f"  {title}: {fmt_pct(bd[key])} -> {fmt_pct(cd[key])} "
                              f"({fmt_points(points(cd[key], bd[key]))})")
+            if detection is not None:
+                lines.append(f"  {GATED_RECALL_NOTE}")
         if base.get("identity") and cand.get("identity"):
             bi, ci = base["identity"], cand["identity"]
             lines.append(f"  personas encontradas: {bi['found']} -> {ci['found']} de {bi['labelled']}")
@@ -319,6 +350,7 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
                 failures.append(f"{name}: personas encontradas {bi['found']} -> {ci['found']}")
         missing = metrics.missing_detections(load_detections(baseline, base),
                                              load_detections(candidate, cand))
+        total_missing += len(missing)
         lines.append(f"  detecciones de la base ausentes en el candidato: {len(missing)}")
         presence = load_presence(candidate, cand) if cand.get("gated") and load_presence else None
         for detection in missing:
@@ -330,14 +362,13 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
         if name not in candidate["videos"]:
             lines.append(f"Video {name}: ausente en el candidato")
             failures.append(f"{name}: ausente en el candidato")
-    common = [n for n in names
-              if "error" not in baseline["videos"][n] and "error" not in candidate["videos"][n]]
+    common = [n for n in names if n in effective]
     for name in names:
         if name not in common:
             lines.append(f"Excluido de los totales: {name} (una de las ejecuciones falló)")
     lines.append("Totales")
     base_videos = {n: baseline["videos"][n] for n in common}
-    cand_videos = {n: candidate["videos"][n] for n in common}
+    cand_videos = {n: effective[n] for n in common}
     lines.append(f"  videos comparados: {len(common)}")
     lines.append(f"  tiempo de pared: {sum(v['wall_s'] for v in base_videos.values()):.1f} s -> "
                  f"{sum(v['wall_s'] for v in cand_videos.values()):.1f} s")
@@ -358,10 +389,16 @@ def compare_documents(baseline, candidate, max_recall_drop, load_detections, loa
             lines.append(f"  {title} total: {fmt_pct(base_detection[key])} -> "
                          f"{fmt_pct(cand_detection[key])} "
                          f"({fmt_points(points(cand_detection[key], base_detection[key]))})")
+        if rescored:
+            lines.append(f"  {GATED_RECALL_NOTE} ({rescored} videos de ChokePoint)")
         drop = points(base_detection["recall"], cand_detection["recall"])
         if drop > max_recall_drop:
             failures.append(f"exhaustividad total baja {drop:.1f} pp, más del máximo de "
                             f"{max_recall_drop:.1f} pp")
+    lines.append(f"  detecciones de la base ausentes en el candidato: {total_missing}")
+    if total_missing > max_missing:
+        failures.append(f"detecciones de la base ausentes en el candidato: {total_missing}, "
+                        f"más del máximo de {max_missing}")
     base_identity, cand_identity = total_identity(base_videos), total_identity(cand_videos)
     if base_identity and cand_identity:
         for key, title in (("found", "personas encontradas"), ("duplicates", "duplicados"),
@@ -378,18 +415,33 @@ def command_compare(args):
     baseline = load_json(args.baseline)
     candidate = load_json(args.candidate)
 
+    loaded = {}
+
+    def detections_doc(document, entry):
+        results_path = args.baseline if document is baseline else args.candidate
+        path = os.path.join(os.path.dirname(os.path.abspath(results_path)),
+                            entry["detections_file"])
+        if path not in loaded:
+            if len(loaded) >= 2:
+                loaded.pop(next(iter(loaded)))
+            loaded[path] = load_json(path)
+        return loaded[path]
+
     def load_detections(document, entry):
-        base_dir = args.baseline if document is baseline else args.candidate
-        path = os.path.join(os.path.dirname(os.path.abspath(base_dir)), entry["detections_file"])
-        return load_json(path)["detections"]
+        return detections_doc(document, entry)["detections"]
 
     def load_presence(document, entry):
         return load_json(os.path.join(os.path.dirname(os.path.abspath(args.candidate)),
                                       os.path.dirname(entry["detections_file"]),
                                       entry["presence_file"]))
 
+    def rescore_gated(name, base_entry, cand_entry):
+        baseline_doc = detections_doc(baseline, base_entry)
+        return gated_detection_over_baseline(name, baseline_doc,
+                                             detections_doc(candidate, cand_entry))
+
     lines, code = compare_documents(baseline, candidate, args.max_recall_drop, load_detections,
-                                    load_presence)
+                                    load_presence, args.max_missing, rescore_gated)
     print("\n".join(lines))
     return code
 
@@ -416,6 +468,9 @@ def build_parser():
     compare.add_argument("candidate", metavar="CANDIDATO.json", help="results.json del candidato")
     compare.add_argument("--max-recall-drop", type=float, default=DEFAULT_MAX_RECALL_DROP,
                          help="caída máxima de la exhaustividad total, en puntos porcentuales")
+    compare.add_argument("--max-missing", type=int, default=DEFAULT_MAX_MISSING, metavar="N",
+                         help="máximo de detecciones de la base ausentes en el candidato, sumando "
+                              "todos los videos (por defecto 0)")
     compare.set_defaults(handler=command_compare)
     return parser
 

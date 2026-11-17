@@ -192,3 +192,119 @@ def test_analysed_fraction_label_only_for_gated_candidates():
     assert any("fracción analizada" in line for line in gated)
     assert not any("fracción analizada" in line for line in plain)
     assert any("(razón " in line for line in plain)
+
+
+LABELLED_FRAMES = list(range(20))
+FRAME_MAP = list(range(20))
+GT = {frame: [("p1", (5.0, 5.0))] for frame in LABELLED_FRAMES}
+
+
+def ground_truth(name):
+    return bench_compuerta.KIND_CHOKEPOINT, GT, FRAME_MAP
+
+
+def detections_doc(frames):
+    return {"fps": 10.0, "frames_analysed": list(frames),
+            "detections": [{"frame": f, "time_s": f / 10.0, "box": [0, 0, 10, 10]}
+                           for f in frames]}
+
+
+BASE_DOC = detections_doc(LABELLED_FRAMES)
+GATED_DOC = detections_doc(range(10))
+
+
+def stored_entry(doc, gated=False):
+    detection = bench_compuerta.detection_metrics(
+        bench_compuerta.KIND_CHOKEPOINT, GT, FRAME_MAP, doc["fps"], doc["detections"],
+        doc["frames_analysed"])
+    e = gated_entry() if gated else entry()
+    e["detection"] = detection
+    e["detections_file"] = "gated" if gated else "base"
+    return e
+
+
+def gated_compare(max_missing=1000):
+    base = document(stored_entry(BASE_DOC))
+    candidate = document(stored_entry(GATED_DOC, gated=True))
+    docs = {"base": BASE_DOC, "gated": GATED_DOC}
+
+    def loader(doc, e):
+        return docs[e["detections_file"]]["detections"]
+
+    def rescore(name, base_entry, cand_entry):
+        return bench_compuerta.gated_detection_over_baseline(
+            name, docs[base_entry["detections_file"]], docs[cand_entry["detections_file"]],
+            ground_truth)
+
+    return base, candidate, bench_compuerta.compare_documents(
+        base, candidate, 0.5, loader, max_missing=max_missing, rescore_gated=rescore)
+
+
+def test_stored_gated_recall_hides_the_skipped_labelled_stretch():
+    candidate = stored_entry(GATED_DOC, gated=True)
+    assert candidate["detection"]["recall"] == 1.0
+    assert candidate["detection"]["fn"] == 0
+
+
+def test_gated_recall_is_measured_over_the_baseline_frames_and_fails_the_check():
+    _, _, (lines, code) = gated_compare()
+    text = "\n".join(lines)
+
+    assert code == 1
+    assert "exhaustividad: 100.0% -> 50.0% (-50.0 pp)" in text
+    assert "exhaustividad total: 100.0% -> 50.0% (-50.0 pp)" in text
+    assert "medida sobre los fotogramas analizados de la base" in text
+    assert any("REGRESIÓN: exhaustividad total baja 50.0 pp" in line for line in lines)
+
+
+def test_gated_detection_over_baseline_counts_skipped_people_as_not_found():
+    detection = bench_compuerta.gated_detection_over_baseline("v0", BASE_DOC, GATED_DOC,
+                                                              ground_truth)
+    assert (detection["tp"], detection["fn"], detection["fp"]) == (10, 10, 0)
+
+
+def test_gated_detection_over_baseline_skips_videos_without_chokepoint_ground_truth():
+    assert bench_compuerta.gated_detection_over_baseline(
+        "v0", BASE_DOC, GATED_DOC, lambda name: (None, None, None)) is None
+
+
+def test_ungated_candidates_keep_their_stored_detection_metrics():
+    calls = []
+
+    def rescore(name, base_entry, cand_entry):
+        calls.append(name)
+        return {"tp": 0, "fp": 0, "fn": 1, "precision": 0.0, "recall": 0.0, "f1": 0.0}
+
+    lines, code = bench_compuerta.compare_documents(document(entry()), document(entry()), 0.5,
+                                                    no_detections, rescore_gated=rescore)
+    assert calls == []
+    assert code == 0
+
+
+def test_missing_detections_over_the_threshold_fail():
+    _, _, (lines, code) = gated_compare(max_missing=9)
+    assert code == 1
+    assert any("REGRESIÓN: detecciones de la base ausentes en el candidato: 10, más del "
+               "máximo de 9" in line for line in lines)
+    assert any(line == "  detecciones de la base ausentes en el candidato: 10" for line in lines)
+
+
+def test_missing_detections_up_to_the_threshold_do_not_fail_by_themselves():
+    _, _, (lines, _) = gated_compare(max_missing=10)
+    assert not any("más del máximo de 10" in line for line in lines)
+
+
+def test_any_missing_detection_fails_by_default():
+    def loader(doc, e):
+        return [{"frame": 1, "time_s": 0.1, "box": [0, 0, 5, 5]}] if doc is base else []
+
+    base = document(entry())
+    lines, code = bench_compuerta.compare_documents(base, document(entry()), 0.5, loader)
+    assert code == 1
+    assert any("ausentes en el candidato: 1, más del máximo de 0" in line for line in lines)
+
+
+def test_max_missing_option_is_parsed():
+    parser = bench_compuerta.build_parser()
+    assert parser.parse_args(["compare", "a.json", "b.json"]).max_missing == 0
+    assert parser.parse_args(["compare", "a.json", "b.json", "--max-missing", "3"]).max_missing == 3
