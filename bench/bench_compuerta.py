@@ -48,18 +48,18 @@ def find_frame_map(name):
     return None
 
 
-def load_chokepoint_xml(source):
+def load_chokepoint_xml(source, include_empty=False):
     xml_path = os.path.join(chokepoint_dir(), "groundtruth", f"{source}.xml")
     if not os.path.exists(xml_path):
         return None
     with open(xml_path) as f:
-        return metrics.parse_chokepoint_gt(f.read())
+        return metrics.parse_chokepoint_gt(f.read(), include_empty)
 
 
 def find_ground_truth(name):
     frame_map = find_frame_map(name)
     if frame_map is not None and metrics.is_composite_map(frame_map):
-        gts = {source: load_chokepoint_xml(source)
+        gts = {source: load_chokepoint_xml(source, include_empty=True)
                for source in metrics.referenced_sources(frame_map)}
         if all(gt is not None for gt in gts.values()):
             return KIND_CHOKEPOINT, gts, frame_map

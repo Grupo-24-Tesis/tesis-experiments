@@ -8,9 +8,16 @@ SAME_DETECTION_IOU = 0.9
 UNSCORED_SOURCE = "sin_gt"
 
 
-def parse_chokepoint_gt(text):
+def chokepoint_frames(text, include_empty):
+    if not include_empty:
+        return re.findall(r'<frame number="(\d+)"\s*>(.*?)</frame>', text, re.S)
+    return [(frame, body) for frame, body in re.findall(
+        r'<frame number="(\d+)"\s*(?:/>|>(.*?)</frame>)', text, re.S)]
+
+
+def parse_chokepoint_gt(text, include_empty=False):
     gt = {}
-    for frame, body in re.findall(r'<frame number="(\d+)"\s*>(.*?)</frame>', text, re.S):
+    for frame, body in chokepoint_frames(text, include_empty):
         people = []
         for pid, eyes in re.findall(r'<person id="([^"]+)"\s*>(.*?)</person>', body, re.S):
             pts = [(int(x), int(y)) for x, y in re.findall(r'x="(\d+)" y="(\d+)"', eyes)]

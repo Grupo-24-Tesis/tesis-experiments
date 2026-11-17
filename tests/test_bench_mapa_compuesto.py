@@ -104,3 +104,24 @@ def test_is_composite_map():
     assert metrics.is_composite_map([None, 3])
     assert not metrics.is_composite_map([1, 2, 3])
     assert not metrics.is_composite_map(None)
+
+
+SELF_CLOSING = """<dataset name="x">
+ <frame number="00000001"/>
+ <frame number="00000002">
+  <person id="0001"><leftEye x="10" y="20"/><rightEye x="20" y="20"/></person>
+ </frame>
+ <frame number="00000003"/>
+</dataset>"""
+
+
+def test_parse_chokepoint_gt_ignores_self_closing_frames_by_default():
+    gt = metrics.parse_chokepoint_gt(SELF_CLOSING)
+    assert sorted(gt) == [2]
+
+
+def test_parse_chokepoint_gt_can_keep_self_closing_frames_as_empty():
+    gt = metrics.parse_chokepoint_gt(SELF_CLOSING, include_empty=True)
+    assert sorted(gt) == [1, 2, 3]
+    assert gt[1] == [] and gt[3] == []
+    assert gt[2] == [("0001", (15.0, 20.0))]

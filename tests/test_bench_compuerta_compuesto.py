@@ -45,3 +45,13 @@ def test_find_ground_truth_legacy_map_still_needs_its_own_xml(tmp_path, monkeypa
 def test_find_ground_truth_unknown_video(tmp_path, monkeypatch):
     monkeypatch.setenv("TESIS_CHOKEPOINT_DIR", str(tmp_path))
     assert bench_compuerta.find_ground_truth("zzz")[0] is None
+
+
+def test_composite_map_keeps_empty_frames_of_the_xml_as_labelled_empty(tmp_path, monkeypatch):
+    monkeypatch.setenv("TESIS_CHOKEPOINT_DIR", str(tmp_path))
+    write(str(tmp_path / "groundtruth" / "A.xml"),
+          '<dataset name="A">\n <frame number="00000005"/>\n</dataset>')
+    write(str(tmp_path / "runs" / "gating" / "videos_prueba" / "c.frames.json"),
+          json.dumps({"frames": [["A", 5]], "empty_labelled": True}))
+    _, gts, _ = bench_compuerta.find_ground_truth("c")
+    assert gts["A"][5] == []
