@@ -122,7 +122,7 @@ def densest_arrivals(first_frames, window):
 
 def distribute_empty(total, gaps, static_index, static_frames, weights, min_frames, max_frames):
     if len(weights) != gaps:
-        raise ValueError("la cantidad de pesos debe ser igual a la cantidad de tramos vacios")
+        raise ValueError("la cantidad de pesos debe ser igual a la cantidad de tramos vacíos")
     others = [i for i in range(gaps) if i != static_index]
     remaining = total - static_frames
     weight_sum = sum(weights[i] for i in others)
@@ -135,7 +135,7 @@ def distribute_empty(total, gaps, static_index, static_frames, weights, min_fram
     frames[others[-1]] = remaining - assigned
     for i in others:
         if not min_frames <= frames[i] <= max_frames:
-            raise ValueError(f"el tramo vacio {i} queda con {frames[i]} fotogramas, fuera de "
+            raise ValueError(f"el tramo vacío {i} queda con {frames[i]} fotogramas, fuera de "
                              f"[{min_frames}, {max_frames}]")
     return frames
 
@@ -210,7 +210,7 @@ def clip_segment(source, start, frames):
 def longest_run(runs, accept):
     candidates = [run for run in runs if accept(run)]
     if not candidates:
-        raise ValueError("no hay un tramo con personas etiquetadas que cumpla la condicion")
+        raise ValueError("no hay un tramo con personas etiquetadas que cumpla la condición")
     return max(candidates, key=lambda run: (run[1] - run[0], -run[0]))
 
 
@@ -352,7 +352,7 @@ def write_video(entries, stores, out_path, fps):
     finally:
         process.stdin.close()
     if process.wait() != 0:
-        raise SystemExit(f"ffmpeg fallo al escribir {out_path}")
+        raise SystemExit(f"ffmpeg falló al escribir {out_path}")
 
 
 def source_infos(names, cache_dir):
@@ -403,7 +403,7 @@ def command_vacios(args):
     for item in found:
         print(f"{item['source']}: fotogramas {item['start']} a {item['end']} "
               f"({item['duration_s']:.1f} s)")
-    print(f"total de metraje vacio: {document['total_s']:.1f} s en {len(found)} tramos")
+    print(f"total de metraje vacío: {document['total_s']:.1f} s en {len(found)} tramos")
 
 
 def load_stretches(out_dir):
@@ -413,7 +413,7 @@ def load_stretches(out_dir):
     stretches = [(item["source"], item["start"], item["end"])
                  for item in load_json(path)["stretches"]]
     if not stretches:
-        raise SystemExit("no hay tramos vacios")
+        raise SystemExit("no hay tramos vacíos")
     return stretches
 
 
@@ -462,7 +462,7 @@ def command_largo(args):
                           LARGE_STATIC_S * FPS, weights, LARGE_STATIC_INDEX,
                           LARGE_MIN_S * FPS, LARGE_MAX_S * FPS)
     emit("largo", segments, sources, stores, out_dir,
-         "metraje vacio en ping-pong; un tramo estatico de un solo fotograma; "
+         "metraje vacío en ping-pong; un tramo estático de un solo fotograma; "
          "20 s de P2E_S5_C1 sin etiquetas y sin puntuar")
 
 
@@ -496,7 +496,7 @@ def build_parser():
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("vacios", help="busca los tramos sin personas en las fuentes etiquetadas")
     largo = sub.add_parser("largo", help="construye el video largo")
-    largo.add_argument("--minutos", type=int, default=45, help="duracion total en minutos")
+    largo.add_argument("--minutos", type=int, default=45, help="duración total en minutos")
     sub.add_parser("bordes", help="construye los clips de borde")
     return parser
 

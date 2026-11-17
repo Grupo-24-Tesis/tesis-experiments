@@ -8,13 +8,13 @@ PERSON_CLASS = 0
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Revisa un video con YOLO cada cierto numero de "
+    parser = argparse.ArgumentParser(description="Revisa un video con YOLO cada cierto número de "
                                                  "fotogramas y guarda si hay alguna persona")
     parser.add_argument("--video", required=True, help="video de entrada")
     parser.add_argument("--out", required=True, help="archivo JSON de salida")
     parser.add_argument("--step", type=int, default=5, help="revisar uno de cada N fotogramas")
-    parser.add_argument("--conf", type=float, default=0.05, help="confianza minima de YOLO")
-    parser.add_argument("--imgsz", type=int, default=640, help="tamano de imagen de YOLO")
+    parser.add_argument("--conf", type=float, default=0.05, help="confianza mínima de YOLO")
+    parser.add_argument("--imgsz", type=int, default=640, help="tamaño de imagen de YOLO")
     parser.add_argument("--weights", required=True, help="pesos de YOLO")
     return parser.parse_args()
 
