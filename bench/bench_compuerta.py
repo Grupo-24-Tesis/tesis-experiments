@@ -38,14 +38,35 @@ def load_json(path):
         return json.load(f)
 
 
-def find_ground_truth(name):
+def find_frame_map(name):
     root = chokepoint_dir()
-    xml_path = os.path.join(root, "groundtruth", f"{name}.xml")
-    map_path = os.path.join(root, "videos", f"{name}.frames.json")
-    if os.path.exists(xml_path) and os.path.exists(map_path):
-        with open(xml_path) as f:
-            gt = metrics.parse_chokepoint_gt(f.read())
-        return KIND_CHOKEPOINT, gt, load_json(map_path)
+    for folder in (os.path.join(root, "videos"), os.path.join(root, "runs", "gating",
+                                                               "videos_prueba")):
+        map_path = os.path.join(folder, f"{name}.frames.json")
+        if os.path.exists(map_path):
+            return load_json(map_path)
+    return None
+
+
+def load_chokepoint_xml(source):
+    xml_path = os.path.join(chokepoint_dir(), "groundtruth", f"{source}.xml")
+    if not os.path.exists(xml_path):
+        return None
+    with open(xml_path) as f:
+        return metrics.parse_chokepoint_gt(f.read())
+
+
+def find_ground_truth(name):
+    frame_map = find_frame_map(name)
+    if frame_map is not None and metrics.is_composite_map(frame_map):
+        gts = {source: load_chokepoint_xml(source)
+               for source in metrics.referenced_sources(frame_map)}
+        if all(gt is not None for gt in gts.values()):
+            return KIND_CHOKEPOINT, gts, frame_map
+    elif frame_map is not None:
+        gt = load_chokepoint_xml(name)
+        if gt is not None:
+            return KIND_CHOKEPOINT, gt, frame_map
     cctv_path = os.path.join(EXPERIMENTS_DIR, "ground_truth", name, "frames.json")
     if os.path.exists(cctv_path):
         return KIND_CCTV, metrics.parse_cctv_gt(load_json(cctv_path)), None

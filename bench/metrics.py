@@ -5,6 +5,7 @@ MIXED_SHARE = 0.2
 CCTV_MAX_DT_S = 0.2
 CCTV_MIN_IOU = 0.3
 SAME_DETECTION_IOU = 0.9
+UNSCORED_SOURCE = "sin_gt"
 
 
 def parse_chokepoint_gt(text):
@@ -71,19 +72,74 @@ def summarise_votes(votes, labelled, identities_count, faces_total, faces_matche
     }
 
 
+def is_composite_map(frame_map):
+    if frame_map is None:
+        return False
+    if isinstance(frame_map, dict):
+        return True
+    return any(not isinstance(entry, int) for entry in frame_map)
+
+
+def map_entries(frame_map):
+    return frame_map["frames"] if isinstance(frame_map, dict) else frame_map
+
+
+def referenced_sources(frame_map):
+    if not is_composite_map(frame_map):
+        return []
+    names = []
+    for entry in map_entries(frame_map):
+        if entry is None or isinstance(entry, int):
+            continue
+        name = entry[0]
+        if name != UNSCORED_SOURCE and name not in names:
+            names.append(name)
+    return names
+
+
+def people_at(gt, frame_map, frame):
+    if frame_map is None:
+        return gt.get(frame)
+    if not is_composite_map(frame_map):
+        if frame >= len(frame_map):
+            return None
+        return gt.get(frame_map[frame])
+    entries = map_entries(frame_map)
+    if frame < 0 or frame >= len(entries):
+        return None
+    entry = entries[frame]
+    if entry is None:
+        return [] if isinstance(frame_map, dict) and frame_map.get("empty_labelled") else None
+    if isinstance(entry, int):
+        return None
+    name, number = entry
+    source = gt.get(name)
+    if source is None or number < 0:
+        return None
+    people = source.get(number)
+    if people is None:
+        return None
+    return [(f"{name}:{pid}", point) for pid, point in people]
+
+
+def labelled_people(gt, frame_map):
+    if not is_composite_map(frame_map):
+        return {pid for people in gt.values() for pid, _ in people}
+    labelled = set()
+    for frame in range(len(map_entries(frame_map))):
+        for pid, _ in people_at(gt, frame_map, frame) or []:
+            labelled.add(pid)
+    return labelled
+
+
 def chokepoint_identity_metrics(identities, gt, frame_map, mixed_share=MIXED_SHARE):
-    labelled = {pid for people in gt.values() for pid, _ in people}
+    labelled = labelled_people(gt, frame_map)
     votes = {}
     faces_total = faces_matched = 0
     for identity in identities:
         counter = Counter()
         for face in identity["faces"]:
-            frame = face["frame"]
-            if frame_map is not None:
-                if frame >= len(frame_map):
-                    continue
-                frame = frame_map[frame]
-            people = gt.get(frame)
+            people = people_at(gt, frame_map, face["frame"])
             if people is None:
                 continue
             faces_total += 1
@@ -131,13 +187,7 @@ def chokepoint_detection_metrics(detections, frames_analysed, gt, frame_map):
         by_frame.setdefault(detection["frame"], []).append(detection["box"])
     tp = fp = fn = 0
     for frame in frames_analysed:
-        if frame_map is not None:
-            if frame >= len(frame_map):
-                continue
-            mapped = frame_map[frame]
-        else:
-            mapped = frame
-        people = gt.get(mapped)
+        people = people_at(gt, frame_map, frame)
         if people is None:
             continue
         boxes = by_frame.get(frame, [])
