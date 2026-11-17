@@ -215,6 +215,21 @@ def test_gating_with_adaptive_sampling_is_refused():
     assert pi.gating_refusal(False, True) is None
 
 
+def test_gate_settings_defaults(monkeypatch):
+    for name in ("GATE_CHECKS_PER_S", "GATE_REWIND_S", "GATE_EXIT_S", "GATE_CONF", "GATE_IMGSZ"):
+        monkeypatch.delenv(name, raising=False)
+
+    assert pi.read_gate_settings() == {"checks_per_s": 2.0, "rewind_s": 1.0, "exit_s": 2.0,
+                                       "conf": 0.25, "imgsz": 640}
+
+
+def test_gate_settings_refuse_a_confidence_above_one(monkeypatch):
+    monkeypatch.setenv("GATE_CONF", "1.5")
+
+    with pytest.raises(SystemExit, match="GATE_CONF debe estar entre 0 y 1"):
+        pi.read_gate_settings()
+
+
 def test_presence_intervals_imports_no_framework():
     code = ("import sys, presence_intervals; "
             "print([m for m in ('numpy', 'cv2', 'torch', 'tensorflow', 'ultralytics') "

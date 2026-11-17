@@ -373,9 +373,11 @@ def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):
     assert not os.path.exists(os.path.join(worker.JOBS_DIR, "job-1"))
 
 
-def gating_at_start(value, adaptive=None, mode=None):
+def gating_at_start(value, adaptive=None, mode=None, extra=None):
     env = {k: v for k, v in os.environ.items()
-           if k not in ("FACE_GATING", "FACE_ADAPTIVE", "PIPELINE_MODE")}
+           if k not in ("FACE_GATING", "FACE_ADAPTIVE", "PIPELINE_MODE")
+           and not k.startswith("GATE_")}
+    env.update(extra or {})
     if value is not None:
         env["FACE_GATING"] = value
     if adaptive is not None:
@@ -414,3 +416,37 @@ def test_adaptive_sampling_is_fine_without_gating_or_in_tracks_mode():
     assert gating_at_start("0", adaptive="1").stdout.strip() == "False"
     assert gating_at_start("1", adaptive="1", mode="tracks").returncode == 0
     assert gating_at_start("1", adaptive="0").stdout.strip() == "True"
+
+
+@pytest.mark.parametrize("name,value,message", [
+    ("GATE_CONF", "1.5", "GATE_CONF debe estar entre 0 y 1, no 1.5"),
+    ("GATE_CONF", "abc", "GATE_CONF debe ser un número positivo, no 'abc'"),
+    ("GATE_CHECKS_PER_S", "0", "GATE_CHECKS_PER_S debe ser un número positivo"),
+    ("GATE_REWIND_S", "-1", "GATE_REWIND_S debe ser un número no negativo"),
+    ("GATE_EXIT_S", "nan", "GATE_EXIT_S debe ser un número no negativo"),
+    ("GATE_IMGSZ", "640.5", "GATE_IMGSZ debe ser un entero positivo"),
+])
+def test_invalid_gate_setting_stops_the_worker_at_start(name, value, message):
+    result = gating_at_start(None, extra={name: value})
+
+    assert result.returncode != 0
+    assert message in result.stderr
+
+
+def test_gate_settings_are_not_checked_when_the_gate_does_not_run():
+    assert gating_at_start("0", extra={"GATE_CONF": "1.5"}).stdout.strip() == "False"
+    assert gating_at_start("1", mode="tracks", extra={"GATE_CONF": "1.5"}).returncode == 0
+
+
+def test_valid_gate_settings_let_the_worker_start():
+    extra = {"GATE_CONF": "0.4", "GATE_CHECKS_PER_S": "4", "GATE_IMGSZ": "320"}
+    assert gating_at_start(None, extra=extra).stdout.strip() == "True"
+
+
+def test_worker_imports_no_framework():
+    code = ("import sys, worker; "
+            "print([m for m in ('numpy', 'cv2', 'torch', 'tensorflow', 'ultralytics') "
+            "if m in sys.modules])")
+    out = subprocess.run([sys.executable, "-c", code], cwd=PIPELINE_DIR, capture_output=True,
+                         text=True, check=True)
+    assert out.stdout.strip() == "[]"
