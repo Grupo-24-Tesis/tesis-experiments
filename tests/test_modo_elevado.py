@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 
 import pytest
 
-from bench import bench_compuerta, estadisticas_runner, modo_elevado
+from bench import bench_compuerta, estadisticas_runner, modo_elevado, mot, pistas
 from harness import run as harness_run
 from harness import runlog
 
@@ -20,7 +20,7 @@ FAKE_ENV = {"PYTHONPATH": "exp"}
 def identity(correctos, **extra):
     base = {"personas_etiquetadas": 10, "identidades": correctos, "encontradas": correctos,
             "duplicados": 0, "mezcladas": 0, "sin_asignar": 0, "pureza": 1.0,
-            "correctos": correctos}
+            "correctos": correctos, "cara_correcta": correctos, "cara_sin_verificar": 0}
     return dict(base, **extra)
 
 
@@ -145,6 +145,7 @@ def test_seguimiento_reports_failure_without_recording_time(tmp_path, monkeypatc
                                                  min_track="3", videos=["v/x.mp4"]))
     assert code == 1
     assert runlog.read_json(str(out / "tiempos.json"), {}) == {}
+    assert runlog.read_json(str(out / "i640_d0p5_m3" / "x" / "etapas.json")) == {"stage1": 1}
 
 
 def test_rostros_needs_stage1_and_is_resumable(tmp_path, monkeypatch, fake_env):
@@ -300,12 +301,18 @@ def test_identity_rows_mark_best_mode():
                                          modo_elevado.tracks_identities(SCORES, stem))
             for stem in modo_elevado.compared_videos(SCORES)}
     rows = modo_elevado.identity_rows(faces, SCORES, best)
+    faces_rule, tracks_rule = modo_elevado.FACES_RULE, pistas.VOTE_RULE
+    assert tracks_rule == "pistas: votos de las cajas de persona"
     assert rows == [
-        ["Camera3", "rostros", "-"] + ["n/d"] * 8 + [""],
-        ["Camera3", "pistas", "i640_d0p5_m3", "10", "2", "2", "0", "0", "0", "100.0%", "2", ""],
-        ["MOT20-01", "rostros", "-", "10", "3", "3", "0", "0", "0", "84.2%", "3", ""],
-        ["MOT20-01", "pistas", "i1280_d0p2_m2", "10", "3", "3", "0", "0", "0", "100.0%", "3", ""],
-        ["MOT20-01", "pistas", "i640_d0p5_m3", "10", "4", "4", "0", "0", "0", "100.0%", "4", "sí"],
+        ["Camera3", "rostros", "-"] + ["n/d"] * 10 + ["", faces_rule],
+        ["Camera3", "pistas", "i640_d0p5_m3", "10", "2", "2", "0", "0", "0", "100.0%", "2", "2",
+         "0", "", tracks_rule],
+        ["MOT20-01", "rostros", "-", "10", "3", "3", "0", "0", "0", "84.2%", "3", "-", "-", "",
+         faces_rule],
+        ["MOT20-01", "pistas", "i1280_d0p2_m2", "10", "3", "3", "0", "0", "0", "100.0%", "3", "3",
+         "0", "", tracks_rule],
+        ["MOT20-01", "pistas", "i640_d0p5_m3", "10", "4", "4", "0", "0", "0", "100.0%", "4", "4",
+         "0", "sí", tracks_rule],
     ]
 
 
@@ -343,24 +350,36 @@ TRACK_RESULTS = {"tracks_checked": 2, "faces": [
      "frame_idx": 0, "score": 0.99}]}
 
 
-def write_run(directory, manifest, results):
+def write_run(directory, manifest, results, summary=True):
     os.makedirs(os.path.join(directory, "candidates"))
     runlog.write_json(os.path.join(directory, "candidates", "manifest.json"), manifest)
     runlog.write_json(os.path.join(directory, "candidates", "stage1_summary.json"), {})
     if results is not None:
         os.makedirs(os.path.join(directory, "faces"))
         runlog.write_json(os.path.join(directory, "faces", "results.json"), results)
+        if summary:
+            runlog.write_json(os.path.join(directory, "faces", "stage2_summary.json"), {})
 
 
-def test_tracks_identity_uses_cctv_metrics_without_mot_gt():
+def test_tracks_identity_uses_track_votes_without_mot_gt():
     gt = [(0.0, [([115, 202, 125, 214], "C3-01")])]
-    identities = [{"id": "1", "faces": [{"frame": 0, "box": [115, 202, 125, 214], "score": 1}]}]
-    result = modo_elevado.tracks_identity("Camera3", identities, 25.0, None,
+    identities = mot_identities()
+    result = modo_elevado.tracks_identity("Camera3", TRACK_MANIFEST, identities, None,
                                           lambda stem: (bench_compuerta.KIND_CCTV, gt, None))
-    assert result["encontradas"] == 1
-    assert result["correctos"] == 1
-    assert modo_elevado.tracks_identity("otro", identities, 25.0, None,
+    assert (result["identidades"], result["encontradas"], result["sin_asignar"]) == (2, 1, 1)
+    assert (result["correctos"], result["cara_correcta"]) == (1, 1)
+    assert result["regla"] == "pistas: votos de las cajas de persona"
+    chokepoint_gt = {3: [("0007", (520.0, 210.0))]}
+    result = modo_elevado.tracks_identity(
+        "P1E_S1_C1", TRACK_MANIFEST, identities, None,
+        lambda stem: (bench_compuerta.KIND_CHOKEPOINT, chokepoint_gt, [3]))
+    assert (result["encontradas"], result["cara_correcta"]) == (1, 1)
+    assert modo_elevado.tracks_identity("otro", TRACK_MANIFEST, identities, None,
                                         lambda stem: (None, None, None)) is None
+
+
+def mot_identities():
+    return mot.tracks_to_identities(TRACK_MANIFEST, TRACK_RESULTS)
 
 
 def test_puntuar_end_to_end(tmp_path, capsys):
@@ -393,6 +412,8 @@ def test_puntuar_end_to_end(tmp_path, capsys):
     tracks = document["ajustes"]["i640_d0p5_m3"]["videos"]["m"]
     assert tracks["identidad"]["encontradas"] == 2
     assert tracks["identidad"]["correctos"] == 2
+    assert tracks["identidad"]["cara_correcta"] == 2
+    assert tracks["identidad"]["regla"] == "pistas: votos de las cajas de persona"
     assert tracks["seguimiento"]["personas_cubiertas"] == 2
     assert document["ajustes"]["i1280_d0p5_m3"]["videos"]["m"]["identidad"] is None
     assert document["rostros"]["m"]["mezcladas"] == 1
@@ -401,6 +422,75 @@ def test_puntuar_end_to_end(tmp_path, capsys):
                                            "correctos": 2}
     assert document["totales_seguimiento"]["i640_d0p5_m3"]["videos"] == 1
     assert "más correctos" in document["nota"]
+    assert document["reglas"]["pistas"] == "pistas: votos de las cajas de persona"
+    assert document["omitidos"] == [
+        {"modo": "pistas", "origen": "i1280_d0p5_m3", "video": "m",
+         "motivo": "sin faces/results.json"},
+        {"modo": "rostros", "origen": str(base / "results.json"), "video": "roto",
+         "motivo": "la base marcó un error: x"}]
     printed = capsys.readouterr().out
     assert "pistas i640_d0p5_m3" in printed
     assert "3.0 s" in printed
+    assert "pistas: votos de las cajas de persona" in printed
+    assert "cara correcta" in printed
+    assert "Omitidos" in printed
+
+
+def test_puntuar_lists_every_omitted_run(tmp_path, monkeypatch, capsys):
+    monkeypatch.setenv("TESIS_CHOKEPOINT_DIR", str(tmp_path / "chokepoint"))
+    corridas = tmp_path / "corridas"
+    setting = corridas / "i640_d0p5_m3"
+    (setting / "sin_etapa1").mkdir(parents=True)
+    runlog.write_json(str(setting / "sin_etapa1" / "etapas.json"), {"stage1": "timeout"})
+    write_run(str(setting / "m"), TRACK_MANIFEST, TRACK_RESULTS)
+    runlog.write_json(str(setting / "m" / "etapas.json"), {"stage1": 0, "stage2": 1})
+    write_run(str(setting / "traza"), TRACK_MANIFEST, TRACK_RESULTS)
+    (setting / "traza" / "stage2.stderr.log").write_text(
+        "Traceback (most recent call last):\n  File x\nValueError: roto\n")
+    write_run(str(setting / "sin_resumen"), TRACK_MANIFEST, TRACK_RESULTS, summary=False)
+    write_run(str(setting / "video_sin_verdad_xyz"), TRACK_MANIFEST, TRACK_RESULTS)
+    for stem in ("m", "traza", "sin_resumen"):
+        (tmp_path / "gt" / stem).mkdir(parents=True)
+        (tmp_path / "gt" / stem / "gt.txt").write_text(MOT_GT)
+    base = tmp_path / "base"
+    base.mkdir()
+    runlog.write_json(str(base / "results.json"), {"videos": {
+        "roto": {"error": "código de salida 1"},
+        "s5": {"identity": None, "kind": None},
+        "cam": {"identity": None, "kind": "cctv"}}})
+    stats = tmp_path / "estadisticas.json"
+    runlog.write_json(str(stats), {})
+    out = tmp_path / "puntuar.json"
+    code = modo_elevado.command_puntuar(args(corridas=str(corridas),
+                                             base=[str(base / "results.json")],
+                                             mot_gt=str(tmp_path / "gt"),
+                                             estadisticas=str(stats), out=str(out)))
+    assert code == 0
+    document = json.loads(out.read_text())
+    reasons = {(item["origen"], item["video"], item["motivo"]) for item in document["omitidos"]}
+    origin = str(base / "results.json")
+    assert reasons == {
+        ("i640_d0p5_m3", "m", "la etapa de rostros terminó con código 1"),
+        ("i640_d0p5_m3", "sin_etapa1", "la etapa de seguimiento terminó con código timeout"),
+        ("i640_d0p5_m3", "sin_etapa1", "sin etapa 1 completa (falta candidates/manifest.json o "
+                                       "candidates/stage1_summary.json)"),
+        ("i640_d0p5_m3", "sin_resumen",
+         "la etapa de rostros no terminó (falta faces/stage2_summary.json)"),
+        ("i640_d0p5_m3", "traza", "la etapa de rostros dejó un error (Traceback) en "
+                                  "stage2.stderr.log"),
+        ("i640_d0p5_m3", "video_sin_verdad_xyz",
+         "tipo de verdad de terreno desconocido: no hay gt.txt de MOT, ni verdad de terreno de "
+         "ChokePoint o CCTV para este video"),
+        (origin, "roto", "la base marcó un error: código de salida 1"),
+        (origin, "s5", "tipo de verdad de terreno desconocido: no hay gt.txt de MOT y la base no "
+                       "tiene métricas de identidad"),
+        (origin, "cam", "la base no tiene métricas de identidad"),
+    }
+    videos = document["ajustes"]["i640_d0p5_m3"]["videos"]
+    assert "sin_etapa1" not in videos
+    assert videos["m"]["identidad"] is None
+    assert videos["m"]["seguimiento"]["personas_cubiertas"] == 2
+    printed = capsys.readouterr().out
+    omitted_section = printed[printed.index("Omitidos"):]
+    assert "sin_etapa1" in omitted_section
+    assert "la base marcó un error" in omitted_section

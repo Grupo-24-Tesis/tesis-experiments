@@ -44,18 +44,29 @@ def tracks_to_identities(manifest, results):
     return identities
 
 
+def box_centre(box):
+    return (box[0] + box[2]) / 2, (box[1] + box[3]) / 2
+
+
+def in_head_region(box, point):
+    height = box[3] - box[1]
+    return box[0] <= point[0] <= box[2] and box[1] <= point[1] <= box[1] + HEAD_REGION * height
+
+
+def head_distance(box, point):
+    head_x = (box[0] + box[2]) / 2
+    head_y = box[1] + HEAD_POINT * (box[3] - box[1])
+    return (head_x - point[0]) ** 2 + (head_y - point[1]) ** 2
+
+
 def assign_face(face_box, people):
-    cx = (face_box[0] + face_box[2]) / 2
-    cy = (face_box[1] + face_box[3]) / 2
+    centre = box_centre(face_box)
     best = None
     best_distance = None
     for person_id, box in people:
-        height = box[3] - box[1]
-        if not (box[0] <= cx <= box[2] and box[1] <= cy <= box[1] + HEAD_REGION * height):
+        if not in_head_region(box, centre):
             continue
-        head_x = (box[0] + box[2]) / 2
-        head_y = box[1] + HEAD_POINT * height
-        distance = (head_x - cx) ** 2 + (head_y - cy) ** 2
+        distance = head_distance(box, centre)
         if best_distance is None or distance < best_distance:
             best, best_distance = person_id, distance
     return best
@@ -125,6 +136,15 @@ def box_iou(a, b):
     return inter / union if union else 0.0
 
 
+def match_person_box(box, people):
+    best_iou, best_person = 0.0, None
+    for person_id, gt_box in people:
+        value = box_iou(box, gt_box)
+        if value > best_iou:
+            best_iou, best_person = value, person_id
+    return best_person if best_person is not None and best_iou >= MIN_TRACK_IOU else None
+
+
 def tracking_metrics(manifest, ground_truth):
     labelled = {pid for people in ground_truth.values() for pid, _ in people}
     counters = []
@@ -132,13 +152,9 @@ def tracking_metrics(manifest, ground_truth):
         counter = Counter()
         for candidate, frame in candidates.items():
             box = manifest["boxes"][track_id][candidate]
-            best_iou, best_person = 0.0, None
-            for person_id, gt_box in ground_truth.get(frame, []):
-                value = box_iou(box, gt_box)
-                if value > best_iou:
-                    best_iou, best_person = value, person_id
-            if best_person is not None and best_iou >= MIN_TRACK_IOU:
-                counter[best_person] += 1
+            person = match_person_box(box, ground_truth.get(frame, []))
+            if person is not None:
+                counter[person] += 1
         counters.append(counter if has_main_person(counter, len(candidates)) else None)
     summary = summarise(counters)
     return {

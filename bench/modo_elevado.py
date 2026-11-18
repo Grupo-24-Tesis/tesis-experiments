@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 
 import yaml
 
-from bench import bench_compuerta, metrics, mot
+from bench import bench_compuerta, mot, pistas
 from bench.barrido import parse_name_list, parse_number_list
 from harness import runlog
 from harness.run import PY, run_logged
@@ -21,11 +21,16 @@ CANDIDATES_NAME = "candidates"
 FACES_NAME = "faces"
 MANIFEST_NAME = "manifest.json"
 STAGE1_SUMMARY_NAME = "stage1_summary.json"
+STAGE2_SUMMARY_NAME = "stage2_summary.json"
+STAGES_NAME = "etapas.json"
+TRACEBACK_MARK = "Traceback (most recent call last)"
 FACES_RESULTS_NAME = "results.json"
 TIMES_NAME = "tiempos.json"
 MOT_GT_NAME = "gt.txt"
 CHECKS_SUFFIX = "_revisiones"
 TRACKING_KEY = "seguimiento_s"
+STAGE1_KEY = "stage1"
+STAGE2_KEY = "stage2"
 FACES_KEY = "rostros_s"
 FACES_MODE = "rostros"
 TRACKS_MODE = "pistas"
@@ -37,7 +42,17 @@ BEST_MODE_NOTE = ("El mejor modo de un video es el que tiene más correctos (enc
 TRACKING_HEADERS = ["ajuste", "video", "etiquetadas", "pistas", "cubiertas", "duplicadas",
                     "mezcladas", "sin asignar", "pureza", "seguimiento"]
 IDENTITY_HEADERS = ["video", "modo", "ajuste", "etiquetadas", "identidades", "encontradas",
-                    "duplicados", "mezcladas", "sin asignar", "pureza", "correctos", "mejor"]
+                    "duplicados", "mezcladas", "sin asignar", "pureza", "correctos",
+                    "cara correcta", "sin verificar", "mejor", "regla"]
+OMITTED_HEADERS = ["modo", "origen", "video", "motivo"]
+FACES_RULE = "rostros: votos de cada rostro guardado"
+RULES_NOTE = ("Reglas de puntuación. Modo rostros (rostros: votos de cada rostro guardado): cada "
+              "rostro de una identidad vota por la persona etiquetada que muestra. Modo pistas "
+              "(pistas: votos de las cajas de persona): cada caja de persona guardada de una pista "
+              "vota por la persona etiquetada que muestra, y la persona principal es la mayoría de "
+              "esos votos. Cara correcta cuenta los rostros guardados que muestran a la persona "
+              "principal de su pista según la regla de rostros del conjunto; sin verificar cuenta "
+              "los rostros guardados en fotogramas sin etiqueta con que compararlos.")
 FOOTAGE_HEADERS = ["video", "altura px", "altura relativa", "personas por revisión",
                    "con personas", "resolución", "mejor modo"]
 TRACKING_COUNTS = ["personas_etiquetadas", "pistas", "personas_cubiertas", "pistas_duplicadas",
@@ -162,6 +177,13 @@ def record_time(times, setting, stem, key, seconds):
     return times
 
 
+def record_stage_code(directory, stage, code):
+    path = os.path.join(directory, STAGES_NAME)
+    codes = runlog.read_json(path, {})
+    codes[stage] = code
+    runlog.write_json(path, codes)
+
+
 def stage_failure(prefix, stage, code, log_path):
     print(f"{prefix}: {stage} falló con código {code}, ver {log_path}", flush=True)
 
@@ -187,6 +209,7 @@ def command_seguimiento(args):
             continue
         prepare_stage1(directory, build_config(video, imgsz, interval, min_track, tracker))
         code, seconds = run_command(stage1_command(directory), os.path.join(directory, "stage1"))
+        record_stage_code(directory, STAGE1_KEY, code)
         if code != 0 or not stage1_done(directory):
             failures += 1
             stage_failure(prefix, "el seguimiento", code,
@@ -230,6 +253,7 @@ def command_rostros(args):
             continue
         prepare_stage2(directory)
         code, seconds = run_command(stage2_command(directory), os.path.join(directory, "stage2"))
+        record_stage_code(directory, STAGE2_KEY, code)
         if code != 0 or not stage2_done(directory):
             failures += 1
             stage_failure(prefix, "rostros", code, os.path.join(directory, "stage2.stderr.log"))
@@ -308,26 +332,74 @@ def spanish_identity(result):
     }
 
 
-def tracks_identity(stem, identities, fps, mot_gt, find_gt=bench_compuerta.find_ground_truth):
+def tracks_identity(stem, manifest, identities, mot_gt,
+                    find_gt=bench_compuerta.find_ground_truth):
     if mot_gt is not None:
-        return mot.identity_metrics(identities, mot_gt)
-    kind, gt, frame_map = find_gt(stem)
-    if kind == bench_compuerta.KIND_CHOKEPOINT:
-        return spanish_identity(metrics.chokepoint_identity_metrics(identities, gt, frame_map))
-    if kind == bench_compuerta.KIND_CCTV:
-        return spanish_identity(metrics.cctv_identity_metrics(identities, fps, gt))
-    return None
+        result = pistas.mot_identity(manifest, identities, mot_gt)
+    else:
+        kind, gt, frame_map = find_gt(stem)
+        if kind == bench_compuerta.KIND_CHOKEPOINT:
+            result = pistas.chokepoint_identity(manifest, identities, gt, frame_map)
+        elif kind == bench_compuerta.KIND_CCTV:
+            result = pistas.cctv_identity(manifest, identities, manifest["fps"], gt)
+        else:
+            return None
+    return dict(result, regla=pistas.VOTE_RULE)
+
+
+def has_traceback(path):
+    if not os.path.exists(path):
+        return False
+    with open(path, errors="replace") as f:
+        return TRACEBACK_MARK in f.read()
+
+
+def stage_failures(directory, stage, label):
+    reasons = []
+    code = runlog.read_json(os.path.join(directory, STAGES_NAME), {}).get(stage)
+    if code is not None and code != 0:
+        reasons.append(f"la etapa de {label} terminó con código {code}")
+    log = f"{stage}.stderr.log"
+    if has_traceback(os.path.join(directory, log)):
+        reasons.append(f"la etapa de {label} dejó un error (Traceback) en {log}")
+    return reasons
+
+
+def stage1_problems(directory):
+    reasons = stage_failures(directory, STAGE1_KEY, "seguimiento")
+    if not stage1_done(directory):
+        reasons.append(f"sin etapa 1 completa (falta {CANDIDATES_NAME}/{MANIFEST_NAME} o "
+                       f"{CANDIDATES_NAME}/{STAGE1_SUMMARY_NAME})")
+    return reasons
+
+
+def stage2_problems(directory):
+    reasons = stage_failures(directory, STAGE2_KEY, "rostros")
+    if not stage2_done(directory):
+        reasons.append(f"sin {FACES_NAME}/{FACES_RESULTS_NAME}")
+    elif not os.path.exists(os.path.join(faces_dir(directory), STAGE2_SUMMARY_NAME)):
+        reasons.append(f"la etapa de rostros no terminó (falta "
+                       f"{FACES_NAME}/{STAGE2_SUMMARY_NAME})")
+    return reasons
+
+
+def omission(mode, origin, stem, reason):
+    return {"modo": mode, "origen": origin, "video": stem, "motivo": reason}
 
 
 def score_run(stem, directory, mot_gt, find_gt=bench_compuerta.find_ground_truth):
     manifest = runlog.read_json(os.path.join(candidates_dir(directory), MANIFEST_NAME))
-    results = runlog.read_json(os.path.join(faces_dir(directory), FACES_RESULTS_NAME))
+    problems = stage2_problems(directory)
     identity = None
-    if results is not None:
-        identity = tracks_identity(stem, mot.tracks_to_identities(manifest, results),
-                                   manifest["fps"], mot_gt, find_gt)
-    return {"seguimiento": mot.tracking_metrics(manifest, mot_gt) if mot_gt is not None else None,
-            "identidad": identity, "con_rostros": results is not None}
+    if not problems:
+        results = runlog.read_json(os.path.join(faces_dir(directory), FACES_RESULTS_NAME))
+        identity = tracks_identity(stem, manifest, mot.tracks_to_identities(manifest, results),
+                                   mot_gt, find_gt)
+        if identity is None:
+            problems.append("tipo de verdad de terreno desconocido: no hay gt.txt de MOT, ni "
+                            "verdad de terreno de ChokePoint o CCTV para este video")
+    return ({"seguimiento": mot.tracking_metrics(manifest, mot_gt) if mot_gt is not None else None,
+             "identidad": identity, "con_rostros": stage2_done(directory)}, problems)
 
 
 def discover_runs(corridas):
@@ -340,9 +412,24 @@ def discover_runs(corridas):
             continue
         for stem in sorted(os.listdir(setting_dir)):
             directory = os.path.join(setting_dir, stem)
-            if os.path.isdir(directory) and stage1_done(directory):
+            if os.path.isdir(directory):
                 runs.setdefault(name, {})[stem] = directory
     return runs
+
+
+def score_runs(runs, mot_gt_for, find_gt):
+    scores = {}
+    omitted = []
+    for setting, by_video in runs.items():
+        for stem, directory in by_video.items():
+            problems = stage1_problems(directory)
+            if problems:
+                omitted.extend(omission(TRACKS_MODE, setting, stem, reason) for reason in problems)
+                continue
+            score, problems = score_run(stem, directory, mot_gt_for(stem), find_gt)
+            omitted.extend(omission(TRACKS_MODE, setting, stem, reason) for reason in problems)
+            scores.setdefault(setting, {})[stem] = score
+    return scores, omitted
 
 
 def mot_loader(mot_dir):
@@ -359,31 +446,50 @@ def mot_loader(mot_dir):
 def baseline_identities(results_path, mot_gt_for):
     document = runlog.read_json(results_path)
     root = os.path.dirname(os.path.abspath(results_path))
+    origin = os.path.abspath(results_path)
     found = {}
+    omitted = []
     for name, entry in document["videos"].items():
         if "error" in entry:
+            omitted.append(omission(FACES_MODE, origin, name,
+                                    f"la base marcó un error: {entry['error']}"))
             continue
         gt = mot_gt_for(name)
         if gt is not None:
+            if "detections_file" not in entry:
+                omitted.append(omission(FACES_MODE, origin, name,
+                                        "la base no indica detections_file para hallar "
+                                        "identities.json"))
+                continue
             path = os.path.join(root, os.path.dirname(entry["detections_file"]),
                                 bench_compuerta.IDENTITIES_NAME)
             found[name] = mot.identity_metrics(runlog.read_json(path)["identities"], gt)
         elif entry.get("identity"):
             found[name] = spanish_identity(entry["identity"])
-    return found
+        elif entry.get("kind") is None:
+            omitted.append(omission(FACES_MODE, origin, name,
+                                    "tipo de verdad de terreno desconocido: no hay gt.txt de "
+                                    "MOT y la base no tiene métricas de identidad"))
+        else:
+            omitted.append(omission(FACES_MODE, origin, name,
+                                    "la base no tiene métricas de identidad"))
+    return found, omitted
 
 
 def merge_baselines(paths, mot_gt_for):
     merged = {}
     sources = {}
+    omitted = []
     for path in paths:
-        for name, identity in baseline_identities(path, mot_gt_for).items():
+        found, skipped = baseline_identities(path, mot_gt_for)
+        omitted.extend(skipped)
+        for name, identity in found.items():
             if name in merged:
                 print(f"Aviso: {name} aparece en {sources[name]} y en {path}; se usa el primero")
                 continue
             merged[name] = identity
             sources[name] = path
-    return merged, sources
+    return merged, sources, omitted
 
 
 def best_mode(faces, tracks):
@@ -444,11 +550,13 @@ def tracking_rows(scores, times):
     return rows
 
 
-def identity_cells(identity):
+def identity_cells(identity, tracks_mode):
     if identity is None:
-        return [MISSING] * (len(IDENTITY_COUNTS) + 2)
+        return [MISSING] * (len(IDENTITY_COUNTS) + 4)
+    face_cells = ([str(identity["cara_correcta"]), str(identity["cara_sin_verificar"])]
+                  if tracks_mode else ["-", "-"])
     return ([str(identity[key]) for key in IDENTITY_COUNTS]
-            + [fmt_pct(identity["pureza"]), str(identity["correctos"])])
+            + [fmt_pct(identity["pureza"]), str(identity["correctos"])] + face_cells)
 
 
 def tracks_identities(scores, stem):
@@ -466,11 +574,17 @@ def identity_rows(faces, scores, best):
     for stem in compared_videos(scores):
         choice = best.get(stem)
         mark = "sí" if choice is not None and choice["modo"] == FACES_MODE else ""
-        rows.append([stem, FACES_MODE, "-"] + identity_cells(faces.get(stem)) + [mark])
+        rows.append([stem, FACES_MODE, "-"] + identity_cells(faces.get(stem), False)
+                    + [mark, FACES_RULE])
         for setting, identity in sorted(tracks_identities(scores, stem).items()):
             mark = "sí" if choice is not None and choice["ajuste"] == setting else ""
-            rows.append([stem, TRACKS_MODE, setting] + identity_cells(identity) + [mark])
+            rows.append([stem, TRACKS_MODE, setting] + identity_cells(identity, True)
+                        + [mark, identity.get("regla", pistas.VOTE_RULE)])
     return rows
+
+
+def omitted_rows(omitted):
+    return [[item["modo"], item["origen"], item["video"], item["motivo"]] for item in omitted]
 
 
 def footage_rows(stats, best):
@@ -502,10 +616,10 @@ def command_puntuar(args):
     if not os.path.exists(stats_path):
         raise SystemExit(f"No existe el archivo de estadísticas {stats_path}: corra antes "
                          f"estadisticas")
-    scores = {setting: {stem: score_run(stem, directory, mot_gt_for(stem))
-                        for stem, directory in runs.items()}
-              for setting, runs in discover_runs(corridas).items()}
-    faces, sources = merge_baselines(args.base, mot_gt_for)
+    scores, omitted_runs = score_runs(discover_runs(corridas), mot_gt_for,
+                                      bench_compuerta.find_ground_truth)
+    faces, sources, omitted_bases = merge_baselines(args.base, mot_gt_for)
+    omitted = omitted_runs + omitted_bases
     best = {stem: best_mode(faces.get(stem), tracks_identities(scores, stem))
             for stem in compared_videos(scores)}
     stats = runlog.read_json(stats_path)
@@ -515,11 +629,15 @@ def command_puntuar(args):
     print_table("Identidades por video: modo rostros frente a cada ajuste de pistas con rostros",
                 IDENTITY_HEADERS, identity_rows(faces, scores, best),
                 "sin ajustes de pistas con rostros puntuables")
+    print(RULES_NOTE)
+    print()
     print_table("Estadísticas del metraje y mejor modo por video", FOOTAGE_HEADERS,
                 footage_rows(stats, best), "sin estadísticas")
+    print_table("Omitidos", OMITTED_HEADERS, omitted_rows(omitted), "ninguno")
     print(BEST_MODE_NOTE)
     document = {
         "nota": BEST_MODE_NOTE,
+        "reglas": {FACES_MODE: FACES_RULE, TRACKS_MODE: pistas.VOTE_RULE, "nota": RULES_NOTE},
         "corridas": corridas,
         "bases": [os.path.abspath(path) for path in args.base],
         "mot_gt": os.path.abspath(args.mot_gt),
@@ -534,6 +652,7 @@ def command_puntuar(args):
         "mejor_modo": best,
         "metraje": stats,
         "tiempos": times,
+        "omitidos": omitted,
     }
     out_file = os.path.abspath(args.out)
     os.makedirs(os.path.dirname(out_file), exist_ok=True)
