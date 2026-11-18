@@ -50,7 +50,9 @@ RULES_NOTE = ("Reglas de puntuación. Modo rostros (rostros: votos de cada rostr
               "rostro de una identidad vota por la persona etiquetada que muestra. Modo pistas "
               "(pistas: votos de las cajas de persona): cada caja de persona guardada de una pista "
               "vota por la persona etiquetada que muestra, y la persona principal es la mayoría de "
-              "esos votos. Cara correcta cuenta los rostros guardados que muestran a la persona "
+              "esos votos. En MOT, donde todo fotograma está etiquetado, la pista necesita votos "
+              "de al menos la mitad de sus cajas; en ChokePoint y CCTV basta un voto, igual que "
+              "en el modo rostros, porque muchos fotogramas no tienen etiqueta. Cara correcta cuenta los rostros guardados que muestran a la persona "
               "principal de su pista según la regla de rostros del conjunto; sin verificar cuenta "
               "los rostros guardados en fotogramas sin etiqueta con que compararlos.")
 FOOTAGE_HEADERS = ["video", "altura px", "altura relativa", "personas por revisión",
