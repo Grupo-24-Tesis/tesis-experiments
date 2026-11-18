@@ -1,5 +1,6 @@
 import csv
 from collections import Counter
+from fractions import Fraction
 from statistics import median
 
 HEAD_REGION = 0.35
@@ -27,7 +28,10 @@ def tracks_to_identities(manifest, results):
     identities = []
     for face in results.get("faces", []):
         track_id = str(face["track_id"])
-        origin = manifest["boxes"][track_id][face["candidate"]]
+        origin = manifest["boxes"].get(track_id, {}).get(face["candidate"])
+        if origin is None:
+            raise ValueError(f"results.json cita el candidato {face['candidate']} de la pista "
+                             f"{track_id}, que no está en el manifest")
         fx1, fy1, fx2, fy2 = face["face_box"]
         identities.append({
             "id": track_id,
@@ -59,7 +63,7 @@ def assign_face(face_box, people):
 
 def identity_metrics(identities, ground_truth):
     labelled = {pid for people in ground_truth.values() for pid, _ in people}
-    counters = {}
+    counters = []
     for identity in identities:
         counter = Counter()
         faces = identity["faces"]
@@ -67,9 +71,7 @@ def identity_metrics(identities, ground_truth):
             person = assign_face(face["box"], ground_truth.get(face["frame"], []))
             if person is not None:
                 counter[person] += 1
-        if not faces or sum(counter.values()) < MIN_ASSIGNED_SHARE * len(faces):
-            counter = Counter()
-        counters[identity["id"]] = counter
+        counters.append(counter if has_main_person(counter, len(faces)) else None)
     summary = summarise(counters)
     return {
         "personas_etiquetadas": len(labelled),
@@ -83,20 +85,35 @@ def identity_metrics(identities, ground_truth):
     }
 
 
+def at_least_share(count, total, share):
+    return Fraction(count) >= Fraction(str(share)) * total
+
+
+def has_main_person(counter, items):
+    assigned = sum(counter.values())
+    return items > 0 and assigned > 0 and at_least_share(assigned, items, MIN_ASSIGNED_SHARE)
+
+
+def main_person(counter):
+    return counter.most_common(1)[0][0]
+
+
+def is_mixed(counter):
+    total = sum(counter.values())
+    return sum(1 for v in counter.values() if at_least_share(v, total, MIXED_SHARE)) >= 2
+
+
 def summarise(counters):
-    main = {k: c.most_common(1)[0][0] for k, c in counters.items() if c}
-    per_person = Counter(main.values())
-    assigned = sum(sum(c.values()) for c in counters.values())
-    pure = sum(c[main[k]] for k, c in counters.items() if c)
+    with_person = [c for c in counters if c is not None]
+    per_person = Counter(main_person(c) for c in with_person)
+    assigned_with_person = sum(sum(c.values()) for c in with_person)
+    pure = sum(c[main_person(c)] for c in with_person)
     return {
         "found": len(per_person),
         "duplicates": sum(n - 1 for n in per_person.values()),
-        "mixed": sum(
-            1 for c in counters.values()
-            if c and sum(1 for v in c.values() if v >= MIXED_SHARE * sum(c.values())) >= 2
-        ),
-        "unassigned": sum(1 for c in counters.values() if not c),
-        "purity": pure / assigned if assigned else 0.0,
+        "mixed": sum(1 for c in with_person if is_mixed(c)),
+        "unassigned": len(counters) - len(with_person),
+        "purity": pure / assigned_with_person if assigned_with_person else 0.0,
     }
 
 
@@ -110,7 +127,7 @@ def box_iou(a, b):
 
 def tracking_metrics(manifest, ground_truth):
     labelled = {pid for people in ground_truth.values() for pid, _ in people}
-    counters = {}
+    counters = []
     for track_id, candidates in manifest["tracks"].items():
         counter = Counter()
         for candidate, frame in candidates.items():
@@ -122,9 +139,7 @@ def tracking_metrics(manifest, ground_truth):
                     best_iou, best_person = value, person_id
             if best_person is not None and best_iou >= MIN_TRACK_IOU:
                 counter[best_person] += 1
-        if not candidates or sum(counter.values()) < MIN_ASSIGNED_SHARE * len(candidates):
-            counter = Counter()
-        counters[track_id] = counter
+        counters.append(counter if has_main_person(counter, len(candidates)) else None)
     summary = summarise(counters)
     return {
         "personas_etiquetadas": len(labelled),

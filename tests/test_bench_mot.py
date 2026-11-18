@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")))
 
 from bench import metrics, mot
@@ -143,3 +145,79 @@ def test_converted_tracks_feed_cctv_metrics():
     result = metrics.cctv_identity_metrics(identities, 25.0, gt)
     assert result["found"] == 1
     assert result["faces_matched"] == 1
+
+
+def test_mixed_share_limit_is_exact():
+    at_limit = [face(i, 5) for i in range(12)] + [face(12 + i, 105) for i in range(3)]
+    result = mot.identity_metrics([{"id": "m", "faces": at_limit}], gt_two(range(15)))
+    assert result["mezcladas"] == 1
+    below = [face(i, 5) for i in range(13)] + [face(13 + i, 105) for i in range(3)]
+    result = mot.identity_metrics([{"id": "m", "faces": below}], gt_two(range(16)))
+    assert result["mezcladas"] == 0
+    assert mot.at_least_share(3, 15, 0.2)
+    assert not mot.at_least_share(2, 15, 0.2)
+
+
+def test_purity_counts_only_identities_with_a_main_person():
+    far = {"frame": 0, "box": [500, 5, 508, 13], "score": 0.9}
+    identities = [
+        {"id": "x", "faces": [far, far, far, face(1, 105)]},
+        {"id": "z", "faces": [face(0, 5), face(2, 5)]},
+    ]
+    result = mot.identity_metrics(identities, gt_two())
+    assert result["sin_asignar"] == 1
+    assert result["pureza"] == 1.0
+
+
+def test_half_assigned_identity_keeps_its_main_person():
+    far = {"frame": 0, "box": [500, 5, 508, 13], "score": 0.9}
+    result = mot.identity_metrics([{"id": "h", "faces": [far, face(0, 5)]}], gt_two())
+    assert result["sin_asignar"] == 0
+    assert result["encontradas"] == 1
+
+
+def test_identities_with_the_same_id_are_counted_apart():
+    identities = [{"id": "a", "faces": [face(0, 5)]}, {"id": "a", "faces": [face(1, 5)]}]
+    result = mot.identity_metrics(identities, gt_two())
+    assert result["identidades"] == 2
+    assert result["encontradas"] == 1
+    assert result["duplicados"] == 1
+
+
+def test_majority_tie_takes_first_person_and_counts_as_mixed():
+    identities = [{"id": "t", "faces": [face(0, 105), face(1, 5)]},
+                  {"id": "u", "faces": [face(2, 105)]}]
+    result = mot.identity_metrics(identities, gt_two())
+    assert result["encontradas"] == 1
+    assert result["duplicados"] == 1
+    assert result["mezcladas"] == 1
+
+
+def test_tracks_to_identities_rejects_unknown_candidate():
+    bad = {"faces": [dict(RESULTS["faces"][0], track_id="9")]}
+    with pytest.raises(ValueError, match="no está en el manifest"):
+        mot.tracks_to_identities(MANIFEST, bad)
+
+
+def test_tracking_metrics_purity_value():
+    gt = {f: [person(1, x=0), person(2, x=100)] for f in range(3)}
+    box1, box2 = [0, 0, 20, 100], [100, 0, 120, 100]
+    manifest = {"tracks": {"t": {"a": 0, "b": 1, "c": 2}},
+                "boxes": {"t": {"a": box1, "b": box1, "c": box2}}}
+    result = mot.tracking_metrics(manifest, gt)
+    assert result["pureza"] == pytest.approx(2 / 3)
+    assert result["pistas_mezcladas"] == 1
+
+
+def test_empty_ground_truth():
+    identity = mot.identity_metrics([{"id": "a", "faces": [face(0, 5)]}], {})
+    assert identity["personas_etiquetadas"] == 0
+    assert identity["sin_asignar"] == 1
+    assert identity["pureza"] == 0.0
+    assert identity["correctos"] == 0
+    tracks = mot.tracking_metrics({"tracks": {"t": {"a": 0}}, "boxes": {"t": {"a": [0, 0, 1, 1]}}},
+                                  {})
+    assert tracks["pistas_sin_asignar"] == 1
+    assert tracks["pureza"] == 0.0
+    assert mot.footage_statistics({}, 1080) == {"altura_mediana_px": 0.0, "altura_relativa": 0.0,
+                                                "personas_por_fotograma_mediana": 0.0}
