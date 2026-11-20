@@ -177,11 +177,11 @@
         - item: Confirmación en MOT
           text: "Con i1280_d0p2_m3 (correctos de rostros frente a pistas): MOT20-01 2/16, 02 0/121, 03 0/0, 05 0/1; MOT17-02 0/7, 04 1/32, 05 6/25, 09 11/13, 10 1/13, 11 19/22, 13 3/12. Pistas gana en todos menos MOT20-03, que empata en 0."
         - item: Confirmación en ChokePoint y cámaras residenciales
-          text: "Rostros gana en los videos de entrada (P1E 21/7, 23/3, 23/3, 23/9; P2E_S1_C1.1 7/0, P2E_S2_C2.1 22/9) y en la mayoría de los de salida del portal 1 (P1L_S1_C2 23/19, P1L_S2_C3 25/11, P1L_S4_C2 23/19). Pistas gana en P1L_S3_C1 (20/25) y en la salida del portal 2 (P2L_S1_C3.1 10/25, P2L_S2_C2.2 2/4, P2L_S3_C1.1 16/25, P2L_S4_C3.2 1/4). Camera3 4/-8 y Camera_ch6 2/2."
+          text: "Rostros gana en los videos de entrada (P1E_S1_C1 21/7, P1E_S2_C2 23/3, P1E_S3_C3 23/3, P1E_S4_C1 23/9; P2E_S1_C1.1 7/0, P2E_S2_C2.1 22/9), salvo P2E_S3_C3.2 y P2E_S4_C1.2, que empatan en 5/5, y en la mayoría de los de salida del portal 1 (P1L_S1_C2 23/19, P1L_S2_C3 25/11, P1L_S4_C2 23/19). Pistas gana en P1L_S3_C1 (20/25) y en la salida del portal 2 (P2L_S1_C3.1 10/25, P2L_S2_C2.2 2/4, P2L_S3_C1.1 16/25, P2L_S4_C3.2 1/4). Camera3 4/-8 y Camera_ch6 2/2. Correctos puede ser negativo: una identidad mezclada que además es un duplicado se resta dos veces, con la misma fórmula en los dos modos."
         - item: Tiempo
           text: "En la muestra, rostros tarda 2.1 veces la duración del video y pistas 2.6 veces. En las multitudes de MOT, pistas tarda de 6 a 10 veces la duración, frente a 3 a 4 de rostros."
         - item: Regla automática
-          text: "La mejor regla encontrada (altura mediana de persona mayor que 126 px y rostro mediano menor que 44 px, entonces pistas) pierde 9 correctos, todos en MOT17-13; elegir siempre rostros pierde 253 y siempre pistas 122. Aplicada a los 78 videos de ChokePoint manda 51 a pistas, y 45 de ellos no se midieron en ese modo."
+          text: "La mejor regla encontrada (altura mediana de persona mayor que 126 px y rostro mediano menor que 44 px, entonces pistas) pierde 9 correctos, todos en MOT17-13; elegir siempre rostros pierde 253 y siempre pistas 122. Aplicada a los 78 videos de ChokePoint manda 51 a pistas, y 45 de ellos no se midieron en ese modo. En el modo de pistas, correctos no comprueba que el rostro guardado sea el de la persona asignada, así que la comparación favorece algo a ese modo."
     - section: Límites
       items:
         - item: Qué queda pendiente
