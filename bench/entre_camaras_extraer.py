@@ -170,7 +170,8 @@ def main():
     for name, source in plan:
         summary = run_video(name, source, args.chokepoint, out_root)
         print(f"{name}: {summary['identidades']} identidades, {summary['rostros']} rostros, "
-              f"coincide {summary['coincide']}, mejor_coincide {summary['mejor_coincide']}, "
+              f"coincide {'sí' if summary['coincide'] else 'no'}, "
+              f"mejor_coincide {'sí' if summary['mejor_coincide'] else 'no'}, "
               f"{summary['tiempo_s']} s", flush=True)
 
 

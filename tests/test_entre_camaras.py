@@ -20,12 +20,18 @@ def test_parse_video_name():
 def test_relation():
     relation = entre_camaras.relation
     assert relation("P1E_S1_C1", "P1E_S1_C2") == "misma_pasada"
-    assert relation("P1E_S1_C1", "P1E_S2_C1") == "otra_pasada"
-    assert relation("P1E_S1_C1", "P1L_S1_C1") == "otra_pasada"
+    assert relation("P1E_S1_C1", "P1E_S2_C1") == "otra_sesion"
+    assert relation("P1E_S1_C1", "P1L_S1_C1") == "misma_sesion"
     assert relation("P2E_S1_C1.1", "P2E_S1_C3.1") == "misma_pasada"
-    assert relation("P2E_S1_C1.1", "P2E_S1_C2.2") == "otra_pasada"
+    assert relation("P2E_S1_C1.1", "P2E_S1_C2.2") == "misma_sesion"
+    assert relation("P2E_S1_C1.1", "P2L_S2_C1.1") == "otra_sesion"
     assert relation("P1E_S1_C1", "P2E_S1_C1.1") == "otro_portal"
     assert relation("P1E_S1_C1", "P1E_S1_C1") is None
+
+
+def test_cases():
+    assert entre_camaras.CASES == ("todas", "misma_pasada", "misma_sesion", "otra_sesion",
+                                   "otro_portal")
 
 
 def test_person_key():
@@ -96,6 +102,31 @@ def test_threshold_table():
     assert entre_camaras.threshold_table(QUERIES, [0.95])[0]["precision"] is None
 
 
+def test_thresholds_reach_095():
+    assert entre_camaras.THRESHOLDS[0] == 0.0
+    assert entre_camaras.THRESHOLDS[-1] == 0.95
+    assert len(entre_camaras.THRESHOLDS) == 20
+
+
+def test_threshold_table_counts_queries_without_target():
+    queries = [(np.array([0.9, 0.8]), np.array([False, True])),
+               (np.array([0.9, 0.1]), np.array([False, False]))]
+    row = entre_camaras.threshold_table(queries, [0.5])[0]
+    assert row["precision"] == pytest.approx(1 / 3)
+    assert row["exhaustividad"] == pytest.approx(1.0)
+    assert row["resultados_por_consulta"] == pytest.approx(1.5)
+
+
+def test_evaluate_threshold_table_includes_queries_without_target():
+    result = entre_camaras.evaluate(make_items())
+    for variant in entre_camaras.VARIANTS:
+        case = result[variant]["otro_portal"]
+        row = case["umbrales"][0]
+        assert row["resultados_por_consulta"] == pytest.approx(5 / 3)
+        assert row["precision"] == 0.0
+        assert row["exhaustividad"] is None
+
+
 def make_items():
     def item(video, identity, label, vector):
         face = np.array([vector], dtype=np.float32)
@@ -121,6 +152,49 @@ def test_evaluate_empty_case_has_none_metrics():
         assert case["metricas"]["consultas"] == 0
         assert case["metricas"]["acierto_1"] is None
         assert case["sin_objetivo"] == 3
+
+
+def test_evaluate_splits_session_cases():
+    items = [
+        {"video": "P1E_S1_C1", "id": 1, "label": "0001", "faces": np.array([[1, 0]], dtype=np.float32),
+         "best": np.array([1, 0], dtype=np.float32)},
+        {"video": "P1E_S2_C1", "id": 1, "label": "0001", "faces": np.array([[1, 0]], dtype=np.float32),
+         "best": np.array([1, 0], dtype=np.float32)},
+    ]
+    result = entre_camaras.evaluate(items)
+    for variant in entre_camaras.VARIANTS:
+        assert result[variant]["otra_sesion"]["metricas"]["consultas"] == 2
+        assert result[variant]["misma_sesion"]["metricas"]["consultas"] == 0
+        assert result[variant]["misma_pasada"]["metricas"]["consultas"] == 0
+
+
+def test_top1_mixed_share():
+    def item(video, identity, label, vector, mixed=False):
+        face = np.array([vector], dtype=np.float32)
+        return {"video": video, "id": identity, "label": label, "faces": face, "best": face[0],
+                "mixed": mixed}
+
+    items = [item("P1E_S1_C1", 1, "0001", [1, 0]),
+             item("P1E_S1_C2", 1, None, [0, 1], mixed=True),
+             item("P1E_S1_C3", 1, "0001", [0.6, 0.8]),
+             item("P1E_S1_C3", 2, None, [0, 1])]
+    result = entre_camaras.evaluate(items)
+    for variant in entre_camaras.VARIANTS:
+        assert result[variant]["todas"]["metricas"]["top1_mezclada"] == pytest.approx(0.5)
+    empty = entre_camaras.evaluate(make_items())
+    assert empty["media"]["otro_portal"]["metricas"]["top1_mezclada"] is None
+
+
+def test_mixed_ids():
+    gt = {20: [("0005", (105, 105)), ("0007", (205, 205))], 30: []}
+    identities = [
+        {"id": 1, "faces": [{"frame": 20, "box": [200, 200, 210, 210]},
+                            {"frame": 20, "box": [100, 100, 110, 110]}]},
+        {"id": 2, "faces": [{"frame": 20, "box": [100, 100, 110, 110]}]},
+        {"id": 3, "faces": [{"frame": 30, "box": [100, 100, 110, 110]}]},
+    ]
+    outcomes = entre_camaras.identity_outcomes(identities, gt, None)
+    assert entre_camaras.mixed_ids(outcomes) == {1}
 
 
 def test_load_video_embeddings(tmp_path):

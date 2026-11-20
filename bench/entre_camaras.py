@@ -16,9 +16,10 @@ EMBEDDINGS_NAME = "embeddings.npz"
 IDENTITIES_NAME = "identities.json"
 EXTRACTION_NAME = "extraccion.json"
 VARIANTS = ("media", "mejor", "par_maximo")
-CASES = ("todas", "misma_pasada", "otra_pasada", "otro_portal")
-THRESHOLDS = tuple(round(0.05 * step, 2) for step in range(19))
+CASES = ("todas", "misma_pasada", "misma_sesion", "otra_sesion", "otro_portal")
+THRESHOLDS = tuple(round(0.05 * step, 2) for step in range(20))
 TOP_K = (1, 5, 10)
+EXPECTED_VIDEOS = 72
 VIDEO_PATTERN = re.compile(r"^P([12])([EL])_S(\d)_C([123])(?:\.(\d))?$")
 
 
@@ -38,10 +39,12 @@ def relation(a, b):
     second = parse_video_name(b)
     if first["portal"] != second["portal"]:
         return "otro_portal"
-    same_pass = all(first[key] == second[key] for key in ("direction", "session", "part"))
+    if first["session"] != second["session"]:
+        return "otra_sesion"
+    same_pass = all(first[key] == second[key] for key in ("direction", "part"))
     if same_pass and first["camera"] != second["camera"]:
         return "misma_pasada"
-    return "otra_pasada"
+    return "misma_sesion"
 
 
 def person_key(pid):
@@ -77,6 +80,10 @@ def identity_outcomes(identities, gt, frame_map, mixed_share=metrics.MIXED_SHARE
 def identity_labels(identities, gt, frame_map, mixed_share=metrics.MIXED_SHARE):
     return {identity_id: label for identity_id, (label, _) in
             identity_outcomes(identities, gt, frame_map, mixed_share).items()}
+
+
+def mixed_ids(outcomes):
+    return {identity_id for identity_id, (_, status) in outcomes.items() if status == "mezclada"}
 
 
 def load_video_embeddings(folder):
@@ -192,7 +199,9 @@ def evaluate(items):
     for video in set(videos):
         for other in set(videos):
             relations[(video, other)] = relation(video, other)
-    collected = {variant: {case: {"queries": [], "sin_objetivo": 0} for case in CASES}
+    mixed = np.array([bool(item.get("mixed")) for item in items])
+    collected = {variant: {case: {"queries": [], "all_queries": [], "top1_mixed": [],
+                                  "sin_objetivo": 0} for case in CASES}
                  for variant in VARIANTS}
     for index, item in enumerate(items):
         if item["label"] is None:
@@ -209,13 +218,21 @@ def evaluate(items):
             scores = query_scores(gallery, item, variant)
             for case in CASES:
                 gallery_mask, target_mask = case_masks[case]
-                if not target_mask.any():
-                    collected[variant][case]["sin_objetivo"] += 1
+                data = collected[variant][case]
+                case_scores = scores[gallery_mask]
+                case_targets = target_mask[gallery_mask]
+                data["all_queries"].append((case_scores, case_targets))
+                if not case_targets.any():
+                    data["sin_objetivo"] += 1
                     continue
-                collected[variant][case]["queries"].append(
-                    (scores[gallery_mask], target_mask[gallery_mask]))
-    return {variant: {case: {"metricas": search_metrics(data["queries"]),
-                             "umbrales": threshold_table(data["queries"]),
+                data["queries"].append((case_scores, case_targets))
+                order = np.lexsort((case_targets.astype(int), -case_scores))
+                data["top1_mixed"].append(bool(mixed[gallery_mask][order[0]]))
+    return {variant: {case: {"metricas": {
+                                **search_metrics(data["queries"]),
+                                "top1_mezclada": float(np.mean(data["top1_mixed"]))
+                                if data["top1_mixed"] else None},
+                             "umbrales": threshold_table(data["all_queries"]),
                              "sin_objetivo": data["sin_objetivo"]}
                       for case, data in cases.items()}
             for variant, cases in collected.items()}
@@ -242,7 +259,7 @@ def print_results(results):
     for variant in VARIANTS:
         print(f"Variante {variant}")
         print(f"{'caso':<14}{'consultas':>10}{'sin objetivo':>14}{'acierto@1':>11}"
-              f"{'acierto@5':>11}{'acierto@10':>12}{'precision@10':>14}{'rango medio':>13}"
+              f"{'acierto@5':>11}{'acierto@10':>12}{'precisión@10':>14}{'rango medio':>13}"
               f"{'AP media':>10}")
         for case in CASES:
             data = results[variant][case]
@@ -268,23 +285,31 @@ def main():
     items = []
     statuses = Counter()
     different = []
+    different_best = []
     for name in names:
         folder = os.path.join(args.runs, name)
         extraction = load_json(os.path.join(folder, EXTRACTION_NAME))
         if not extraction["coincide"]:
             different.append(name)
+        if not extraction["mejor_coincide"]:
+            different_best.append(name)
         outcomes = label_video(folder, name)
+        mixed = mixed_ids(outcomes)
         for entry in load_video_embeddings(folder):
             label, status = outcomes[entry["id"]]
             statuses[status] += 1
             items.append({"video": name, "id": entry["id"], "label": label,
-                          "faces": entry["faces"], "best": entry["best"]})
+                          "faces": entry["faces"], "best": entry["best"],
+                          "mixed": entry["id"] in mixed})
+    if len(names) < EXPECTED_VIDEOS:
+        print(f"Aviso: solo hay {len(names)} videos extraídos de {EXPECTED_VIDEOS} esperados")
     results = evaluate(items)
     document = {"extraccion": {"videos": len(names), "identidades": len(items),
                                "etiquetadas": statuses["etiquetada"],
                                "sin_persona": statuses["sin_persona"],
                                "mezcladas": statuses["mezclada"],
-                               "videos_distintos": different},
+                               "videos_distintos": different,
+                               "videos_mejor_distinto": different_best},
                 "resultados": results}
     with open(out, "w") as f:
         json.dump(document, f, indent=2, ensure_ascii=False)
