@@ -64,3 +64,14 @@ guarda en git junto con el código que lo generó.
 - Las pruebas nunca modifican el código del pipeline.
 - Videos, fotogramas y recortes solo se guardan en las máquinas del proyecto y nunca en git:
   muestran a personas reales.
+
+## Búsqueda entre cámaras (ChokePoint)
+
+Mide si el embedding de una identidad encuentra a la misma persona en otras cámaras. La extracción repite el análisis con compuerta de cada video y guarda un embedding por rostro; la puntuación usa la verdad de terreno de ChokePoint.
+
+```
+cd /data/TesisFaceRecognition/tesis_face_recognition_experiments && /data/TesisFaceRecognition/tesis_face_recognition_pipeline/venvs/faces/bin/python -m bench.entre_camaras_extraer
+cd /data/TesisFaceRecognition/tesis_face_recognition_experiments && venvs/eval/bin/python -m bench.entre_camaras
+```
+
+Los resultados quedan en `/data/TesisFaceRecognition/chokepoint/runs/entre_camaras/` (una carpeta por video y `resultados.json`). Los embeddings nunca se guardan en git. Una extracción interrumpida se retoma sola: se omiten los videos que ya tienen `extraccion.json`.
