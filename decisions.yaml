@@ -157,11 +157,15 @@
 - id: D005
   date: "2026-11-20"
   title: Las cámaras elevadas o con multitudes usan el modo de pistas por elección manual en cada cámara
-  status: decidido
+  status: descartado (2026-11-20, ver D007)
   decided_by: Equipo del proyecto (tesis), tras revisar el experimento de cámaras elevadas
   numbers_from: "Banco bench/modo_elevado.py, bench/mot.py y bench/pistas.py sobre MOT20, MOT17, ChokePoint y las cámaras residenciales (fuera del registro del banco)"
   facts: []
   sections:
+    - section: Estado
+      items:
+        - item: Descartada
+          text: "El modo manual por cámara se construyó y se probó de punta a punta, pero no se fusionó: D007 descarta el modo elevado. Esta decisión queda solo como registro del experimento."
     - section: Decisión
       items:
         - item: Qué se decide
@@ -189,11 +193,15 @@
 - id: D006
   date: "2026-11-20"
   title: Los valores ajustados del seguimiento pasan a ser los valores por defecto del modo de pistas, sin compuerta de presencia
-  status: decidido
+  status: descartado (2026-11-20, ver D007)
   decided_by: Equipo del proyecto (tesis), tras el experimento de cámaras elevadas (D005)
   numbers_from: "Banco bench/modo_elevado.py (fuera del registro del banco)"
   facts: []
   sections:
+    - section: Estado
+      items:
+        - item: Descartada
+          text: "Los nuevos valores no llegaron a producción: tracking.py sigue con YOLO_IMGSZ 640 y DETECT_INTERVAL_S 0.5. D007 descarta el modo elevado. Esta decisión queda solo como registro del experimento."
     - section: Decisión
       items:
         - item: Nuevos valores
@@ -210,3 +218,23 @@
           text: "Las suites anteriores que dependían de los valores por defecto antiguos (640 px y 0.5 s) dan resultados distintos si se vuelven a correr; para reproducirlas hay que fijar esos valores en su configuración."
         - item: Compuerta
           text: "La compuerta de presencia queda fuera del modo de pistas por ahora; no se midió en ese modo."
+- id: D007
+  date: "2026-11-20"
+  title: Se descarta el modo elevado; el objetivo vuelve a ser reconocer a la misma persona entre cámaras por su rostro
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras la prueba de punta a punta del modo por cámara
+  numbers_from: "Sin mediciones nuevas; los números están en D001 y D005"
+  facts: []
+  sections:
+    - section: Decisión
+      items:
+        - item: Qué se descarta
+          text: "El modo de identificación por cámara (Rostros o Elevada / multitud) y el modo de pistas como alternativa para cámaras elevadas o con multitudes. D005 y D006 quedan como registro del experimento, sin efecto. El código se construyó y se probó de punta a punta en las ramas feat/modo-por-camara, que se conservan sin fusionar."
+        - item: Motivo
+          text: "El objetivo del proyecto es reconocer rostros y seguir a la misma persona entre cámaras por su embedding facial. El modo de pistas guarda el mejor recorte de cada pista sin identificar a la persona por su rostro, y en cámaras elevadas los rostros son demasiado pequeños (16 px de mediana en MOT20-01). Procesar esos videos con otro método da datos que no sirven para ese objetivo."
+        - item: Videos de baja calidad
+          text: "Un video que no cumpla los requisitos mínimos del modo rostros se rechazará con un aviso al usuario en lugar de procesarse. Los requisitos y el aviso están por diseñar."
+    - section: Siguiente paso
+      items:
+        - item: Reconocimiento entre cámaras
+          text: "D001 descartó el reconocimiento entre videos porque las grabaciones residenciales (960x480, rostros de unos 21 px de mediana) daban resultados al azar, no porque el objetivo dejara de importar. Con los videos de ChokePoint, donde los rostros son más grandes y el modo rostros ya da buenos resultados, se retoma ese objetivo: encontrar a la misma persona en varias cámaras."
