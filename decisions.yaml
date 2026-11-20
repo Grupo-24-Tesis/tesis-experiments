@@ -154,3 +154,59 @@
       items:
         - item: Qué no resuelve
           text: "Los rostros que no se pueden identificar pero miden más de 12 px siguen apareciendo (en el otro día de la cámara 6 quedan {od_12.e2e.tracks_false_outputs} salidas no útiles)."
+- id: D005
+  date: "2026-11-20"
+  title: Las cámaras elevadas o con multitudes usan el modo de pistas por elección manual en cada cámara
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras revisar el experimento de cámaras elevadas
+  numbers_from: "Banco bench/modo_elevado.py, bench/mot.py y bench/pistas.py sobre MOT20, MOT17, ChokePoint y las cámaras residenciales (fuera del registro del banco)"
+  facts: []
+  sections:
+    - section: Decisión
+      items:
+        - item: Qué se decide
+          text: "Cada cámara tiene un modo de identificación de dos valores: Rostros (por defecto, el pipeline de identidad por rostro) y Elevada / multitud (modo de pistas). El usuario elige el modo de cada cámara; no hay regla automática."
+        - item: Motivo
+          text: "El modo de pistas ajustado gana en las cámaras elevadas y en las multitudes, pero pierde en la mayoría de los videos de ChokePoint y en Camera3, y la mejor regla automática no está comprobada en los videos donde decidiría."
+    - section: Por qué (medido)
+      items:
+        - item: Problema
+          text: "En MOT20-01 (cámara elevada sobre una multitud, 74 personas etiquetadas) el modo rostros guardó 4 identidades: los rostros miden 16 px de mediana y el umbral de detección descarta el 73 % de las 1685 detecciones."
+        - item: Ajuste del seguimiento
+          text: "12 combinaciones de YOLO_IMGSZ, DETECT_INTERVAL_S y min_track_len en MOT20-01 y 02. Con 640 px YOLO encuentra el 51 % de las personas y con 1280 px el 94 %. Correctos en el conjunto de ajuste: modo rostros 2, i1280_d0p1_m3 139 (1573 s), i1280_d0p2_m3 137 (1160 s), i640_d0p1_m2 97. Se eligió i1280_d0p2_m3: empata en correctos con un 26 % menos de tiempo."
+        - item: Confirmación en MOT
+          text: "Con i1280_d0p2_m3 (correctos de rostros frente a pistas): MOT20-01 2/16, 02 0/121, 03 0/0, 05 0/1; MOT17-02 0/7, 04 1/32, 05 6/25, 09 11/13, 10 1/13, 11 19/22, 13 3/12. Pistas gana en todos menos MOT20-03, que empata en 0."
+        - item: Confirmación en ChokePoint y cámaras residenciales
+          text: "Rostros gana en los videos de entrada (P1E 21/7, 23/3, 23/3, 23/9; P2E_S1_C1.1 7/0, P2E_S2_C2.1 22/9) y en la mayoría de los de salida del portal 1 (P1L_S1_C2 23/19, P1L_S2_C3 25/11, P1L_S4_C2 23/19). Pistas gana en P1L_S3_C1 (20/25) y en la salida del portal 2 (P2L_S1_C3.1 10/25, P2L_S2_C2.2 2/4, P2L_S3_C1.1 16/25, P2L_S4_C3.2 1/4). Camera3 4/-8 y Camera_ch6 2/2."
+        - item: Tiempo
+          text: "En la muestra, rostros tarda 2.1 veces la duración del video y pistas 2.6 veces. En las multitudes de MOT, pistas tarda de 6 a 10 veces la duración, frente a 3 a 4 de rostros."
+        - item: Regla automática
+          text: "La mejor regla encontrada (altura mediana de persona mayor que 126 px y rostro mediano menor que 44 px, entonces pistas) pierde 9 correctos, todos en MOT17-13; elegir siempre rostros pierde 253 y siempre pistas 122. Aplicada a los 78 videos de ChokePoint manda 51 a pistas, y 45 de ellos no se midieron en ese modo."
+    - section: Límites
+      items:
+        - item: Qué queda pendiente
+          text: "Un modo Automático necesita medir el modo de pistas en los 78 videos de ChokePoint (unas 5 a 6 horas de GPU). Hasta entonces la elección es manual y un mal ajuste de la cámara produce los resultados del modo equivocado."
+- id: D006
+  date: "2026-11-20"
+  title: Los valores ajustados del seguimiento pasan a ser los valores por defecto del modo de pistas, sin compuerta de presencia
+  status: decidido
+  decided_by: Equipo del proyecto (tesis), tras el experimento de cámaras elevadas (D005)
+  numbers_from: "Banco bench/modo_elevado.py (fuera del registro del banco)"
+  facts: []
+  sections:
+    - section: Decisión
+      items:
+        - item: Nuevos valores
+          text: "En tracking.py, YOLO_IMGSZ pasa de 640 a 1280 y DETECT_INTERVAL_S de 0.5 a 0.2; min_track_len sigue en 3 en custom_tracktrack.yaml. El resto del pipeline no cambia y el modo rostros conserva todos sus valores."
+        - item: Uso
+          text: "El modo de pistas atiende solo a las cámaras con el modo Elevada / multitud. La compuerta de presencia se usa solo en el modo rostros."
+    - section: Por qué (medido)
+      items:
+        - item: Resultado en MOT20-01
+          text: "Con estos valores, MOT20-01 da 60 pistas y 38 rostros en 229 s; el modo rostros guardó 4 identidades en ese video."
+    - section: Límites
+      items:
+        - item: Reproducibilidad
+          text: "Las suites anteriores que dependían de los valores por defecto antiguos (640 px y 0.5 s) dan resultados distintos si se vuelven a correr; para reproducirlas hay que fijar esos valores en su configuración."
+        - item: Compuerta
+          text: "La compuerta de presencia queda fuera del modo de pistas por ahora; no se midió en ese modo."
