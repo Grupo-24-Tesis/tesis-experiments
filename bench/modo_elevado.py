@@ -206,13 +206,13 @@ def command_seguimiento(args):
         stem = video_stem(video)
         directory = run_dir(out, name, video)
         prefix = f"[{number}/{len(plan)}] {name} {stem}"
-        if stage1_done(directory):
+        if not stage1_problems(directory):
             print(f"{prefix}: seguimiento ya hecho, se omite", flush=True)
             continue
         prepare_stage1(directory, build_config(video, imgsz, interval, min_track, tracker))
         code, seconds = run_command(stage1_command(directory), os.path.join(directory, "stage1"))
         record_stage_code(directory, STAGE1_KEY, code)
-        if code != 0 or not stage1_done(directory):
+        if code != 0 or stage1_problems(directory):
             failures += 1
             stage_failure(prefix, "el seguimiento", code,
                           os.path.join(directory, "stage1.stderr.log"))
@@ -250,13 +250,19 @@ def command_rostros(args):
             print(f"{prefix}: falta el seguimiento de este ajuste, corra antes seguimiento",
                   flush=True)
             continue
-        if stage2_done(directory):
+        problems = stage1_problems(directory)
+        if problems:
+            failures += 1
+            print(f"{prefix}: el seguimiento de este ajuste no terminó bien "
+                  f"({'; '.join(problems)}), corra antes seguimiento", flush=True)
+            continue
+        if not stage2_problems(directory):
             print(f"{prefix}: rostros ya hecho, se omite", flush=True)
             continue
         prepare_stage2(directory)
         code, seconds = run_command(stage2_command(directory), os.path.join(directory, "stage2"))
         record_stage_code(directory, STAGE2_KEY, code)
-        if code != 0 or not stage2_done(directory):
+        if code != 0 or stage2_problems(directory):
             failures += 1
             stage_failure(prefix, "rostros", code, os.path.join(directory, "stage2.stderr.log"))
             continue

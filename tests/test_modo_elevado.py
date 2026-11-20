@@ -100,6 +100,7 @@ def stage2_effect(cmd):
     out = cmd[cmd.index("--out") + 1]
     os.makedirs(out, exist_ok=True)
     runlog.write_json(os.path.join(out, "results.json"), {"tracks_checked": 2, "faces": []})
+    runlog.write_json(os.path.join(out, "stage2_summary.json"), {"n_faces": 0})
 
 
 def args(**values):
@@ -163,6 +164,82 @@ def test_rostros_needs_stage1_and_is_resumable(tmp_path, monkeypatch, fake_env):
     assert fake.calls == []
     with pytest.raises(SystemExit, match="--ajuste"):
         modo_elevado.command_rostros(args(out=str(out), ajuste="otro", videos=["v/x.mp4"]))
+
+
+def write_stage_codes(directory, **codes):
+    runlog.write_json(os.path.join(directory, "etapas.json"), codes)
+
+
+def write_stage2_outputs(directory, summary=True):
+    faces = os.path.join(directory, "faces")
+    os.makedirs(faces, exist_ok=True)
+    runlog.write_json(os.path.join(faces, "results.json"), {"tracks_checked": 9, "faces": []})
+    if summary:
+        runlog.write_json(os.path.join(faces, "stage2_summary.json"), {"n_faces": 0})
+
+
+def test_seguimiento_reruns_stage1_that_exited_with_error(tmp_path, monkeypatch, fake_env, capsys):
+    out = tmp_path / "corridas"
+    directory = str(out / "i640_d0p5_m3" / "x")
+    write_stage1_outputs(directory)
+    write_stage_codes(directory, stage1=1)
+    fake = FakeRun(stage1_effect)
+    monkeypatch.setattr(subprocess, "run", fake)
+    code = modo_elevado.command_seguimiento(args(out=str(out), imgsz="640", intervalo="0.5",
+                                                 min_track="3", videos=["v/x.mp4"]))
+    assert code == 0
+    assert len(fake.calls) == 1
+    assert "ya hecho" not in capsys.readouterr().out
+    assert runlog.read_json(os.path.join(directory, "etapas.json")) == {"stage1": 0}
+    assert "seguimiento_s" in runlog.read_json(str(out / "tiempos.json"))["i640_d0p5_m3"]["x"]
+
+
+def test_seguimiento_skips_clean_stage1(tmp_path, monkeypatch, fake_env, capsys):
+    out = tmp_path / "corridas"
+    directory = str(out / "i640_d0p5_m3" / "x")
+    write_stage1_outputs(directory)
+    write_stage_codes(directory, stage1=0)
+    fake = FakeRun(stage1_effect)
+    monkeypatch.setattr(subprocess, "run", fake)
+    code = modo_elevado.command_seguimiento(args(out=str(out), imgsz="640", intervalo="0.5",
+                                                 min_track="3", videos=["v/x.mp4"]))
+    assert code == 0
+    assert fake.calls == []
+    assert "seguimiento ya hecho, se omite" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("stage2_code, summary", [(1, True), (0, False)])
+def test_rostros_reruns_stage2_that_did_not_finish(tmp_path, monkeypatch, fake_env, capsys,
+                                                   stage2_code, summary):
+    out = tmp_path / "corridas"
+    directory = str(out / "i640_d0p5_m3" / "x")
+    write_stage1_outputs(directory)
+    write_stage2_outputs(directory, summary=summary)
+    write_stage_codes(directory, stage1=0, stage2=stage2_code)
+    fake = FakeRun(stage2_effect)
+    monkeypatch.setattr(subprocess, "run", fake)
+    code = modo_elevado.command_rostros(args(out=str(out), ajuste="i640_d0p5_m3",
+                                             videos=["v/x.mp4"]))
+    assert code == 0
+    assert len(fake.calls) == 1
+    assert "ya hecho" not in capsys.readouterr().out
+    assert runlog.read_json(os.path.join(directory, "etapas.json")) == {"stage1": 0, "stage2": 0}
+    assert runlog.read_json(os.path.join(directory, "faces", "results.json"))["tracks_checked"] == 2
+
+
+def test_rostros_does_not_run_on_failed_stage1(tmp_path, monkeypatch, fake_env, capsys):
+    out = tmp_path / "corridas"
+    directory = str(out / "i640_d0p5_m3" / "x")
+    write_stage1_outputs(directory)
+    write_stage_codes(directory, stage1=1)
+    fake = FakeRun(stage2_effect)
+    monkeypatch.setattr(subprocess, "run", fake)
+    code = modo_elevado.command_rostros(args(out=str(out), ajuste="i640_d0p5_m3",
+                                             videos=["v/x.mp4"]))
+    assert code == 1
+    assert fake.calls == []
+    assert "terminó con código 1" in capsys.readouterr().out
+    assert not os.path.exists(os.path.join(directory, "faces"))
 
 
 def capture(monkeypatch):
