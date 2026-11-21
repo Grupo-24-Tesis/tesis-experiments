@@ -450,3 +450,145 @@ def test_worker_imports_no_framework():
     out = subprocess.run([sys.executable, "-c", code], cwd=PIPELINE_DIR, capture_output=True,
                          text=True, check=True)
     assert out.stdout.strip() == "[]"
+
+
+def embedding_text(seed):
+    import base64
+    import numpy as np
+    rng = np.random.default_rng(seed)
+    vec = rng.normal(size=512).astype("<f4")
+    vec = vec / np.linalg.norm(vec)
+    return base64.b64encode(vec.tobytes()).decode()
+
+
+def write_embeddings(faces_dir, track_ids):
+    os.makedirs(faces_dir, exist_ok=True)
+    with open(os.path.join(faces_dir, "embeddings.json"), "w") as f:
+        json.dump({"model": "GhostFaceNet", "dimensions": 512,
+                   "embeddings": {t: embedding_text(int(t)) for t in track_ids}}, f)
+
+
+@pytest.fixture
+def embedding_pipeline(monkeypatch):
+    def run_pipeline(video_path, job_dir):
+        faces_dir = os.path.join(job_dir, "faces")
+        write_embeddings(faces_dir, ["4"])
+        return faces_dir, FACES
+
+    monkeypatch.setattr(worker, "run_pipeline", run_pipeline)
+
+
+def fake_appearances(count):
+    return [{"faceId": f"job-1_{i}", "timestamp": "00:00:01", "frameUrl": "https://x/" + str(i),
+             "capturedAt": "2026-10-16T10:05:21-05:00", "embedding": "A" * 2732}
+            for i in range(count)]
+
+
+def test_completed_carries_embeddings(embedding_pipeline):
+    sqs = FakeSqs()
+
+    worker.handle_message(sqs, FakeS3(), job_message())
+
+    body = sqs.sent[1][1]
+    assert body["embeddingModel"] == "GhostFaceNet"
+    assert body["embeddingDimensions"] == 512
+    assert body["part"] == 1 and body["parts"] == 1
+    assert body["appearances"][0]["embedding"] == embedding_text(4)
+
+
+def test_split_parts_respects_limit():
+    appearances = fake_appearances(300)
+
+    parts = worker.split_parts(appearances, 400)
+
+    assert len(parts) > 1
+    assert [a for part in parts for a in part] == appearances
+    for part in parts:
+        body = json.dumps({"appearances": part})
+        assert 400 + len(body.encode()) < worker.PART_BYTES
+
+
+def test_parts_share_attempt_and_total():
+    sqs = FakeSqs()
+
+    worker.send_completed(sqs, "job-1", "intento-1", fake_appearances(300),
+                          "GhostFaceNet", 512)
+
+    bodies = [body for _, body in sqs.sent]
+    assert len(bodies) > 1
+    assert [b["part"] for b in bodies] == list(range(1, len(bodies) + 1))
+    assert {b["parts"] for b in bodies} == {len(bodies)}
+    assert {b["attemptId"] for b in bodies} == {"intento-1"}
+    assert {b["embeddingModel"] for b in bodies} == {"GhostFaceNet"}
+    assert sum(len(b["appearances"]) for b in bodies) == 300
+
+
+def test_resend_reuses_attempt_id(embedding_pipeline):
+    failing = FakeSqs(fail_send=True)
+    worker.handle_message(failing, FakeS3(), job_message())
+    job_dir = os.path.join(worker.JOBS_DIR, "job-1")
+    with open(os.path.join(job_dir, worker.PAYLOAD_NAME)) as f:
+        saved = json.load(f)
+    assert saved["embeddingModel"] == "GhostFaceNet"
+    assert saved["embeddingDimensions"] == 512
+    assert saved["appearances"][0]["faceId"] == "job-1_4"
+
+    sqs = FakeSqs()
+    worker.handle_message(sqs, FakeS3(), job_message(receive_count=2))
+
+    completed = sqs.sent[1][1]
+    assert completed["attemptId"] == saved["attemptId"]
+    assert completed["appearances"][0]["embedding"] == embedding_text(4)
+
+
+def test_legacy_payload_list_still_resent(pipeline):
+    job_dir = os.path.join(worker.JOBS_DIR, "job-1")
+    os.makedirs(job_dir)
+    legacy = [{"faceId": "job-1_4", "timestamp": "00:01:23",
+               "frameUrl": "https://cubo.s3.us-east-2.amazonaws.com/faces/job-1/4.jpg",
+               "capturedAt": "2026-10-16T10:05:21-05:00"}]
+    with open(os.path.join(job_dir, worker.PAYLOAD_NAME), "w") as f:
+        json.dump(legacy, f)
+    sqs = FakeSqs()
+
+    worker.handle_message(sqs, FakeS3(), job_message(receive_count=2))
+
+    body = sqs.sent[1][1]
+    assert body["appearances"] == legacy
+    assert body["attemptId"]
+    assert body["part"] == 1 and body["parts"] == 1
+    assert "embeddingModel" not in body
+    assert pipeline == []
+
+
+def test_earlier_dict_payload_still_resent(pipeline):
+    job_dir = os.path.join(worker.JOBS_DIR, "job-1")
+    os.makedirs(job_dir)
+    with open(os.path.join(job_dir, worker.PAYLOAD_NAME), "w") as f:
+        json.dump({"appearances": [{"faceId": "job-1_4"}]}, f)
+    sqs = FakeSqs()
+
+    worker.handle_message(sqs, FakeS3(), job_message(receive_count=2))
+
+    body = sqs.sent[1][1]
+    assert body["appearances"] == [{"faceId": "job-1_4"}]
+    assert body["attemptId"]
+
+
+def test_tracks_mode_sends_no_embeddings(pipeline):
+    sqs = FakeSqs()
+
+    worker.handle_message(sqs, FakeS3(), job_message())
+
+    body = sqs.sent[1][1]
+    assert "embeddingModel" not in body
+    assert "embeddingDimensions" not in body
+    assert "embedding" not in body["appearances"][0]
+    assert body["attemptId"]
+
+
+def test_oversized_appearance_fails_in_spanish():
+    huge = [{"faceId": "job-1_1", "embedding": "A" * worker.PART_BYTES}]
+
+    with pytest.raises(worker.JobError, match="no cabe"):
+        worker.split_parts(huge, 400)
