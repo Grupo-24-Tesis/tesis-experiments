@@ -592,3 +592,37 @@ def test_oversized_appearance_fails_in_spanish():
 
     with pytest.raises(worker.JobError, match="no cabe"):
         worker.split_parts(huge, 400)
+
+
+def part_bytes_at_start(value):
+    env = {k: v for k, v in os.environ.items() if k != "RESULT_PART_BYTES"}
+    if value is not None:
+        env["RESULT_PART_BYTES"] = value
+    return subprocess.run([sys.executable, "-c", "import worker; print(worker.PART_BYTES)"],
+                          cwd=PIPELINE_DIR, env=env, capture_output=True, text=True)
+
+
+def test_result_part_bytes_default():
+    assert part_bytes_at_start(None).stdout.strip() == "245760"
+    assert part_bytes_at_start("").stdout.strip() == "245760"
+    assert part_bytes_at_start("245760").stdout.strip() == "245760"
+
+
+def test_result_part_bytes_small_value_splits_more(monkeypatch):
+    assert part_bytes_at_start("50000").stdout.strip() == "50000"
+    default_parts = worker.split_parts(fake_appearances(300), 400)
+
+    monkeypatch.setattr(worker, "PART_BYTES", 50000)
+    small_parts = worker.split_parts(fake_appearances(300), 400)
+
+    assert len(small_parts) > len(default_parts)
+    for part in small_parts:
+        assert 400 + len(json.dumps({"appearances": part}).encode()) < 50000
+
+
+@pytest.mark.parametrize("value", ["abc", "0", "-5", "245761", "1.5"])
+def test_result_part_bytes_invalid_refuses_start(value):
+    result = part_bytes_at_start(value)
+
+    assert result.returncode != 0
+    assert "RESULT_PART_BYTES debe ser un entero entre 1 y 245760" in result.stderr
