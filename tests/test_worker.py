@@ -268,8 +268,7 @@ def stages(monkeypatch):
     return calls
 
 
-def test_faces_mode_without_gating_runs_only_face_identities(monkeypatch, tmp_path, stages):
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+def test_pipeline_without_gate_runs_only_face_identities(monkeypatch, tmp_path, stages):
     monkeypatch.setattr(worker, "FACE_GATING", False)
     job_dir = str(tmp_path / "job-1")
 
@@ -281,8 +280,7 @@ def test_faces_mode_without_gating_runs_only_face_identities(monkeypatch, tmp_pa
     assert faces == FACES
 
 
-def test_faces_mode_with_gating_runs_the_gate_before_the_face_pass(monkeypatch, tmp_path, stages):
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
+def test_pipeline_always_runs_gate_and_face_identities(monkeypatch, tmp_path, stages):
     monkeypatch.setattr(worker, "FACE_GATING", True)
     job_dir = str(tmp_path / "job-1")
     presence = os.path.join(job_dir, "presence.json")
@@ -297,6 +295,7 @@ def test_faces_mode_with_gating_runs_the_gate_before_the_face_pass(monkeypatch, 
           "--presence", presence]),
     ]
     assert faces == FACES
+    assert not {"tracking.py", "face_recognition.py"} & {script for _, script, _ in stages}
 
 
 def test_a_failing_gate_stops_the_job_before_the_face_pass(monkeypatch, tmp_path):
@@ -306,7 +305,6 @@ def test_a_failing_gate_stops_the_job_before_the_face_pass(monkeypatch, tmp_path
         calls.append(script)
         raise worker.StageError(f"{script} terminó con código 1")
 
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "faces")
     monkeypatch.setattr(worker, "FACE_GATING", True)
     monkeypatch.setattr(worker, "run_stage", run_stage)
 
@@ -315,75 +313,15 @@ def test_a_failing_gate_stops_the_job_before_the_face_pass(monkeypatch, tmp_path
     assert calls == ["presence_gate.py"]
 
 
-def test_tracks_mode_ignores_the_gating_flag(monkeypatch, tmp_path, stages):
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "tracks")
-    monkeypatch.setattr(worker, "FACE_GATING", True)
-
-    worker.run_pipeline("/videos/v.mp4", str(tmp_path / "job-1"))
-
-    assert [script for _, script, _ in stages] == ["tracking.py", "face_recognition.py"]
-
-
-def test_tracks_mode_runs_the_two_stages(monkeypatch, tmp_path, stages):
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "tracks")
-    job_dir = str(tmp_path / "job-1")
-    candidates_dir = os.path.join(job_dir, "candidates")
-    faces_dir = os.path.join(job_dir, "faces")
-
-    result = worker.run_pipeline("/videos/v.mp4", job_dir)
-
-    assert stages == [
-        (worker.TRACK_PYTHON, "tracking.py",
-         ["--video", "/videos/v.mp4", "--candidates-dir", candidates_dir]),
-        (worker.FACES_PYTHON, "face_recognition.py",
-         ["--candidates-dir", candidates_dir, "--faces-dir", faces_dir]),
-    ]
-    assert result == (faces_dir, FACES)
-
-
-def mode_at_start(value):
-    env = {k: v for k, v in os.environ.items() if k != "PIPELINE_MODE"}
-    if value is not None:
-        env["PIPELINE_MODE"] = value
-    out = subprocess.run([sys.executable, "-c", "import worker; print(worker.PIPELINE_MODE)"],
-                         cwd=PIPELINE_DIR, env=env, capture_output=True, text=True, check=True)
-    return out.stdout.strip()
-
-
-def test_faces_is_the_default_mode():
-    assert mode_at_start(None) == "faces"
-
-
-def test_empty_mode_falls_back_to_faces():
-    assert mode_at_start("") == "faces"
-
-
-def test_mode_is_read_from_the_environment():
-    assert mode_at_start("tracks") == "tracks"
-
-
-def test_unknown_mode_stops_the_worker_before_any_work(monkeypatch, stages):
-    monkeypatch.setattr(worker, "PIPELINE_MODE", "personas")
-
-    with pytest.raises(SystemExit, match="PIPELINE_MODE desconocido 'personas'"):
-        worker.run_local("/videos/v.mp4", "job-1")
-    with pytest.raises(SystemExit, match="PIPELINE_MODE desconocido 'personas'"):
-        worker.poll_forever()
-    assert stages == []
-    assert not os.path.exists(os.path.join(worker.JOBS_DIR, "job-1"))
-
-
-def gating_at_start(value, adaptive=None, mode=None, extra=None):
+def gating_at_start(value, adaptive=None, extra=None):
     env = {k: v for k, v in os.environ.items()
-           if k not in ("FACE_GATING", "FACE_ADAPTIVE", "PIPELINE_MODE")
+           if k not in ("FACE_GATING", "FACE_ADAPTIVE")
            and not k.startswith("GATE_")}
     env.update(extra or {})
     if value is not None:
         env["FACE_GATING"] = value
     if adaptive is not None:
         env["FACE_ADAPTIVE"] = adaptive
-    if mode is not None:
-        env["PIPELINE_MODE"] = mode
     return subprocess.run([sys.executable, "-c", "import worker; print(worker.FACE_GATING)"],
                           cwd=PIPELINE_DIR, env=env, capture_output=True, text=True)
 
@@ -412,9 +350,24 @@ def test_adaptive_sampling_with_gating_stops_the_worker_at_start():
     assert "FACE_ADAPTIVE=1" in result.stderr and "FACE_GATING" in result.stderr
 
 
-def test_adaptive_sampling_is_fine_without_gating_or_in_tracks_mode():
+def test_adaptive_with_gate_refuses_start():
+    for gating in (None, "1"):
+        result = gating_at_start(gating, adaptive="1")
+        assert result.returncode != 0
+        assert "FACE_ADAPTIVE=1" in result.stderr
+
+
+def test_pipeline_mode_variable_is_ignored():
+    env = dict(os.environ, PIPELINE_MODE="tracks")
+    out = subprocess.run([sys.executable, "-c",
+                          "import worker; print(hasattr(worker, 'PIPELINE_MODE'))"],
+                         cwd=PIPELINE_DIR, env=env, capture_output=True, text=True)
+    assert out.returncode == 0
+    assert out.stdout.strip() == "False"
+
+
+def test_adaptive_sampling_is_fine_without_gating():
     assert gating_at_start("0", adaptive="1").stdout.strip() == "False"
-    assert gating_at_start("1", adaptive="1", mode="tracks").returncode == 0
     assert gating_at_start("1", adaptive="0").stdout.strip() == "True"
 
 
@@ -435,7 +388,6 @@ def test_invalid_gate_setting_stops_the_worker_at_start(name, value, message):
 
 def test_gate_settings_are_not_checked_when_the_gate_does_not_run():
     assert gating_at_start("0", extra={"GATE_CONF": "1.5"}).stdout.strip() == "False"
-    assert gating_at_start("1", mode="tracks", extra={"GATE_CONF": "1.5"}).returncode == 0
 
 
 def test_valid_gate_settings_let_the_worker_start():
@@ -575,7 +527,8 @@ def test_earlier_dict_payload_still_resent(pipeline):
     assert body["attemptId"]
 
 
-def test_tracks_mode_sends_no_embeddings(pipeline):
+def test_missing_embeddings_file_sends_no_embeddings(monkeypatch, stages):
+    monkeypatch.setattr(worker, "FACE_GATING", False)
     sqs = FakeSqs()
 
     worker.handle_message(sqs, FakeS3(), job_message())

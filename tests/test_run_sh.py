@@ -34,7 +34,7 @@ def repo(tmp_path):
 def run_script(repo, *args, **env_overrides):
     log = repo / "calls.log"
     env = {k: v for k, v in os.environ.items()
-           if k not in ("FACE_GATING", "FACE_ADAPTIVE", "PIPELINE_MODE")}
+           if k not in ("FACE_GATING", "FACE_ADAPTIVE")}
     env.update(env_overrides)
     env["RUN_LOG"] = str(log)
     video = str(repo.parent / "v.mp4")
@@ -91,3 +91,11 @@ def test_adaptive_sampling_without_gating_runs_the_face_pass(repo):
 
     assert result.returncode == 0
     assert len(calls) == 1
+
+
+def test_run_sh_ignores_pipeline_mode(repo):
+    result, calls = run_script(repo, PIPELINE_MODE="tracks")
+
+    assert result.returncode == 0
+    assert [call.split()[:2] for call in calls] == [["track", "presence_gate.py"],
+                                                    ["faces", "face_identities.py"]]
