@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 
 from bench import metrics
 
-DEFAULT_PIPELINE_DIR = "/data/TesisFaceRecognition/wt/tesis_face_recognition_pipeline"
+DEFAULT_PIPELINE_DIR = "/data/TesisFaceRecognition/tesis_face_recognition_pipeline"
 DEFAULT_CHOKEPOINT_DIR = "/data/TesisFaceRecognition/chokepoint"
 FPS = 30
 WIDTH = 800

@@ -308,3 +308,13 @@ def test_max_missing_option_is_parsed():
     parser = bench_compuerta.build_parser()
     assert parser.parse_args(["compare", "a.json", "b.json"]).max_missing == 0
     assert parser.parse_args(["compare", "a.json", "b.json", "--max-missing", "3"]).max_missing == 3
+
+
+def test_command_run_passes_absolute_label_dir(tmp_path, monkeypatch):
+    seen = []
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(bench_compuerta, "run_video",
+                        lambda video, label_dir, env, extra, gated: seen.append(label_dir) or {})
+    args = bench_compuerta.build_parser().parse_args(["run", "--label", "x", "--out", "rel", "v.mp4"])
+    assert bench_compuerta.command_run(args) == 0
+    assert seen == [str(tmp_path / "rel" / "x")]

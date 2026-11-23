@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(
 from bench import metrics
 
 EXPERIMENTS_DIR = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-DEFAULT_PIPELINE_DIR = "/data/TesisFaceRecognition/wt/tesis_face_recognition_pipeline"
+DEFAULT_PIPELINE_DIR = "/data/TesisFaceRecognition/tesis_face_recognition_pipeline"
 DEFAULT_CHOKEPOINT_DIR = "/data/TesisFaceRecognition/chokepoint"
 RESULTS_NAME = "results.json"
 DETECTIONS_NAME = "detections.json"
@@ -234,7 +234,7 @@ def describe(name, entry):
 
 
 def command_run(args):
-    label_dir = os.path.join(args.out, args.label)
+    label_dir = os.path.join(os.path.abspath(args.out), args.label)
     os.makedirs(label_dir, exist_ok=True)
     env_overrides = parse_env(args.env)
     videos = {}
